@@ -57,10 +57,10 @@ defmodule SimpleCharts.Line do
       {:ok, svg_string}
 
   """
-  @spec to_svg(datapoints :: datapoints()) :: {:ok, String.t()} | {:error, atom()}
+  @spec to_svg(datapoints()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
   def to_svg(datapoints), do: to_svg(datapoints, [])
 
-  @spec to_svg(datapoints :: datapoints(), options()) :: {:ok, String.t()} | {:error, atom()}
+  @spec to_svg(datapoints(), options()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
   def to_svg([], _options), do: {:error, :empty_datapoints}
 
   def to_svg(datapoints, options) do
@@ -92,10 +92,10 @@ defmodule SimpleCharts.Line do
       svg_string
 
   """
-  @spec to_svg!(datapoints :: datapoints()) :: String.t()
+  @spec to_svg!(datapoints()) :: SimpleCharts.svg()
   def to_svg!(datapoints), do: to_svg!(datapoints, [])
 
-  @spec to_svg!(datapoints :: datapoints(), options()) :: String.t()
+  @spec to_svg!(datapoints(), options()) :: SimpleCharts.svg()
   def to_svg!([], _options), do: raise(SimpleCharts.Line, "empty_datapoints")
 
   def to_svg!(datapoints, options) do
@@ -172,7 +172,7 @@ defmodule SimpleCharts.Line do
     end)
   end
 
-  @spec draw_chart(points(), options()) :: String.t()
+  @spec draw_chart(points(), options()) :: SimpleCharts.svg()
   defp draw_chart(datapoints, options) do
     chart =
       """

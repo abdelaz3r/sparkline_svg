@@ -3,9 +3,22 @@ defmodule SimpleCharts do
   General documentation for `SimpleCharts`.
   """
 
-  # Some general function here:
-  # - svg to encoded as base64
-  # - svg to file (maybe)
+  @typedoc "Svg string."
+  @type svg :: String.t()
 
-  # Some utils function here
+  @doc """
+  Convert a svg string into a base64 string to be used as a background-image.
+
+  Notice: check for color encoding.
+
+  ## Examples
+
+      iex> SimpleCharts.as_background_image(svg_string)
+      "data:image/svg+xml,%3Csvg..."
+
+  """
+  @spec as_background_image(svg()) :: String.t()
+  def as_background_image(svg) when is_binary(svg) do
+    ["data:image/svg+xml", Base.encode64(svg)] |> Enum.join(",")
+  end
 end
