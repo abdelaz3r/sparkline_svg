@@ -4,7 +4,7 @@ defmodule SimpleCharts.Line do
   """
 
   @typedoc "Data point."
-  @type datapoint :: {DateTime.t() | Time.t() | integer(), number()}
+  @type datapoint :: {DateTime.t() | Date.t() | Time.t() | integer(), number()}
 
   @typedoc "Data points."
   @type datapoints :: list(datapoint())
@@ -122,24 +122,28 @@ defmodule SimpleCharts.Line do
   defp normalize_x(datapoints) do
     datapoints =
       Enum.map(datapoints, fn
-        {%DateTime{} = x, y} ->
-          {DateTime.to_unix(x), y}
+        {%DateTime{} = datetime, y} ->
+          {DateTime.to_unix(datetime), y}
 
-        {%Time{} = x, y} ->
-          {seconds, _milliseconds} = Time.to_seconds_after_midnight(x)
+        {%Date{} = date, y} ->
+          date = Date.to_string(date)
+          {:ok, datetime, _} = DateTime.from_iso8601(date <> "T00:00:00Z")
+          {DateTime.to_unix(datetime), y}
+
+        {%Time{} = time, y} ->
+          {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
           {seconds, y}
 
         {x, y} when is_integer(x) or is_float(x) ->
           {x, y}
 
         _ ->
-          {:error, :invalid_datapoint}
+          {:error, :invalid_datapoints}
       end)
 
-    case Enum.any?(datapoints, fn {x, _y} -> x == :error end) do
-      true -> {:error, :invalid_datapoints}
-      false -> {:ok, datapoints}
-    end
+    if Enum.any?(datapoints, fn {x, _y} -> x == :error end),
+      do: {:error, :invalid_datapoints},
+      else: {:ok, datapoints}
   end
 
   @spec compute_min_max(datapoints()) :: {:ok, min_max(), min_max()} | {:error, atom()}

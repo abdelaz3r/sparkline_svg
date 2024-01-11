@@ -57,6 +57,15 @@ defmodule SimpleChartsLineTest do
     assert Line.to_svg(data) == {:ok, context.line_chart}
   end
 
+  test "date-based datapoints", context do
+    data = [
+      {Date.utc_today(), 1},
+      {Date.utc_today() |> Date.add(1), 2}
+    ]
+
+    assert Line.to_svg(data) == {:ok, context.line_chart}
+  end
+
   test "datetime-based datapoints", context do
     data = [
       {DateTime.utc_now(), 1},
