@@ -11,9 +11,9 @@ defmodule SimpleCharts.Line do
 
   @typedoc "Option."
   @type option ::
-          {:width, non_neg_integer()}
-          | {:height, non_neg_integer()}
-          | {:padding, non_neg_integer()}
+          {:width, number()}
+          | {:height, number()}
+          | {:padding, number()}
           | {:dots?, boolean()}
           | {:dot_radius, number()}
           | {:dot_color, String.t()}
@@ -107,12 +107,18 @@ defmodule SimpleCharts.Line do
 
   # Private functions
 
+  @typep point :: %{x: number(), y: number()}
+  @typep points :: list(point())
+  @typep min_max :: {number(), number()}
+
+  @spec check_dimension(number(), number()) :: {:ok} | {:error, atom()}
   defp check_dimension(length, padding) do
     if length - 2 * padding > 0,
       do: {:ok},
       else: {:error, :invalid_dimension}
   end
 
+  @spec normalize_x(datapoints()) :: {:ok, datapoints()} | {:error, atom()}
   defp normalize_x(datapoints) do
     datapoints =
       Enum.map(datapoints, fn
@@ -136,6 +142,7 @@ defmodule SimpleCharts.Line do
     end
   end
 
+  @spec compute_min_max(datapoints()) :: {:ok, min_max(), min_max()} | {:error, atom()}
   defp compute_min_max(datapoints) do
     {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
     {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
@@ -145,6 +152,7 @@ defmodule SimpleCharts.Line do
       else: {:error, :invalid_datapoints}
   end
 
+  @spec compute_datapoints(datapoints(), min_max(), min_max(), options()) :: points()
   defp compute_datapoints(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = Keyword.get(options, :width)
     height = Keyword.get(options, :height)
@@ -160,6 +168,7 @@ defmodule SimpleCharts.Line do
     end)
   end
 
+  @spec draw_chart(points(), options()) :: String.t()
   defp draw_chart(datapoints, options) do
     """
     <svg
@@ -174,6 +183,7 @@ defmodule SimpleCharts.Line do
     """
   end
 
+  @spec draw_dots(points(), options()) :: String.t()
   defp draw_dots(datapoints, options) do
     Enum.map_join(datapoints, "", fn %{x: x, y: y} ->
       """
@@ -186,6 +196,7 @@ defmodule SimpleCharts.Line do
     end)
   end
 
+  @spec draw_line(points(), options()) :: String.t()
   defp draw_line(datapoints, options) do
     """
     <path
@@ -196,6 +207,7 @@ defmodule SimpleCharts.Line do
     """
   end
 
+  @spec draw_area(points(), options()) :: String.t()
   defp draw_area(datapoints, options) do
     # Extract the x value of the first datapoint to know where to finish the area.
     [%{x: x, y: _y} | _] = datapoints
@@ -208,11 +220,13 @@ defmodule SimpleCharts.Line do
     """
   end
 
+  @spec compute_curve(points(), options()) :: String.t()
   defp compute_curve([%{x: x, y: y} = curr | points], options) do
     "M #{point_to_string({x, y})} "
     |> compute_curve(points, curr, curr, options)
   end
 
+  @spec compute_curve(String.t(), points(), point(), point(), options()) :: String.t()
   defp compute_curve(acc, [curr | [next | _] = points], prev2, prev1, options) do
     acc
     |> curve_command(prev2, prev1, curr, next, options)
@@ -223,6 +237,7 @@ defmodule SimpleCharts.Line do
     curve_command(acc, prev2, prev1, curr, curr, options)
   end
 
+  @spec curve_command(String.t(), point(), point(), point(), point(), options()) :: String.t()
   defp curve_command(acc, prev2, prev1, curr, next, options) do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
     cp2 = calculate_control_point(curr, prev1, next, :right, options)
@@ -230,6 +245,8 @@ defmodule SimpleCharts.Line do
     "#{acc} C #{point_to_string(cp1)} #{point_to_string(cp2)} #{point_to_string({curr.x, curr.y})}"
   end
 
+  @spec calculate_control_point(point(), point(), point(), atom(), options()) ::
+          {number(), number()}
   defp calculate_control_point(curr, prev, next, direction, options) do
     smoothing = Keyword.get(options, :line_smoothing)
 
@@ -244,6 +261,7 @@ defmodule SimpleCharts.Line do
     }
   end
 
+  @spec calculate_line(point(), point()) :: {number(), number()}
   defp calculate_line(%{x: x1, y: y1}, %{x: x2, y: y2}) do
     length_x = x2 - x1
     length_y = y2 - y1
@@ -256,14 +274,17 @@ defmodule SimpleCharts.Line do
 
   # Helper functions
 
+  @spec default_options(options()) :: options()
   defp default_options(options) do
     Keyword.merge(@default_options, options, fn _k, _default, value -> value end)
   end
 
+  @spec point_to_string({number(), number()}) :: String.t()
   defp point_to_string({x, y}) do
     "#{format_float(x)},#{format_float(y)}"
   end
 
+  @spec format_float(float()) :: float()
   defp format_float(float) when is_float(float) do
     Float.round(float, 3)
   end
