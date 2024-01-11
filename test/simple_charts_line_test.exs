@@ -5,10 +5,10 @@ defmodule SimpleChartsLineTest do
 
   setup do
     line_chart =
-      "<svg\n  width=\"auto\"\n  height=\"auto\"\n  viewBox=\"0 0 200 100\"\n  xmlns=\"http://www.w3.org/2000/svg\">\n  \n  <path\n  d=\"M 6.0,94.0  C 43.6,76.4 156.4,23.6 194.0,6.0\"\n  fill=\"none\"\n  stroke=\"white\"\n  stroke-width=\"0.25\" />\n\n  <circle\n  cx=\"6.0\"\n  cy=\"94.0\"\n  r=\"1\"\n  fill=\"white\" />\n<circle\n  cx=\"194.0\"\n  cy=\"6.0\"\n  r=\"1\"\n  fill=\"white\" />\n\n</svg>\n"
+      "<svg width=\"auto\" height=\"auto\" viewBox=\"0 0 200 100\" xmlns=\"http://www.w3.org/2000/svg\">  <path d=\"M 6.0,94.0 C 43.6,76.4 156.4,23.6 194.0,6.0\" fill=\"none\" stroke=\"white\" stroke-width=\"0.25\" />  <circle cx=\"6.0\" cy=\"94.0\" r=\"1\" fill=\"white\" /><circle cx=\"194.0\" cy=\"6.0\" r=\"1\" fill=\"white\" /></svg>"
 
     line_chart_config =
-      "<svg\n  width=\"auto\"\n  height=\"auto\"\n  viewBox=\"0 0 300 50\"\n  xmlns=\"http://www.w3.org/2000/svg\">\n  <path\n  d=\"M 6.0,44.0  C 63.6,36.4 236.4,13.6 294.0,6.0 V 50 H 6.0 Z\"\n  fill=\"black\"\n  stroke=\"none\" />\n\n  <path\n  d=\"M 6.0,44.0  C 63.6,36.4 236.4,13.6 294.0,6.0\"\n  fill=\"none\"\n  stroke=\"white\"\n  stroke-width=\"0.25\" />\n\n  \n</svg>\n"
+      "<svg width=\"auto\" height=\"auto\" viewBox=\"0 0 300 50\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M 6.0,44.0 C 63.6,36.4 236.4,13.6 294.0,6.0 V 50 H 6.0 Z\" fill=\"black\" stroke=\"none\" />  <path d=\"M 6.0,44.0 C 63.6,36.4 236.4,13.6 294.0,6.0\" fill=\"none\" stroke=\"white\" stroke-width=\"0.25\" />  </svg>"
 
     %{line_chart: line_chart, line_chart_config: line_chart_config}
   end

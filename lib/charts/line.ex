@@ -170,17 +170,20 @@ defmodule SimpleCharts.Line do
 
   @spec draw_chart(points(), options()) :: String.t()
   defp draw_chart(datapoints, options) do
-    """
-    <svg
-      width="auto"
-      height="auto"
-      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
-      xmlns="http://www.w3.org/2000/svg">
-      #{if(Keyword.get(options, :area?), do: draw_area(datapoints, options))}
-      #{if(Keyword.get(options, :line?), do: draw_line(datapoints, options))}
-      #{if(Keyword.get(options, :dots?), do: draw_dots(datapoints, options))}
-    </svg>
-    """
+    chart =
+      """
+      <svg
+        width="auto"
+        height="auto"
+        viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+        xmlns="http://www.w3.org/2000/svg">
+        #{if(Keyword.get(options, :area?), do: draw_area(datapoints, options))}
+        #{if(Keyword.get(options, :line?), do: draw_line(datapoints, options))}
+        #{if(Keyword.get(options, :dots?), do: draw_dots(datapoints, options))}
+      </svg>
+      """
+
+    Regex.replace(~r/\n\s?/, chart, "")
   end
 
   @spec draw_dots(points(), options()) :: String.t()
@@ -220,13 +223,13 @@ defmodule SimpleCharts.Line do
     """
   end
 
-  @spec compute_curve(points(), options()) :: String.t()
+  @spec compute_curve(points(), options()) :: iolist()
   defp compute_curve([%{x: x, y: y} = curr | points], options) do
-    "M #{point_to_string({x, y})} "
+    ["M #{tuple_to_string({x, y})} "]
     |> compute_curve(points, curr, curr, options)
   end
 
-  @spec compute_curve(String.t(), points(), point(), point(), options()) :: String.t()
+  @spec compute_curve(iolist(), points(), point(), point(), options()) :: iolist()
   defp compute_curve(acc, [curr | [next | _] = points], prev2, prev1, options) do
     acc
     |> curve_command(prev2, prev1, curr, next, options)
@@ -237,12 +240,15 @@ defmodule SimpleCharts.Line do
     curve_command(acc, prev2, prev1, curr, curr, options)
   end
 
-  @spec curve_command(String.t(), point(), point(), point(), point(), options()) :: String.t()
+  @spec curve_command(iolist(), point(), point(), point(), point(), options()) :: iolist()
   defp curve_command(acc, prev2, prev1, curr, next, options) do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
     cp2 = calculate_control_point(curr, prev1, next, :right, options)
 
-    "#{acc} C #{point_to_string(cp1)} #{point_to_string(cp2)} #{point_to_string({curr.x, curr.y})}"
+    part =
+      "C #{tuple_to_string(cp1)} #{tuple_to_string(cp2)} #{tuple_to_string({curr.x, curr.y})}"
+
+    [acc | part]
   end
 
   @spec calculate_control_point(point(), point(), point(), atom(), options()) ::
@@ -279,8 +285,8 @@ defmodule SimpleCharts.Line do
     Keyword.merge(@default_options, options, fn _k, _default, value -> value end)
   end
 
-  @spec point_to_string({number(), number()}) :: String.t()
-  defp point_to_string({x, y}) do
+  @spec tuple_to_string({number(), number()}) :: String.t()
+  defp tuple_to_string({x, y}) do
     "#{format_float(x)},#{format_float(y)}"
   end
 
