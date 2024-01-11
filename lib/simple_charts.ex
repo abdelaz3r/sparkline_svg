@@ -7,9 +7,7 @@ defmodule SimpleCharts do
   @type svg :: String.t()
 
   @doc """
-  Convert a svg string into a base64 string to be used as a background-image.
-
-  Notice: check for color encoding.
+  Convert a svg string into a Base64 string to be used as a background-image.
 
   ## Examples
 
@@ -19,6 +17,6 @@ defmodule SimpleCharts do
   """
   @spec as_background_image(svg()) :: String.t()
   def as_background_image(svg) when is_binary(svg) do
-    ["data:image/svg+xml", Base.encode64(svg)] |> Enum.join(",")
+    ["data:image/svg+xml;base64", Base.encode64(svg)] |> Enum.join(",")
   end
 end
