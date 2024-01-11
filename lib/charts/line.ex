@@ -49,10 +49,10 @@ defmodule SimpleCharts.Line do
   ## Examples
 
       iex> SimpleCharts.Line.to_svg([{1, 1}, {2, 2}, {3, 3}])
-      svg_string
+      {:ok, svg_string}
 
       iex> SimpleCharts.Line.to_svg([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
-      svg_string
+      {:ok, svg_string}
 
   """
   @spec to_svg(datapoints :: datapoints()) :: {:ok, String.t()} | {:error, atom()}
@@ -63,48 +63,86 @@ defmodule SimpleCharts.Line do
 
   def to_svg(datapoints, options) do
     options = default_options(options)
-
-    width = Keyword.get(options, :width)
-    height = Keyword.get(options, :height)
     padding = Keyword.get(options, :padding)
 
-    # TODO: check that width - 2 * padding > 0 and height - 2 * padding > 0
-    # TODO: check that max_time - min_time != 0 and max_value - min_value != 0
+    with {:ok} <- check_dimension(Keyword.get(options, :width), padding),
+         {:ok} <- check_dimension(Keyword.get(options, :height), padding),
+         {:ok, datapoints} <- normalize_x(datapoints),
+         {:ok, min_max_x, min_max_y} <- compute_min_max(datapoints) do
+      datapoints =
+        datapoints
+        |> compute_datapoints(min_max_x, min_max_y, options)
+        |> draw_chart(options)
 
+      {:ok, datapoints}
+    end
+  end
+
+  defp check_dimension(length, padding) do
+    if length - 2 * padding > 0,
+      do: {:ok},
+      else: {:error, :invalid_dimension}
+  end
+
+  defp normalize_x(datapoints) do
     datapoints =
       Enum.map(datapoints, fn
+        {%DateTime{} = x, y} ->
+          {DateTime.to_unix(x), y}
+
         {%Time{} = x, y} ->
           {seconds, _milliseconds} = Time.to_seconds_after_midnight(x)
           {seconds, y}
 
-        {%DateTime{} = x, y} ->
-          {DateTime.to_unix(x), y}
-
-        {x, y} ->
+        {x, y} when is_integer(x) or is_float(x) ->
           {x, y}
+
+        _ ->
+          {:error, :invalid_datapoint}
       end)
 
-    {{min_time, _}, {max_time, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
-    {{_, min_value}, {_, max_value}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
+    case Enum.any?(datapoints, fn {x, _y} -> x == :error end) do
+      true -> {:error, :invalid_datapoints}
+      false -> {:ok, datapoints}
+    end
+  end
 
-    datapoints =
-      datapoints
-      |> Enum.sort_by(fn {x, _} -> x end)
-      |> Enum.map(fn {x, y} ->
-        %{
-          x: (x - min_time) / (max_time - min_time) * (width - padding * 2) + padding,
-          y: height - (y - min_value) / (max_value - min_value) * (height - padding * 2) - padding
-        }
-      end)
+  defp compute_min_max(datapoints) do
+    {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
+    {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
 
-    {:ok,
-     """
-     <svg width="auto" height="auto" viewBox="0 0 #{width} #{height}" xmlns="http://www.w3.org/2000/svg">
-       #{if(Keyword.get(options, :area?), do: draw_area(datapoints, options))}
-       #{if(Keyword.get(options, :line?), do: draw_line(datapoints, options))}
-       #{if(Keyword.get(options, :dots?), do: draw_dots(datapoints, options))}
-     </svg>
-     """}
+    if max_x - min_x != 0 or max_y - min_y != 0,
+      do: {:ok, {min_x, max_x}, {min_y, max_y}},
+      else: {:error, :invalid_datapoints}
+  end
+
+  defp compute_datapoints(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
+    width = Keyword.get(options, :width)
+    height = Keyword.get(options, :height)
+    padding = Keyword.get(options, :padding)
+
+    datapoints
+    |> Enum.sort_by(fn {x, _} -> x end)
+    |> Enum.map(fn {x, y} ->
+      %{
+        x: (x - min_x) / (max_x - min_x) * (width - padding * 2) + padding,
+        y: height - (y - min_y) / (max_y - min_y) * (height - padding * 2) - padding
+      }
+    end)
+  end
+
+  defp draw_chart(datapoints, options) do
+    """
+    <svg
+      width="auto"
+      height="auto"
+      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      xmlns="http://www.w3.org/2000/svg">
+      #{if(Keyword.get(options, :area?), do: draw_area(datapoints, options))}
+      #{if(Keyword.get(options, :line?), do: draw_line(datapoints, options))}
+      #{if(Keyword.get(options, :dots?), do: draw_dots(datapoints, options))}
+    </svg>
+    """
   end
 
   defp draw_dots(datapoints, options) do
