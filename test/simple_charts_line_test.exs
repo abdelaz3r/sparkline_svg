@@ -13,14 +13,24 @@ defmodule SimpleChartsLineTest do
     %{line_chart: line_chart, line_chart_config: line_chart_config}
   end
 
-  test "invalid datapoints", _context do
-    datapoints = [{1, 1}, {2, 2}]
+  test "to_svg/2 error handling", _context do
+    data = [{1, 1}, {2, 2}]
 
     assert Line.to_svg([]) == {:error, :empty_datapoints}
-    assert Line.to_svg(datapoints, width: 5, padding: 4) == {:error, :invalid_dimension}
-    assert Line.to_svg(datapoints, height: 5, padding: 4) == {:error, :invalid_dimension}
+    assert Line.to_svg(data, width: 5, padding: 4) == {:error, :invalid_dimension}
+    assert Line.to_svg(data, height: 5, padding: 4) == {:error, :invalid_dimension}
     assert Line.to_svg([{"a", 1}, {"b", 2}]) == {:error, :invalid_datapoints}
     assert Line.to_svg([{1, 1}, {1, 1}]) == {:error, :invalid_datapoints}
+  end
+
+  test "to_svg!/2 error handling", _context do
+    data = [{1, 1}, {2, 2}]
+
+    assert_raise Line, "empty_datapoints", fn -> Line.to_svg!([]) end
+    assert_raise Line, "invalid_dimension", fn -> Line.to_svg!(data, width: 5, padding: 4) end
+    assert_raise Line, "invalid_dimension", fn -> Line.to_svg!(data, height: 5, padding: 4) end
+    assert_raise Line, "invalid_datapoints", fn -> Line.to_svg!([{"a", 1}, {"b", 2}]) end
+    assert_raise Line, "invalid_datapoints", fn -> Line.to_svg!([{1, 1}, {1, 1}]) end
   end
 
   test "number datapoints", context do
@@ -30,30 +40,30 @@ defmodule SimpleChartsLineTest do
   end
 
   test "timestamp-based datapoints", context do
-    datapoints = [
+    data = [
       {1_704_877_202, 1},
       {1_704_877_203, 2}
     ]
 
-    assert Line.to_svg(datapoints) == {:ok, context.line_chart}
+    assert Line.to_svg(data) == {:ok, context.line_chart}
   end
 
   test "time-based datapoints", context do
-    datapoints = [
+    data = [
       {Time.utc_now(), 1},
       {Time.utc_now() |> Time.add(1, :second), 2}
     ]
 
-    assert Line.to_svg(datapoints) == {:ok, context.line_chart}
+    assert Line.to_svg(data) == {:ok, context.line_chart}
   end
 
   test "datetime-based datapoints", context do
-    datapoints = [
+    data = [
       {DateTime.utc_now(), 1},
       {DateTime.utc_now() |> DateTime.add(1, :second), 2}
     ]
 
-    assert Line.to_svg(datapoints) == {:ok, context.line_chart}
+    assert Line.to_svg(data) == {:ok, context.line_chart}
   end
 
   test "non-default options", context do

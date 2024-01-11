@@ -43,6 +43,8 @@ defmodule SimpleCharts.Line do
     area_color: "black"
   ]
 
+  defexception [:message]
+
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
 
@@ -77,6 +79,33 @@ defmodule SimpleCharts.Line do
       {:ok, datapoints}
     end
   end
+
+  @doc """
+  Return a valid SVG document representing a line chart with the given datapoints.
+
+  ## Examples
+
+      iex> SimpleCharts.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}])
+      svg_string
+
+      iex> SimpleCharts.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
+      svg_string
+
+  """
+  @spec to_svg!(datapoints :: datapoints()) :: String.t()
+  def to_svg!(datapoints), do: to_svg!(datapoints, [])
+
+  @spec to_svg!(datapoints :: datapoints(), options()) :: String.t()
+  def to_svg!([], _options), do: raise(SimpleCharts.Line, "empty_datapoints")
+
+  def to_svg!(datapoints, options) do
+    case to_svg(datapoints, options) do
+      {:ok, svg} -> svg
+      {:error, reason} -> raise(SimpleCharts.Line, Atom.to_string(reason))
+    end
+  end
+
+  # Private functions
 
   defp check_dimension(length, padding) do
     if length - 2 * padding > 0,
