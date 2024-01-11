@@ -27,6 +27,22 @@ defmodule SimpleCharts.Line do
   @typedoc "Options."
   @type options :: list(option())
 
+  # Default options
+  @default_options [
+    width: 200,
+    height: 100,
+    padding: 6,
+    dots?: true,
+    dot_radius: 1,
+    dot_color: "white",
+    line?: true,
+    line_width: 0.25,
+    line_color: "white",
+    line_smoothing: 0.2,
+    area?: false,
+    area_color: "black"
+  ]
+
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
 
@@ -43,9 +59,7 @@ defmodule SimpleCharts.Line do
   def to_svg(datapoints), do: to_svg(datapoints, [])
 
   @spec to_svg(datapoints :: datapoints(), options()) :: {:ok, String.t()} | {:error, atom()}
-  def to_svg([], _options) do
-    {:error, :empty_datapoints}
-  end
+  def to_svg([], _options), do: {:error, :empty_datapoints}
 
   def to_svg(datapoints, options) do
     options = default_options(options)
@@ -150,7 +164,7 @@ defmodule SimpleCharts.Line do
   end
 
   defp calculate_control_point(curr, prev, next, direction, options) do
-    smoothing = Keyword.get(options, :line_smoothing, 0.2)
+    smoothing = Keyword.get(options, :line_smoothing)
 
     {length, angle} = calculate_line(prev, next)
 
@@ -176,18 +190,7 @@ defmodule SimpleCharts.Line do
   # Helper functions
 
   defp default_options(options) do
-    options
-    |> Keyword.put_new(:width, 200)
-    |> Keyword.put_new(:height, 100)
-    |> Keyword.put_new(:padding, 6)
-    |> Keyword.put_new(:dots?, true)
-    |> Keyword.put_new(:dot_radius, 1)
-    |> Keyword.put_new(:dot_color, "white")
-    |> Keyword.put_new(:line?, true)
-    |> Keyword.put_new(:line_width, 0.25)
-    |> Keyword.put_new(:line_color, "white")
-    |> Keyword.put_new(:area?, false)
-    |> Keyword.put_new(:area_color, "black")
+    Keyword.merge(@default_options, options, fn _k, _default, value -> value end)
   end
 
   defp point_to_string({x, y}) do
