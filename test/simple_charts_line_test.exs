@@ -1,4 +1,4 @@
-defmodule SimpleChartsTest do
+defmodule SimpleChartsLineTest do
   use ExUnit.Case, async: true
 
   setup do
@@ -9,12 +9,12 @@ defmodule SimpleChartsTest do
   end
 
   test "empty datapoints", _context do
-    assert SimpleCharts.line([]) == {:error, :empty_datapoints}
+    assert SimpleCharts.Line.to_svg([]) == {:error, :empty_datapoints}
   end
 
   test "number datapoints", context do
-    assert SimpleCharts.line([{1, 1}, {2, 2}]) == {:ok, context.simple_line_chart}
-    assert SimpleCharts.line([{-1, 1}, {0, 2}]) == {:ok, context.simple_line_chart}
+    assert SimpleCharts.Line.to_svg([{1, 1}, {2, 2}]) == {:ok, context.simple_line_chart}
+    assert SimpleCharts.Line.to_svg([{-1, 1}, {0, 2}]) == {:ok, context.simple_line_chart}
   end
 
   test "timestamp-based datapoints", context do
@@ -23,7 +23,7 @@ defmodule SimpleChartsTest do
       {1_704_877_203, 2}
     ]
 
-    assert SimpleCharts.line(datapoints) == {:ok, context.simple_line_chart}
+    assert SimpleCharts.Line.to_svg(datapoints) == {:ok, context.simple_line_chart}
   end
 
   test "time-based datapoints", context do
@@ -32,7 +32,7 @@ defmodule SimpleChartsTest do
       {Time.utc_now() |> Time.add(1, :second), 2}
     ]
 
-    assert SimpleCharts.line(datapoints) == {:ok, context.simple_line_chart}
+    assert SimpleCharts.Line.to_svg(datapoints) == {:ok, context.simple_line_chart}
   end
 
   test "datetime-based datapoints", context do
@@ -41,6 +41,6 @@ defmodule SimpleChartsTest do
       {DateTime.utc_now() |> DateTime.add(1, :second), 2}
     ]
 
-    assert SimpleCharts.line(datapoints) == {:ok, context.simple_line_chart}
+    assert SimpleCharts.Line.to_svg(datapoints) == {:ok, context.simple_line_chart}
   end
 end
