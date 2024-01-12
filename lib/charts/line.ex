@@ -77,8 +77,9 @@ defmodule SimpleCharts.Line do
 
     with :ok <- check_dimension(Keyword.get(options, :width), padding),
          :ok <- check_dimension(Keyword.get(options, :height), padding),
-         {:ok, datapoints} <- clean_datapoints(datapoints),
-         {:ok, min_max_x, min_max_y} <- compute_min_max(datapoints) do
+         {:ok, datapoints} <- clean_datapoints(datapoints) do
+      {min_max_x, min_max_y} = compute_min_max(datapoints)
+
       datapoints =
         datapoints
         |> compute_datapoints(min_max_x, min_max_y, options)
@@ -173,14 +174,16 @@ defmodule SimpleCharts.Line do
     :error
   end
 
-  @spec compute_min_max(datapoints()) :: {:ok, min_max(), min_max()} | {:error, atom()}
+  @spec compute_min_max(datapoints()) :: {min_max(), min_max()}
   defp compute_min_max(datapoints) do
     {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
     {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
+    [{x, y} | _tail] = datapoints
 
-    if max_x - min_x != 0 or max_y - min_y != 0,
-      do: {:ok, {min_x, max_x}, {min_y, max_y}},
-      else: {:error, :invalid_datapoints}
+    min_max_x = if max_x - min_x == 0, do: {0, 2 * x}, else: {min_x, max_x}
+    min_max_y = if max_y - min_y == 0, do: {0, 2 * y}, else: {min_y, max_y}
+
+    {min_max_x, min_max_y}
   end
 
   @spec compute_datapoints(datapoints(), min_max(), min_max(), options()) :: points()
@@ -198,6 +201,28 @@ defmodule SimpleCharts.Line do
   end
 
   @spec draw_chart(points(), options()) :: SimpleCharts.svg()
+  defp draw_chart([%{x: x, y: y}], options) do
+    left = Keyword.get(options, :padding)
+    right = Keyword.get(options, :width) - 2 * Keyword.get(options, :padding)
+
+    """
+    <svg width="100%" height="100%"
+      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M#{left},#{format_float(y)}L#{right},#{format_float(y)}"
+        fill="none"
+        stroke="#{Keyword.get(options, :line_color)}"
+        stroke-width="#{Keyword.get(options, :line_width)}" />
+      <circle
+        cx="#{format_float(x)}"
+        cy="#{format_float(y)}"
+        r="#{Keyword.get(options, :dot_radius)}"
+        fill="#{Keyword.get(options, :dot_color)}" />
+    </svg>
+    """
+  end
+
   defp draw_chart(datapoints, options) do
     """
     <svg width="100%" height="100%"
