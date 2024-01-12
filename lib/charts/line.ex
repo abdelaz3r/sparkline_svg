@@ -67,8 +67,8 @@ defmodule SimpleCharts.Line do
     options = default_options(options)
     padding = Keyword.get(options, :padding)
 
-    with {:ok} <- check_dimension(Keyword.get(options, :width), padding),
-         {:ok} <- check_dimension(Keyword.get(options, :height), padding),
+    with :ok <- check_dimension(Keyword.get(options, :width), padding),
+         :ok <- check_dimension(Keyword.get(options, :height), padding),
          {:ok, datapoints} <- normalize_x(datapoints),
          {:ok, min_max_x, min_max_y} <- compute_min_max(datapoints) do
       datapoints =
@@ -111,10 +111,10 @@ defmodule SimpleCharts.Line do
   @typep points :: list(point())
   @typep min_max :: {number(), number()}
 
-  @spec check_dimension(number(), number()) :: {:ok} | {:error, atom()}
+  @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
   defp check_dimension(length, padding) do
     if length - 2 * padding > 0,
-      do: {:ok},
+      do: :ok,
       else: {:error, :invalid_dimension}
   end
 
