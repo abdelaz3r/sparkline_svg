@@ -14,14 +14,14 @@ defmodule SimpleCharts.Line do
           {:width, number()}
           | {:height, number()}
           | {:padding, number()}
-          | {:dots?, boolean()}
+          | {:show_dot, boolean()}
           | {:dot_radius, number()}
           | {:dot_color, String.t()}
-          | {:line?, boolean()}
+          | {:show_line, boolean()}
           | {:line_width, number()}
           | {:line_color, String.t()}
           | {:line_smoothing, float()}
-          | {:area?, boolean()}
+          | {:show_area, boolean()}
           | {:area_color, String.t()}
 
   @typedoc "Options."
@@ -32,14 +32,14 @@ defmodule SimpleCharts.Line do
     width: 200,
     height: 100,
     padding: 6,
-    dots?: true,
+    show_dot: true,
     dot_radius: 1,
     dot_color: "white",
-    line?: true,
+    show_line: true,
     line_width: 0.25,
     line_color: "white",
     line_smoothing: 0.2,
-    area?: false,
+    show_area: false,
     area_color: "black"
   ]
 
@@ -181,9 +181,9 @@ defmodule SimpleCharts.Line do
         height="auto"
         viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
         xmlns="http://www.w3.org/2000/svg">
-        #{if(Keyword.get(options, :area?), do: draw_area(datapoints, options))}
-        #{if(Keyword.get(options, :line?), do: draw_line(datapoints, options))}
-        #{if(Keyword.get(options, :dots?), do: draw_dots(datapoints, options))}
+        #{if(Keyword.get(options, :show_area), do: draw_area(datapoints, options))}
+        #{if(Keyword.get(options, :show_line), do: draw_line(datapoints, options))}
+        #{if(Keyword.get(options, :show_dots), do: draw_dots(datapoints, options))}
       </svg>
       """
 
