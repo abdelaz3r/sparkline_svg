@@ -171,20 +171,15 @@ defmodule SimpleCharts.Line do
 
   @spec draw_chart(points(), options()) :: SimpleCharts.svg()
   defp draw_chart(datapoints, options) do
-    chart =
-      """
-      <svg
-        width="auto"
-        height="auto"
-        viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
-        xmlns="http://www.w3.org/2000/svg">
-        #{if(Keyword.get(options, :show_area), do: draw_area(datapoints, options))}
-        #{if(Keyword.get(options, :show_line), do: draw_line(datapoints, options))}
-        #{if(Keyword.get(options, :show_dots), do: draw_dots(datapoints, options))}
-      </svg>
-      """
-
-    Regex.replace(~r/\n\s?/, chart, "")
+    """
+    <svg width="100%" height="100%"
+      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      xmlns="http://www.w3.org/2000/svg">
+      #{if(Keyword.get(options, :show_area), do: draw_area(datapoints, options))}
+      #{if(Keyword.get(options, :show_line), do: draw_line(datapoints, options))}
+      #{if(Keyword.get(options, :show_dot), do: draw_dots(datapoints, options))}
+    </svg>
+    """
   end
 
   @spec draw_dots(points(), options()) :: String.t()
@@ -218,7 +213,7 @@ defmodule SimpleCharts.Line do
 
     """
     <path
-      d="#{compute_curve(datapoints, options)} V #{Keyword.get(options, :height)} H #{x} Z"
+      d="#{[compute_curve(datapoints, options), "V", "#{Keyword.get(options, :height)}", "H", "#{x}", "Z"]}"
       fill="#{Keyword.get(options, :area_color)}"
       stroke="none" />
     """
@@ -226,7 +221,7 @@ defmodule SimpleCharts.Line do
 
   @spec compute_curve(points(), options()) :: iolist()
   defp compute_curve([%{x: x, y: y} = curr | points], options) do
-    ["M #{tuple_to_string({x, y})} "]
+    ["M#{tuple_to_string({x, y})}"]
     |> compute_curve(points, curr, curr, options)
   end
 
@@ -245,11 +240,9 @@ defmodule SimpleCharts.Line do
   defp curve_command(acc, prev2, prev1, curr, next, options) do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
     cp2 = calculate_control_point(curr, prev1, next, :right, options)
+    part = "C#{tuple_to_string(cp1)} #{tuple_to_string(cp2)} #{tuple_to_string({curr.x, curr.y})}"
 
-    part =
-      "C #{tuple_to_string(cp1)} #{tuple_to_string(cp2)} #{tuple_to_string({curr.x, curr.y})}"
-
-    [acc | part]
+    [acc, part]
   end
 
   @spec calculate_control_point(point(), point(), point(), atom(), options()) ::
