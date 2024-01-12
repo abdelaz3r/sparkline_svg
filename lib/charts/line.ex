@@ -126,8 +126,7 @@ defmodule SimpleCharts.Line do
           {DateTime.to_unix(datetime), y}
 
         {%Date{} = date, y} ->
-          date = Date.to_string(date)
-          {:ok, datetime, _} = DateTime.from_iso8601(date <> "T00:00:00Z")
+          {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
           {DateTime.to_unix(datetime), y}
 
         {%Time{} = time, y} ->
