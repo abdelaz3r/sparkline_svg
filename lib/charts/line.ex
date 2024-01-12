@@ -4,10 +4,18 @@ defmodule SimpleCharts.Line do
   """
 
   @typedoc "Data point."
-  @type datapoint :: {DateTime.t() | Date.t() | Time.t() | integer(), number()}
+  @type datapoint ::
+          {DateTime.t(), number()}
+          | {Date.t(), number()}
+          | {Time.t(), number()}
+          | {number(), number()}
 
   @typedoc "Data points."
-  @type datapoints :: list(datapoint())
+  @type datapoints ::
+          list({DateTime.t(), number()})
+          | list({Date.t(), number()})
+          | list({Time.t(), number()})
+          | list({number(), number()})
 
   @typedoc "Option."
   @type option ::
@@ -69,7 +77,7 @@ defmodule SimpleCharts.Line do
 
     with :ok <- check_dimension(Keyword.get(options, :width), padding),
          :ok <- check_dimension(Keyword.get(options, :height), padding),
-         {:ok, datapoints} <- normalize_x(datapoints),
+         {:ok, datapoints} <- clean_datapoints(datapoints),
          {:ok, min_max_x, min_max_y} <- compute_min_max(datapoints) do
       datapoints =
         datapoints
@@ -116,31 +124,53 @@ defmodule SimpleCharts.Line do
       else: {:error, :invalid_dimension}
   end
 
-  @spec normalize_x(datapoints()) :: {:ok, datapoints()} | {:error, atom()}
-  defp normalize_x(datapoints) do
-    datapoints =
-      Enum.map(datapoints, fn
-        {%DateTime{} = datetime, y} ->
-          {DateTime.to_unix(datetime), y}
-
-        {%Date{} = date, y} ->
-          {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
-          {DateTime.to_unix(datetime), y}
-
-        {%Time{} = time, y} ->
-          {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
-          {seconds, y}
-
-        {x, y} when is_integer(x) or is_float(x) ->
-          {x, y}
-
-        _ ->
-          {:error, :invalid_datapoints}
+  @spec clean_datapoints(datapoints()) :: {:ok, datapoints()} | {:error, atom()}
+  defp clean_datapoints(datapoints) do
+    {datapoints, _type} =
+      Enum.reduce_while(datapoints, {[], nil}, fn datapoint, {datapoints, type} ->
+        case clean_datapoint(datapoint, type) do
+          {{x, y}, type} -> {:cont, {[{x, y} | datapoints], type}}
+          :error -> {:halt, {:error, type}}
+        end
       end)
 
-    if Enum.any?(datapoints, fn {x, _y} -> x == :error end),
-      do: {:error, :invalid_datapoints},
-      else: {:ok, datapoints}
+    case datapoints do
+      :error ->
+        {:error, :invalid_datapoints}
+
+      datapoints ->
+        datapoints =
+          datapoints
+          |> Enum.reverse()
+          |> Enum.sort_by(fn {x, _} -> x end)
+          |> Enum.uniq_by(fn {x, _} -> x end)
+
+        {:ok, datapoints}
+    end
+  end
+
+  @spec clean_datapoint(datapoint(), atom()) :: {{number(), number()}, atom()} | :error
+  defp clean_datapoint({%DateTime{} = datetime, y}, type)
+       when is_nil(type) or type == :datetime do
+    {{DateTime.to_unix(datetime), y}, :datetime}
+  end
+
+  defp clean_datapoint({%Date{} = date, y}, type) when is_nil(type) or type == :date do
+    {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
+    {{DateTime.to_unix(datetime), y}, :date}
+  end
+
+  defp clean_datapoint({%Time{} = time, y}, type) when is_nil(type) or type == :time do
+    {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
+    {{seconds, y}, :time}
+  end
+
+  defp clean_datapoint({x, y}, type) when is_number(x) and (is_nil(type) or type == :number) do
+    {{x, y}, :number}
+  end
+
+  defp clean_datapoint(_datapoint, _type) do
+    :error
   end
 
   @spec compute_min_max(datapoints()) :: {:ok, min_max(), min_max()} | {:error, atom()}
@@ -159,9 +189,7 @@ defmodule SimpleCharts.Line do
     height = Keyword.get(options, :height)
     padding = Keyword.get(options, :padding)
 
-    datapoints
-    |> Enum.sort_by(fn {x, _} -> x end)
-    |> Enum.map(fn {x, y} ->
+    Enum.map(datapoints, fn {x, y} ->
       %{
         x: (x - min_x) / (max_x - min_x) * (width - padding * 2) + padding,
         y: height - (y - min_y) / (max_y - min_y) * (height - padding * 2) - padding
