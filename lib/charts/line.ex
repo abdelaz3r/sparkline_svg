@@ -58,9 +58,9 @@ defmodule SimpleCharts.Line do
 
   """
   @spec to_svg(datapoints()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
-  def to_svg(datapoints), do: to_svg(datapoints, [])
-
   @spec to_svg(datapoints(), options()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
+  def to_svg(datapoints, options \\ [])
+
   def to_svg([], _options), do: {:error, :empty_datapoints}
 
   def to_svg(datapoints, options) do
@@ -93,10 +93,8 @@ defmodule SimpleCharts.Line do
 
   """
   @spec to_svg!(datapoints()) :: SimpleCharts.svg()
-  def to_svg!(datapoints), do: to_svg!(datapoints, [])
-
   @spec to_svg!(datapoints(), options()) :: SimpleCharts.svg()
-  def to_svg!([], _options), do: raise(SimpleCharts.Line, "empty_datapoints")
+  def to_svg!(datapoints, options \\ [])
 
   def to_svg!(datapoints, options) do
     case to_svg(datapoints, options) do
@@ -239,7 +237,7 @@ defmodule SimpleCharts.Line do
     |> compute_curve(points, prev1, curr, options)
   end
 
-  defp compute_curve(acc, [curr | []], prev2, prev1, options) do
+  defp compute_curve(acc, [curr], prev2, prev1, options) do
     curve_command(acc, prev2, prev1, curr, curr, options)
   end
 
