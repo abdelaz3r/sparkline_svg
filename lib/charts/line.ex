@@ -31,6 +31,7 @@ defmodule SimpleCharts.Line do
           | {:line_smoothing, float()}
           | {:show_area, boolean()}
           | {:area_color, String.t()}
+          | {:placeholder, String.t()}
 
   @typedoc "Options."
   @type options :: list(option())
@@ -48,7 +49,8 @@ defmodule SimpleCharts.Line do
     line_color: "black",
     line_smoothing: 0.2,
     show_area: false,
-    area_color: "rgba(0, 0, 0, 0.2)"
+    area_color: "rgba(0, 0, 0, 0.2)",
+    placeholder: "No data"
   ]
 
   defexception [:message]
@@ -67,25 +69,25 @@ defmodule SimpleCharts.Line do
   """
   @spec to_svg(datapoints()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
   @spec to_svg(datapoints(), options()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
-  def to_svg(datapoints, options \\ [])
-
-  def to_svg([], _options), do: {:error, :empty_datapoints}
-
-  def to_svg(datapoints, options) do
+  def to_svg(datapoints, options \\ []) do
     options = default_options(options)
     padding = Keyword.get(options, :padding)
 
     with :ok <- check_dimension(Keyword.get(options, :width), padding),
          :ok <- check_dimension(Keyword.get(options, :height), padding),
          {:ok, datapoints} <- clean_datapoints(datapoints) do
-      {min_max_x, min_max_y} = compute_min_max(datapoints)
+      svg =
+        if Enum.empty?(datapoints) do
+          draw_chart([], options)
+        else
+          {min_max_x, min_max_y} = compute_min_max(datapoints)
 
-      datapoints =
-        datapoints
-        |> compute_datapoints(min_max_x, min_max_y, options)
-        |> draw_chart(options)
+          datapoints
+          |> compute_datapoints(min_max_x, min_max_y, options)
+          |> draw_chart(options)
+        end
 
-      {:ok, datapoints}
+      {:ok, svg}
     end
   end
 
@@ -103,9 +105,7 @@ defmodule SimpleCharts.Line do
   """
   @spec to_svg!(datapoints()) :: SimpleCharts.svg()
   @spec to_svg!(datapoints(), options()) :: SimpleCharts.svg()
-  def to_svg!(datapoints, options \\ [])
-
-  def to_svg!(datapoints, options) do
+  def to_svg!(datapoints, options \\ []) do
     case to_svg(datapoints, options) do
       {:ok, svg} -> svg
       {:error, reason} -> raise(SimpleCharts.Line, Atom.to_string(reason))
@@ -198,6 +198,19 @@ defmodule SimpleCharts.Line do
         y: height - (y - min_y) / (max_y - min_y) * (height - padding * 2) - padding
       }
     end)
+  end
+
+  @spec draw_chart(points(), options()) :: SimpleCharts.svg()
+  defp draw_chart([], options) do
+    """
+    <svg width="100%" height="100%"
+      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      xmlns="http://www.w3.org/2000/svg">
+      <text x="50%" y="50%" text-anchor="middle">
+        #{Keyword.get(options, :placeholder)}
+      </text>
+    </svg>
+    """
   end
 
   @spec draw_chart(points(), options()) :: SimpleCharts.svg()
