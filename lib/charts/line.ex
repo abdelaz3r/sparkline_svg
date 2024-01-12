@@ -34,13 +34,13 @@ defmodule SimpleCharts.Line do
     padding: 6,
     show_dot: true,
     dot_radius: 1,
-    dot_color: "white",
+    dot_color: "black",
     show_line: true,
     line_width: 0.25,
-    line_color: "white",
+    line_color: "black",
     line_smoothing: 0.2,
     show_area: false,
-    area_color: "black"
+    area_color: "rgba(0, 0, 0, 0.2)"
   ]
 
   defexception [:message]
