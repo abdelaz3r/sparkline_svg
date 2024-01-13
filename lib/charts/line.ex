@@ -131,13 +131,13 @@ defmodule SimpleCharts.Line do
       Enum.reduce_while(datapoints, {[], nil}, fn datapoint, {datapoints, type} ->
         case clean_datapoint(datapoint, type) do
           {{x, y}, type} -> {:cont, {[{x, y} | datapoints], type}}
-          :error -> {:halt, {:error, type}}
+          {:error, reason} -> {:halt, {{:error, reason}, type}}
         end
       end)
 
     case datapoints do
-      :error ->
-        {:error, :invalid_datapoints}
+      {:error, reason} ->
+        {:error, reason}
 
       datapoints ->
         datapoints =
@@ -150,28 +150,32 @@ defmodule SimpleCharts.Line do
     end
   end
 
-  @spec clean_datapoint(datapoint(), atom()) :: {{number(), number()}, atom()} | :error
-  defp clean_datapoint({%DateTime{} = datetime, y}, type)
-       when is_nil(type) or type == :datetime do
-    {{DateTime.to_unix(datetime), y}, :datetime}
+  @spec clean_datapoint(datapoint(), atom()) :: {{number(), number()}, atom()} | {:error, atom()}
+  defp clean_datapoint({%DateTime{} = datetime, y}, type) when is_nil(type) or type == DateTime do
+    {{DateTime.to_unix(datetime), y}, DateTime}
   end
 
-  defp clean_datapoint({%Date{} = date, y}, type) when is_nil(type) or type == :date do
+  defp clean_datapoint({%Date{} = date, y}, type) when is_nil(type) or type == Date do
     {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
-    {{DateTime.to_unix(datetime), y}, :date}
+    {{DateTime.to_unix(datetime), y}, Date}
   end
 
-  defp clean_datapoint({%Time{} = time, y}, type) when is_nil(type) or type == :time do
+  defp clean_datapoint({%Time{} = time, y}, type) when is_nil(type) or type == Time do
     {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
-    {{seconds, y}, :time}
+    {{seconds, y}, Time}
   end
 
   defp clean_datapoint({x, y}, type) when is_number(x) and (is_nil(type) or type == :number) do
     {{x, y}, :number}
   end
 
-  defp clean_datapoint(_datapoint, _type) do
-    :error
+  defp clean_datapoint({x, _y}, _type)
+       when is_number(x) or x.__struct__ in [DateTime, Date, Time] do
+    {:error, :mixed_datapoints_types}
+  end
+
+  defp clean_datapoint(_datapoints, _t) do
+    {:error, :invalid_datapoints_types}
   end
 
   @spec compute_min_max(datapoints()) :: {min_max(), min_max()}

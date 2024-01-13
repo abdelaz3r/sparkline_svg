@@ -36,16 +36,18 @@ defmodule SimpleChartsLineTest do
   end
 
   test "to_svg/2 with invalid datapoints type", _context do
-    assert Line.to_svg([{"a", 1}, {"b", 2}]) == {:error, :invalid_datapoints}
+    assert Line.to_svg([{"a", 1}, {"b", 2}]) == {:error, :invalid_datapoints_types}
   end
 
   test "to_svg/2 with mixed datapoints type", _context do
-    assert Line.to_svg([{1, 1}, {DateTime.utc_now(), 2}]) == {:error, :invalid_datapoints}
-    assert Line.to_svg([{Time.utc_now(), 1}, {2, 2}]) == {:error, :invalid_datapoints}
+    assert Line.to_svg([{1, 1}, {DateTime.utc_now(), 2}]) == {:error, :mixed_datapoints_types}
+    assert Line.to_svg([{Time.utc_now(), 1}, {2, 2}]) == {:error, :mixed_datapoints_types}
   end
 
   test "to_svg!/2 error handling", _context do
-    assert_raise Line, "invalid_datapoints", fn -> Line.to_svg!([{"a", 1}, {"b", 2}]) end
+    assert_raise Line, "invalid_datapoints_types", fn ->
+      Line.to_svg!([{"a", 1}, {"b", 2}])
+    end
   end
 
   # ceux-ci a terme doivent marcher
