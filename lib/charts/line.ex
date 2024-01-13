@@ -143,8 +143,8 @@ defmodule SimpleCharts.Line do
         datapoints =
           datapoints
           |> Enum.reverse()
-          |> Enum.sort_by(fn {x, _} -> x end)
           |> Enum.uniq_by(fn {x, _} -> x end)
+          |> Enum.sort_by(fn {x, _} -> x end)
 
         {:ok, datapoints}
     end
@@ -290,16 +290,16 @@ defmodule SimpleCharts.Line do
   end
 
   @spec compute_curve(points(), options()) :: iolist()
-  defp compute_curve([%{x: x, y: y} = curr | points], options) do
+  defp compute_curve([%{x: x, y: y} = curr | rest], options) do
     ["M#{tuple_to_string({x, y})}"]
-    |> compute_curve(points, curr, curr, options)
+    |> compute_curve(rest, curr, curr, options)
   end
 
   @spec compute_curve(iolist(), points(), point(), point(), options()) :: iolist()
-  defp compute_curve(acc, [curr | [next | _] = points], prev2, prev1, options) do
+  defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, options) do
     acc
     |> curve_command(prev2, prev1, curr, next, options)
-    |> compute_curve(points, prev1, curr, options)
+    |> compute_curve(rest, prev1, curr, options)
   end
 
   defp compute_curve(acc, [curr], prev2, prev1, options) do
@@ -310,9 +310,9 @@ defmodule SimpleCharts.Line do
   defp curve_command(acc, prev2, prev1, curr, next, options) do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
     cp2 = calculate_control_point(curr, prev1, next, :right, options)
-    part = "C#{tuple_to_string(cp1)} #{tuple_to_string(cp2)} #{tuple_to_string({curr.x, curr.y})}"
+    currrent = {curr.x, curr.y}
 
-    [acc, part]
+    [acc, "C", tuple_to_string(cp1), " ", tuple_to_string(cp2), " ", tuple_to_string(currrent)]
   end
 
   @spec calculate_control_point(point(), point(), point(), atom(), options()) ::
