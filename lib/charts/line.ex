@@ -17,6 +17,16 @@ defmodule SimpleCharts.Line do
           | list({Time.t(), number()})
           | list({number(), number()})
 
+  @typedoc "Class option."
+  @type class_option ::
+          {:core, String.t()}
+          | {:line, String.t()}
+          | {:dots, String.t()}
+          | {:area, String.t()}
+
+  @typedoc "Class options."
+  @type class_options :: list(class_option())
+
   @typedoc "Option."
   @type option ::
           {:width, number()}
@@ -32,6 +42,7 @@ defmodule SimpleCharts.Line do
           | {:show_area, boolean()}
           | {:area_color, String.t()}
           | {:placeholder, String.t()}
+          | {:classes, class_options()}
 
   @typedoc "Options."
   @type options :: list(option())
@@ -50,7 +61,8 @@ defmodule SimpleCharts.Line do
     line_smoothing: 0.2,
     show_area: false,
     area_color: "rgba(0, 0, 0, 0.2)",
-    placeholder: "No data"
+    placeholder: "No data",
+    classes: [core: nil, line: nil, dots: nil, area: nil]
   ]
 
   defexception [:message]
@@ -209,6 +221,7 @@ defmodule SimpleCharts.Line do
     """
     <svg width="100%" height="100%"
       viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      class="#{get_in(options, [:classes, :core])}"
       xmlns="http://www.w3.org/2000/svg">
       <text x="50%" y="50%" text-anchor="middle">
         #{Keyword.get(options, :placeholder)}
@@ -218,24 +231,21 @@ defmodule SimpleCharts.Line do
   end
 
   @spec draw_chart(points(), options()) :: SimpleCharts.svg()
-  defp draw_chart([%{x: x, y: y}], options) do
+  defp draw_chart([%{x: _x, y: y} = point], options) do
     left = Keyword.get(options, :padding)
     right = Keyword.get(options, :width) - 2 * Keyword.get(options, :padding)
 
     """
     <svg width="100%" height="100%"
       viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      class="#{get_in(options, [:classes, :core])}"
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M#{left},#{format_float(y)}L#{right},#{format_float(y)}"
         fill="none"
         stroke="#{Keyword.get(options, :line_color)}"
         stroke-width="#{Keyword.get(options, :line_width)}" />
-      <circle
-        cx="#{format_float(x)}"
-        cy="#{format_float(y)}"
-        r="#{Keyword.get(options, :dot_radius)}"
-        fill="#{Keyword.get(options, :dot_color)}" />
+      #{if(Keyword.get(options, :show_dot), do: draw_dots([point], options))}
     </svg>
     """
   end
@@ -244,6 +254,7 @@ defmodule SimpleCharts.Line do
     """
     <svg width="100%" height="100%"
       viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      class="#{get_in(options, [:classes, :core])}"
       xmlns="http://www.w3.org/2000/svg">
       #{if(Keyword.get(options, :show_area), do: draw_area(datapoints, options))}
       #{if(Keyword.get(options, :show_line), do: draw_line(datapoints, options))}
@@ -254,25 +265,31 @@ defmodule SimpleCharts.Line do
 
   @spec draw_dots(points(), options()) :: String.t()
   defp draw_dots(datapoints, options) do
+    classes = get_in(options, [:classes, :dots])
+
     Enum.map_join(datapoints, "", fn %{x: x, y: y} ->
       """
       <circle
+        class="#{classes}"
         cx="#{format_float(x)}"
         cy="#{format_float(y)}"
         r="#{Keyword.get(options, :dot_radius)}"
-        fill="#{Keyword.get(options, :dot_color)}" />
+        fill="#{if(classes, do: "", else: Keyword.get(options, :dot_color))}" />
       """
     end)
   end
 
   @spec draw_line(points(), options()) :: String.t()
   defp draw_line(datapoints, options) do
+    classes = get_in(options, [:classes, :line])
+
     """
     <path
+      class="#{classes}"
       d="#{compute_curve(datapoints, options)}"
       fill="none"
-      stroke="#{Keyword.get(options, :line_color)}"
-      stroke-width="#{Keyword.get(options, :line_width)}" />
+      stroke="#{if(classes, do: "", else: Keyword.get(options, :line_color))}"
+      stroke-width="#{if(classes, do: "", else: Keyword.get(options, :line_width))}" />
     """
   end
 
@@ -281,11 +298,14 @@ defmodule SimpleCharts.Line do
     # Extract the x value of the first datapoint to know where to finish the area.
     [%{x: x, y: _y} | _] = datapoints
 
+    classes = get_in(options, [:classes, :area])
+
     """
     <path
+      class="#{classes}"
       d="#{[compute_curve(datapoints, options), "V", "#{Keyword.get(options, :height)}", "H", "#{x}", "Z"]}"
-      fill="#{Keyword.get(options, :area_color)}"
-      stroke="none" />
+      stroke="none"
+      fill="#{if(classes, do: "", else: Keyword.get(options, :area_color))}" />
     """
   end
 
@@ -346,7 +366,13 @@ defmodule SimpleCharts.Line do
 
   @spec default_options(options()) :: options()
   defp default_options(options) do
-    Keyword.merge(@default_options, options, fn _k, _default, value -> value end)
+    Keyword.merge(@default_options, options, fn
+      :classes, default, value ->
+        Keyword.merge(default, value, fn _k, _default, value -> value end)
+
+      _k, _default, value ->
+        value
+    end)
   end
 
   @spec tuple_to_string({number(), number()}) :: String.t()
