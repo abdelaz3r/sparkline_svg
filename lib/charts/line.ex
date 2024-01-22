@@ -53,7 +53,42 @@ defmodule SimpleCharts.Line do
     placeholder: "No data"
   ]
 
-  defexception [:message]
+  @enforce_keys [:datapoints, :options]
+  defstruct [:datapoints, :annotations, :options]
+
+  # defexception [:message]
+
+  @doc """
+  TODO.
+
+  ## Examples
+
+      iex> ...
+
+  """
+  @spec new(datapoints()) :: map()
+  @spec new(datapoints(), options()) :: map()
+  def new(datapoints, options \\ []) do
+    options = default_options(options)
+    %__MODULE__{datapoints: datapoints, options: options}
+  end
+
+  @doc """
+  TODO.
+
+  ## Examples
+
+      iex> ...
+
+  """
+  @spec show_dots(map()) :: map()
+  @spec show_dots(map(), options()) :: map()
+  def show_dots(sparkline, options \\ []) do
+    options = default_options(options)
+
+    # merge dots options with global options
+    %__MODULE__{sparkline | options: options}
+  end
 
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
