@@ -185,7 +185,13 @@ defmodule SimpleCharts.Line do
     [{x, y} | _tail] = datapoints
 
     min_max_x = if max_x - min_x == 0, do: {0, 2 * x}, else: {min_x, max_x}
-    min_max_y = if max_y - min_y == 0, do: {0, 2 * y}, else: {min_y, max_y}
+
+    min_max_y =
+      cond do
+        max_y - min_y != 0 -> {min_y, max_y}
+        y == 0 -> {-1, 1}
+        true -> {0, 2 * y}
+      end
 
     {min_max_x, min_max_y}
   end
