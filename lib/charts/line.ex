@@ -223,7 +223,6 @@ defmodule SimpleCharts.Line do
     """
   end
 
-  @spec draw_chart(points(), options()) :: SimpleCharts.svg()
   defp draw_chart([%{x: x, y: y}], options) do
     left = Keyword.get(options, :padding)
     right = Keyword.get(options, :width) - 2 * Keyword.get(options, :padding)
