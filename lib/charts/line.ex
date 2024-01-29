@@ -1,23 +1,95 @@
 defmodule SimpleCharts.Line do
   @moduledoc """
-  Documentation for `SimpleCharts.Line`.
+  `SimpleCharts.Line` uses a list of datapoints to return a line chart in SVG format.
+
+  ## Usage example:
+
+  ``` elixir
+  # Datapoints
+  datapoints = [{1, 1}, {2, 2}, {3, 3}]
+
+  # A very simple line chart
+  SimpleCharts.Line.to_svg(datapoints)
+
+  # A line chart with different sizes
+  SimpleCharts.Line.to_svg(datapoints, width: 240, height: 80)
+
+  # A complete example of a line chart
+  options = [
+    width: 100,
+    height: 40,
+    padding: 0.5,
+    show_dot: false,
+    dot_radius: 0.1,
+    dot_color: "rgb(255, 255, 255)",
+    line_color: "rgba(166, 218, 149)",
+    line_width: 0.05,
+    line_smoothing: 0.1
+  ]
+
+  SimpleCharts.Line.to_svg(datapoints, options)
+  ```
+
+  ## Options
+
+  Use the following options to customize the chart:
+
+  - `width`: The width of the chart, defaults to `200`.
+  - `height`: The height of the chart, defaults to `100`.
+  - `padding`: The padding of the chart, defaults to `6`.
+  - `show_dot`: A boolean to decide whether to show dots or not, defaults to `true`.
+  - `dot_radius`: The radius of the dots, defaults to `1`.
+  - `dot_color`: The color of the dots, defaults to `"black"`.
+  - `show_line`: A boolean to decide whether to show the line or not, defaults to `true`.
+  - `line_width`: The width of the line, defaults to `0.25`.
+  - `line_color`: The color of the line, defaults to `"black"`.
+  - `line_smoothing`: The smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
+    defaults to `0.2`.
+  - `show_area`: A boolean to decide whether to show the area under the line or not, defaults to `false`.
+  - `area_color`: The color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
+  - `placeholder`: A placeholder for an empty chart, defaults to `"No data"`.
+
+  ## Datapoints
+
+  A datapoint can be a pair of `DateTime` and `number`, `Date` and `number`, `Time` and `number`,
+  or simply two `numbers`. However, the datapoints in a list must all be of the same type.
+
+  ``` elixir
+  # Datapoints
+  datapoints = [{1, 1}, {2, 2}, {3, 3}]
+
+  # Datapoints with DateTime
+  datapoints = [{~N[2021-01-01 00:00:00], 1}, {~N[2021-01-02 00:00:00], 2}, {~N[2021-01-03 00:00:00], 3}]
+
+  # Datapoints with Date
+  datapoints = [{~D[2021-01-01], 1}, {~D[2021-01-02], 2}, {~D[2021-01-03], 3}]
+
+  # Datapoints with Time
+  datapoints = [{~T[00:00:00], 1}, {~T[00:00:00], 2}, {~T[00:00:00], 3}]
+  ```
   """
 
-  @typedoc "Data point."
+  @typedoc """
+  A datapoint can be a pair of DateTime and number, Date and number, Time and number,
+  or simply two numbers.
+  """
   @type datapoint ::
           {DateTime.t(), number()}
           | {Date.t(), number()}
           | {Time.t(), number()}
           | {number(), number()}
 
-  @typedoc "Data points."
+  @typedoc """
+  A list of datapoints. The data types in the list correspond to those defined for
+  datapoint.
+  """
   @type datapoints ::
           list({DateTime.t(), number()})
           | list({Date.t(), number()})
           | list({Time.t(), number()})
           | list({number(), number()})
 
-  @typedoc "Option."
+  @typedoc "An option for the chart."
   @type option ::
           {:width, number()}
           | {:height, number()}
@@ -33,7 +105,7 @@ defmodule SimpleCharts.Line do
           | {:area_color, String.t()}
           | {:placeholder, String.t()}
 
-  @typedoc "Options."
+  @typedoc "An options list for the chart."
   @type options :: list(option())
 
   # Default options
