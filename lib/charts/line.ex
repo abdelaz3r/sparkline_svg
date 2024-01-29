@@ -351,7 +351,7 @@ defmodule SimpleCharts.Line do
 
   @spec default_options(options()) :: options()
   defp default_options(options) do
-    Keyword.merge(@default_options, options, fn _k, _default, value -> value end)
+    Keyword.merge(@default_options, options)
   end
 
   @spec tuple_to_string({number(), number()}) :: String.t()
