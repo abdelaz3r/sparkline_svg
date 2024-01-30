@@ -214,7 +214,6 @@ defmodule SimpleCharts.Line do
       datapoints ->
         datapoints =
           datapoints
-          |> Enum.reverse()
           |> Enum.uniq_by(fn {x, _} -> x end)
           |> Enum.sort_by(fn {x, _} -> x end)
 
