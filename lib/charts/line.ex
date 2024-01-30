@@ -222,21 +222,29 @@ defmodule SimpleCharts.Line do
   end
 
   @spec clean_datapoint(datapoint(), atom()) :: {{number(), number()}, atom()} | {:error, atom()}
-  defp clean_datapoint({%DateTime{} = datetime, y}, type) when is_nil(type) or type == DateTime do
+  defp clean_datapoint({%module{} = value, y}, nil) do
+    clean_datapoint({value, y}, module)
+  end
+
+  defp clean_datapoint({value, y}, nil) when is_number(value) do
+    clean_datapoint({value, y}, :number)
+  end
+
+  defp clean_datapoint({%DateTime{} = datetime, y}, DateTime) do
     {{DateTime.to_unix(datetime), y}, DateTime}
   end
 
-  defp clean_datapoint({%Date{} = date, y}, type) when is_nil(type) or type == Date do
+  defp clean_datapoint({%Date{} = date, y}, Date) do
     {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
     {{DateTime.to_unix(datetime), y}, Date}
   end
 
-  defp clean_datapoint({%Time{} = time, y}, type) when is_nil(type) or type == Time do
+  defp clean_datapoint({%Time{} = time, y}, Time) do
     {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
     {{seconds, y}, Time}
   end
 
-  defp clean_datapoint({x, y}, type) when is_number(x) and (is_nil(type) or type == :number) do
+  defp clean_datapoint({x, y}, type) when is_number(x) and type == :number do
     {{x, y}, :number}
   end
 
