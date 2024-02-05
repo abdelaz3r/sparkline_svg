@@ -58,7 +58,7 @@ defmodule SparklineTest do
   end
 
   test "to_svg!/2 error handling", _context do
-    assert_raise Sparkline, "invalid_x_type", fn ->
+    assert_raise Sparkline.Error, "invalid_x_type", fn ->
       Sparkline.to_svg!([{"a", 1}, {"b", 2}])
     end
   end
