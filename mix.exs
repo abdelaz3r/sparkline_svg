@@ -1,9 +1,9 @@
-defmodule SimpleCharts.MixProject do
+defmodule Sparkline.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :simple_charts,
+      app: :sparkline,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,

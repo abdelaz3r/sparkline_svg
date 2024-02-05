@@ -21,7 +21,7 @@ erl_crash.dump
 *.beam
 
 # Ignore package tarball (built via "mix hex.build").
-simple_charts-*.tar
+sparkline-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/

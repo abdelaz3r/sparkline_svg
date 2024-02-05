@@ -1,6 +1,6 @@
-defmodule SimpleCharts.Line do
+defmodule Sparkline.Line do
   @moduledoc """
-  `SimpleCharts.Line` uses a list of datapoints to return a line chart in SVG format.
+  `Sparkline.Line` uses a list of datapoints to return a line chart in SVG format.
 
   ## Usage example:
 
@@ -9,10 +9,10 @@ defmodule SimpleCharts.Line do
   datapoints = [{1, 1}, {2, 2}, {3, 3}]
 
   # A very simple line chart
-  SimpleCharts.Line.to_svg(datapoints)
+  Sparkline.Line.to_svg(datapoints)
 
   # A line chart with different sizes
-  SimpleCharts.Line.to_svg(datapoints, width: 240, height: 80)
+  Sparkline.Line.to_svg(datapoints, width: 240, height: 80)
 
   # A complete example of a line chart
   options = [
@@ -27,7 +27,7 @@ defmodule SimpleCharts.Line do
     line_smoothing: 0.1
   ]
 
-  SimpleCharts.Line.to_svg(datapoints, options)
+  Sparkline.Line.to_svg(datapoints, options)
   ```
 
   ## Options
@@ -132,15 +132,15 @@ defmodule SimpleCharts.Line do
 
   ## Examples
 
-      iex> SimpleCharts.Line.to_svg([{1, 1}, {2, 2}, {3, 3}])
+      iex> Sparkline.Line.to_svg([{1, 1}, {2, 2}, {3, 3}])
       {:ok, svg_string}
 
-      iex> SimpleCharts.Line.to_svg([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
+      iex> Sparkline.Line.to_svg([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
       {:ok, svg_string}
 
   """
-  @spec to_svg(datapoints()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
-  @spec to_svg(datapoints(), options()) :: {:ok, SimpleCharts.svg()} | {:error, atom()}
+  @spec to_svg(datapoints()) :: {:ok, Sparkline.svg()} | {:error, atom()}
+  @spec to_svg(datapoints(), options()) :: {:ok, Sparkline.svg()} | {:error, atom()}
   def to_svg(datapoints, options \\ []) do
     options = default_options(options)
     padding = Keyword.get(options, :padding)
@@ -168,19 +168,19 @@ defmodule SimpleCharts.Line do
 
   ## Examples
 
-      iex> SimpleCharts.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}])
+      iex> Sparkline.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}])
       svg_string
 
-      iex> SimpleCharts.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
+      iex> Sparkline.Line.to_svg!([{1, 1}, {2, 2}, {3, 3}], width: 240, height: 80)
       svg_string
 
   """
-  @spec to_svg!(datapoints()) :: SimpleCharts.svg()
-  @spec to_svg!(datapoints(), options()) :: SimpleCharts.svg()
+  @spec to_svg!(datapoints()) :: Sparkline.svg()
+  @spec to_svg!(datapoints(), options()) :: Sparkline.svg()
   def to_svg!(datapoints, options \\ []) do
     case to_svg(datapoints, options) do
       {:ok, svg} -> svg
-      {:error, reason} -> raise(SimpleCharts.Line, Atom.to_string(reason))
+      {:error, reason} -> raise(Sparkline.Line, Atom.to_string(reason))
     end
   end
 
@@ -300,7 +300,7 @@ defmodule SimpleCharts.Line do
     end)
   end
 
-  @spec draw_chart(points(), options()) :: SimpleCharts.svg()
+  @spec draw_chart(points(), options()) :: Sparkline.svg()
   defp draw_chart([], options) do
     """
     <svg width="100%" height="100%"

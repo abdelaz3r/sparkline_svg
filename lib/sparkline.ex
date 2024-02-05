@@ -1,6 +1,6 @@
-defmodule SimpleCharts do
+defmodule Sparkline do
   @moduledoc """
-  General documentation for `SimpleCharts`.
+  General documentation for `Sparkline`.
   """
 
   @typedoc "Svg string."
@@ -11,7 +11,7 @@ defmodule SimpleCharts do
 
   ## Examples
 
-      iex> SimpleCharts.as_data_uri(svg_string)
+      iex> Sparkline.as_data_uri(svg_string)
       "data:image/svg+xml,%3Csvg..."
 
   """

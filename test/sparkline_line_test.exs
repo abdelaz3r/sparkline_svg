@@ -1,7 +1,7 @@
-defmodule SimpleChartsLineTest do
+defmodule SparklineLineTest do
   use ExUnit.Case, async: true
 
-  alias SimpleCharts.Line
+  alias Sparkline.Line
 
   setup do
     chart = """
