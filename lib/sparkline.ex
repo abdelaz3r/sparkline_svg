@@ -69,6 +69,9 @@ defmodule Sparkline do
   ```
   """
 
+  alias Sparkline.Datapoint
+  alias Sparkline.Draw
+
   @typedoc "Svg string."
   @type svg :: String.t()
 
@@ -130,9 +133,6 @@ defmodule Sparkline do
 
   defexception [:message]
 
-  alias Sparkline.Core
-  alias Sparkline.Draw
-
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
 
@@ -151,17 +151,17 @@ defmodule Sparkline do
     options = Keyword.merge(@default_options, options)
     padding = Keyword.get(options, :padding)
 
-    with :ok <- Core.check_dimension(Keyword.get(options, :width), padding),
-         :ok <- Core.check_dimension(Keyword.get(options, :height), padding),
-         {:ok, datapoints} <- Core.clean_datapoints(datapoints) do
+    with :ok <- Datapoint.check_dimension(Keyword.get(options, :width), padding),
+         :ok <- Datapoint.check_dimension(Keyword.get(options, :height), padding),
+         {:ok, datapoints} <- Datapoint.clean(datapoints) do
       svg =
         if Enum.empty?(datapoints) do
           Draw.chart([], options)
         else
-          {min_max_x, min_max_y} = Core.compute_min_max(datapoints)
+          {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
 
           datapoints
-          |> Core.compute_datapoints(min_max_x, min_max_y, options)
+          |> Datapoint.resize(min_max_x, min_max_y, options)
           |> Draw.chart(options)
         end
 

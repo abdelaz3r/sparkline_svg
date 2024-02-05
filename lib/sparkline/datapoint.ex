@@ -1,4 +1,4 @@
-defmodule Sparkline.Core do
+defmodule Sparkline.Datapoint do
   @moduledoc false
 
   @type point :: %{x: number(), y: number()}
@@ -12,9 +12,8 @@ defmodule Sparkline.Core do
       else: {:error, :invalid_dimension}
   end
 
-  @spec clean_datapoints(Sparkline.datapoints()) ::
-          {:ok, Sparkline.datapoints()} | {:error, atom()}
-  def clean_datapoints(datapoints) do
+  @spec clean(Sparkline.datapoints()) :: {:ok, Sparkline.datapoints()} | {:error, atom()}
+  def clean(datapoints) do
     {datapoints, _type} =
       Enum.reduce_while(datapoints, {[], nil}, fn {x, y}, {datapoints, type} ->
         with {:ok, x, type} <- clean_x(x, type),
@@ -84,8 +83,8 @@ defmodule Sparkline.Core do
     {:error, :invalid_y_type}
   end
 
-  @spec compute_min_max(Sparkline.datapoints()) :: {min_max(), min_max()}
-  def compute_min_max(datapoints) do
+  @spec get_min_max(Sparkline.datapoints()) :: {min_max(), min_max()}
+  def get_min_max(datapoints) do
     {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
     {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
     [{x, y} | _tail] = datapoints
@@ -102,9 +101,8 @@ defmodule Sparkline.Core do
     {min_max_x, min_max_y}
   end
 
-  @spec compute_datapoints(Sparkline.datapoints(), min_max(), min_max(), Sparkline.options()) ::
-          points()
-  def compute_datapoints(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
+  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.options()) :: points()
+  def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = Keyword.get(options, :width)
     height = Keyword.get(options, :height)
     padding = Keyword.get(options, :padding)
