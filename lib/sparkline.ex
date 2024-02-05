@@ -131,8 +131,6 @@ defmodule Sparkline do
     placeholder: "No data"
   ]
 
-  defexception [:message]
-
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
 
@@ -186,7 +184,7 @@ defmodule Sparkline do
   def to_svg!(datapoints, options \\ []) do
     case to_svg(datapoints, options) do
       {:ok, svg} -> svg
-      {:error, reason} -> raise(Sparkline, Atom.to_string(reason))
+      {:error, reason} -> raise(Sparkline.Error, Atom.to_string(reason))
     end
   end
 
