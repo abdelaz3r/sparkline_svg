@@ -1,4 +1,4 @@
-defmodule SimpleChartsTest do
+defmodule SparklineTest do
   use ExUnit.Case, async: true
 
   setup do
@@ -11,8 +11,8 @@ defmodule SimpleChartsTest do
   test "as_data_uri/1", context do
     data_uri =
       [{1, 1}, {2, 2}]
-      |> SimpleCharts.Line.to_svg!()
-      |> SimpleCharts.as_data_uri()
+      |> Sparkline.Line.to_svg!()
+      |> Sparkline.as_data_uri()
 
     assert data_uri == context.data_uri
   end
