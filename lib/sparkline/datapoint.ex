@@ -94,11 +94,11 @@ defmodule Sparkline.Datapoint do
     {min_max_x, min_max_y}
   end
 
-  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.options()) :: points()
+  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.map_options()) :: points()
   def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
-    width = Keyword.get(options, :width)
-    height = Keyword.get(options, :height)
-    padding = Keyword.get(options, :padding)
+    width = options.width
+    height = options.height
+    padding = options.padding
 
     Enum.map(datapoints, fn {x, y} ->
       %{

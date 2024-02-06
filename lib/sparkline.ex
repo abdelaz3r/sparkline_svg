@@ -123,19 +123,28 @@ defmodule Sparkline do
   @typedoc "A area-related sparkline options list."
   @type area_options :: list(option())
 
+  # TODO: cast real types
+  @typedoc false
+  @typep map_options :: %{
+           width: number(),
+           height: number(),
+           padding: number(),
+           placeholder: nil | String.t(),
+           dots: nil | map(),
+           line: nil | map(),
+           area: nil | map()
+         }
+
   @typedoc """
   TODO.
   Sparkline struct.
   """
   @type t :: %Sparkline{
           datapoints: datapoints(),
-          options: options(),
-          dots_options: dots_options() | nil,
-          line_options: line_options() | nil,
-          area_options: area_options() | nil
+          options: map_options()
         }
   @enforce_keys [:datapoints, :options]
-  defstruct [:datapoints, :options, :dots_options, :line_options, :area_options]
+  defstruct [:datapoints, :options]
 
   @doc """
   TODO: Add documentation
@@ -143,8 +152,11 @@ defmodule Sparkline do
   @spec new(datapoints()) :: Sparkline.t()
   @spec new(datapoints(), options()) :: Sparkline.t()
   def new(datapoints, options \\ []) do
-    default_options = [width: 200, height: 100, padding: 6, placeholder: nil]
-    options = Keyword.merge(default_options, options)
+    options =
+      [width: 200, height: 100, padding: 6, placeholder: nil]
+      |> Keyword.merge(options)
+      |> Map.new()
+      |> Map.merge(%{dots: nil, line: nil, area: nil})
 
     %Sparkline{datapoints: datapoints, options: options}
   end
@@ -155,10 +167,12 @@ defmodule Sparkline do
   @spec show_dots(Sparkline.t()) :: Sparkline.t()
   @spec show_dots(Sparkline.t(), dots_options()) :: Sparkline.t()
   def show_dots(sparkline, options \\ []) do
-    default_dots_options = [radius: 1, color: "black"]
-    options = Keyword.merge(default_dots_options, options)
+    dots_options =
+      [radius: 1, color: "black"]
+      |> Keyword.merge(options)
+      |> Map.new()
 
-    %Sparkline{sparkline | dots_options: options}
+    %Sparkline{sparkline | options: %{sparkline.options | dots: dots_options}}
   end
 
   @doc """
@@ -167,10 +181,12 @@ defmodule Sparkline do
   @spec show_line(Sparkline.t()) :: Sparkline.t()
   @spec show_line(Sparkline.t(), line_options()) :: Sparkline.t()
   def show_line(sparkline, options \\ []) do
-    default_line_options = [width: 0.25, color: "black", smoothing: 0.2]
-    options = Keyword.merge(default_line_options, options)
+    line_options =
+      [width: 0.25, color: "black", smoothing: 0.2]
+      |> Keyword.merge(options)
+      |> Map.new()
 
-    %Sparkline{sparkline | line_options: options}
+    %Sparkline{sparkline | options: %{sparkline.options | line: line_options}}
   end
 
   @doc """
@@ -179,10 +195,12 @@ defmodule Sparkline do
   @spec show_area(Sparkline.t()) :: Sparkline.t()
   @spec show_area(Sparkline.t(), area_options()) :: Sparkline.t()
   def show_area(sparkline, options \\ []) do
-    default_area_options = [color: "rgba(0, 0, 0, 0.2)"]
-    options = Keyword.merge(default_area_options, options)
+    area_options =
+      [color: "rgba(0, 0, 0, 0.2)"]
+      |> Keyword.merge(options)
+      |> Map.new()
 
-    %Sparkline{sparkline | area_options: options}
+    %Sparkline{sparkline | options: %{sparkline.options | line: area_options}}
   end
 
   @doc """
@@ -199,10 +217,10 @@ defmodule Sparkline do
   """
   @spec to_svg(Sparkline.t()) :: {:ok, svg()} | {:error, atom()}
   def to_svg(sparkline) do
-    padding = Keyword.get(sparkline.options, :padding)
+    %{width: width, height: height, padding: padding} = sparkline.options
 
-    with :ok <- check_dimension(Keyword.get(sparkline.options, :width), padding),
-         :ok <- check_dimension(Keyword.get(sparkline.options, :height), padding),
+    with :ok <- check_dimension(width, padding),
+         :ok <- check_dimension(height, padding),
          {:ok, datapoints} <- Datapoint.clean(sparkline.datapoints) do
       svg =
         if Enum.empty?(datapoints) do
