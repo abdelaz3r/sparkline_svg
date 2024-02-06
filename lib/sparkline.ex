@@ -123,17 +123,16 @@ defmodule Sparkline do
   @typedoc "A area-related sparkline options list."
   @type area_options :: list(option())
 
-  # TODO: cast real types
   @typedoc false
-  @typep map_options :: %{
-           width: number(),
-           height: number(),
-           padding: number(),
-           placeholder: nil | String.t(),
-           dots: nil | map(),
-           line: nil | map(),
-           area: nil | map()
-         }
+  @type internal_options :: %{
+          width: number(),
+          height: number(),
+          padding: number(),
+          placeholder: nil | String.t(),
+          dots: nil | map(),
+          line: nil | map(),
+          area: nil | map()
+        }
 
   @typedoc """
   TODO.
@@ -141,7 +140,7 @@ defmodule Sparkline do
   """
   @type t :: %Sparkline{
           datapoints: datapoints(),
-          options: map_options()
+          options: internal_options()
         }
   @enforce_keys [:datapoints, :options]
   defstruct [:datapoints, :options]

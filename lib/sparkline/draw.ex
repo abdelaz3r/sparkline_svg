@@ -42,7 +42,7 @@ defmodule Sparkline.Draw do
     """
   end
 
-  @spec dots(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  @spec dots(Datapoint.points(), Sparkline.internal_options()) :: String.t()
   defp dots(datapoints, options) do
     Enum.map_join(datapoints, "", fn %{x: x, y: y} ->
       """
@@ -55,7 +55,7 @@ defmodule Sparkline.Draw do
     end)
   end
 
-  @spec line(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  @spec line(Datapoint.points(), Sparkline.internal_options()) :: String.t()
   defp line([%{x: x, y: y}], options) do
     left = x - options.width / 10
     right = x + options.width / 10
@@ -79,7 +79,7 @@ defmodule Sparkline.Draw do
     """
   end
 
-  @spec area(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  @spec area(Datapoint.points(), Sparkline.internal_options()) :: String.t()
   defp area([_points], _options), do: ""
 
   defp area(datapoints, options) do
@@ -94,7 +94,7 @@ defmodule Sparkline.Draw do
     """
   end
 
-  @spec compute_curve(Datapoint.points(), Sparkline.map_options()) :: iolist()
+  @spec compute_curve(Datapoint.points(), Sparkline.internal_options()) :: iolist()
   defp compute_curve([%{x: x, y: y} = curr | rest], options) do
     ["M#{tuple_to_string({x, y})}"]
     |> compute_curve(rest, curr, curr, options)
@@ -105,7 +105,7 @@ defmodule Sparkline.Draw do
           Datapoint.points(),
           Datapoint.point(),
           Datapoint.point(),
-          Sparkline.map_options()
+          Sparkline.internal_options()
         ) :: iolist()
   defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, options) do
     acc
@@ -123,7 +123,7 @@ defmodule Sparkline.Draw do
           Datapoint.point(),
           Datapoint.point(),
           Datapoint.point(),
-          Sparkline.map_options()
+          Sparkline.internal_options()
         ) :: iolist()
   defp curve_command(acc, prev2, prev1, curr, next, options) do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
@@ -138,7 +138,7 @@ defmodule Sparkline.Draw do
           Datapoint.point(),
           Datapoint.point(),
           atom(),
-          Sparkline.map_options()
+          Sparkline.internal_options()
         ) :: {number(), number()}
   defp calculate_control_point(curr, prev, next, direction, options) do
     {length, angle} = calculate_line(prev, next)
