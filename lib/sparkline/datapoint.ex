@@ -60,6 +60,11 @@ defmodule Sparkline.Datapoint do
     {:ok, seconds, Time}
   end
 
+  defp clean_x(%NaiveDateTime{} = datetime, NaiveDateTime) do
+    {seconds, _} = NaiveDateTime.to_gregorian_seconds(datetime)
+    {:ok, seconds, NaiveDateTime}
+  end
+
   defp clean_x(x, :number) when is_number(x) do
     {:ok, x, :number}
   end

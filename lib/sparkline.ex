@@ -76,9 +76,9 @@ defmodule Sparkline do
 
   # Datapoints with DateTime
   datapoints = [
-    {~N[2021-01-01 00:00:00], 1},
-    {~N[2021-01-02 00:00:00], 2},
-    {~N[2021-01-03 00:00:00], 3}
+    {~U[2021-01-01 00:00:00Z], 1},
+    {~U[2021-01-02 00:00:00Z], 2},
+    {~U[2021-01-03 00:00:00Z], 3}
   ]
 
   # Datapoints with Date
@@ -86,6 +86,13 @@ defmodule Sparkline do
 
   # Datapoints with Time
   datapoints = [{~T[00:01:00], 1}, {~T[00:02:00], 2}, {~T[00:03:00], 3}]
+
+  # Datapoints with NaiveDateTime
+  datapoints = [
+    {~N[2021-01-01 00:00:00], 1},
+    {~N[2021-01-02 00:00:00], 2},
+    {~N[2021-01-03 00:00:00], 3}
+  ]
   ```
   """
 
@@ -103,6 +110,7 @@ defmodule Sparkline do
           {DateTime.t(), number()}
           | {Date.t(), number()}
           | {Time.t(), number()}
+          | {NaiveDateTime.t(), number()}
           | {number(), number()}
 
   @typedoc """
@@ -112,6 +120,7 @@ defmodule Sparkline do
           list({DateTime.t(), number()})
           | list({Date.t(), number()})
           | list({Time.t(), number()})
+          | list({NaiveDateTime.t(), number()})
           | list({number(), number()})
 
   @typedoc "A general sparkline option."
