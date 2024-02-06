@@ -127,6 +127,13 @@ defmodule SparklineTest do
            ])
            |> Sparkline.show_line()
            |> Sparkline.to_svg() == {:ok, chart}
+
+    assert Sparkline.new([
+             {NaiveDateTime.utc_now(), 1},
+             {NaiveDateTime.utc_now() |> NaiveDateTime.add(1, :second), 2}
+           ])
+           |> Sparkline.show_line()
+           |> Sparkline.to_svg() == {:ok, chart}
   end
 
   test "to_svg/2 with non-default options" do
