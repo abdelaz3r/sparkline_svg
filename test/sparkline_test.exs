@@ -150,11 +150,11 @@ defmodule SparklineTest do
 
   test "to_svg/2 with non-default options (for line)" do
     assert Sparkline.new([{1, 1}, {2, 2}])
-           |> Sparkline.show_line(width: 1, color: "red", smoothing: 0)
+           |> Sparkline.show_line(width: 1, color: "red")
            |> Sparkline.to_svg() ==
              {:ok,
               """
-              <svg width="100%" height="100%"\n  viewBox="0 0 200 100"\n  xmlns="http://www.w3.org/2000/svg">\n  \n  <path\n  d="M6.0,94.0C6.0,94.0 194.0,6.0 194.0,6.0"\n  fill="none"\n  stroke="red"\n  stroke-width="1" />\n\n  \n</svg>
+              <svg width="100%" height="100%"\n  viewBox="0 0 200 100"\n  xmlns="http://www.w3.org/2000/svg">\n  \n  <path\n  d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0"\n  fill="none"\n  stroke="red"\n  stroke-width="1" />\n\n  \n</svg>
               """}
   end
 
@@ -164,14 +164,14 @@ defmodule SparklineTest do
            |> Sparkline.to_svg() ==
              {:ok,
               """
-              <svg width="100%" height="100%"\n  viewBox="0 0 200 100"\n  xmlns="http://www.w3.org/2000/svg">\n  <path\n  d="M6.0,94.0C6.0,94.0 194.0,6.0 194.0,6.0V100H6.0Z"\n  fill="red"\n  stroke="none" />\n\n  \n  \n</svg>
+              <svg width="100%" height="100%"\n  viewBox="0 0 200 100"\n  xmlns="http://www.w3.org/2000/svg">\n  <path\n  d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z"\n  fill="red"\n  stroke="none" />\n\n  \n  \n</svg>
               """}
   end
 
   test "to_svg/2 with non-default options (all)" do
-    assert Sparkline.new([{1, 1}, {2, 2}], width: 10, height: 10, padding: 1)
+    assert Sparkline.new([{1, 1}, {2, 2}], width: 10, height: 10, padding: 1, smoothing: 0)
            |> Sparkline.show_dots(radius: 2, color: "red")
-           |> Sparkline.show_line(width: 1, color: "red", smoothing: 0)
+           |> Sparkline.show_line(width: 1, color: "red")
            |> Sparkline.show_area(color: "red")
            |> Sparkline.to_svg() ==
              {:ok,
