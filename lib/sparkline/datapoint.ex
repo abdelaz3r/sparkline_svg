@@ -1,8 +1,13 @@
 defmodule Sparkline.Datapoint do
   @moduledoc false
 
+  @typedoc false
   @type point :: %{x: number(), y: number()}
+
+  @typedoc false
   @type points :: list(point())
+
+  @typedoc false
   @type min_max :: {number(), number()}
 
   @spec clean(Sparkline.datapoints()) :: {:ok, Sparkline.datapoints()} | {:error, atom()}
@@ -94,7 +99,8 @@ defmodule Sparkline.Datapoint do
     {min_max_x, min_max_y}
   end
 
-  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.map_options()) :: points()
+  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.internal_options()) ::
+          points()
   def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = options.width
     height = options.height
