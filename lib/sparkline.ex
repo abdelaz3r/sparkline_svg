@@ -95,41 +95,95 @@ defmodule Sparkline do
           | list({Time.t(), number()})
           | list({number(), number()})
 
-  @typedoc "An option for the chart."
+  @typedoc "A general sparkline option."
   @type option ::
           {:width, number()}
           | {:height, number()}
           | {:padding, number()}
-          | {:show_dot, boolean()}
-          | {:dot_radius, number()}
-          | {:dot_color, String.t()}
-          | {:show_line, boolean()}
-          | {:line_width, number()}
-          | {:line_color, String.t()}
-          | {:line_smoothing, float()}
-          | {:show_area, boolean()}
-          | {:area_color, String.t()}
-          | {:placeholder, String.t()}
+          | {:placeholder, nil | String.t()}
 
-  @typedoc "An options list for the chart."
+  @typedoc "A general sparkline options list."
   @type options :: list(option())
 
-  # Default options
-  @default_options [
-    width: 200,
-    height: 100,
-    padding: 6,
-    show_dot: true,
-    dot_radius: 1,
-    dot_color: "black",
-    show_line: true,
-    line_width: 0.25,
-    line_color: "black",
-    line_smoothing: 0.2,
-    show_area: false,
-    area_color: "rgba(0, 0, 0, 0.2)",
-    placeholder: "No data"
-  ]
+  @typedoc "A dots-related sparkline option."
+  @type dots_option :: {:radius, number()} | {:color, String.t()}
+
+  @typedoc "A dots-related sparkline options list."
+  @type dots_options :: list(option())
+
+  @typedoc "A line-related sparkline option."
+  @type line_option :: {:width, number()} | {:color, String.t()} | {:smoothing, float()}
+
+  @typedoc "A line-related sparkline options list."
+  @type line_options :: list(option())
+
+  @typedoc "A area-related sparkline option."
+  @type area_option :: {:color, String.t()}
+
+  @typedoc "A area-related sparkline options list."
+  @type area_options :: list(option())
+
+  @typedoc """
+  TODO.
+  Sparkline struct.
+  """
+  @type t :: %Sparkline{
+          datapoints: datapoints(),
+          options: options(),
+          dots_options: dots_options() | nil,
+          line_options: line_options() | nil,
+          area_options: area_options() | nil
+        }
+  @enforce_keys [:datapoints, :options]
+  defstruct [:datapoints, :options, :dots_options, :line_options, :area_options]
+
+  @doc """
+  TODO: Add documentation
+  """
+  @spec new(datapoints()) :: Sparkline.t()
+  @spec new(datapoints(), options()) :: Sparkline.t()
+  def new(datapoints, options \\ []) do
+    default_options = [width: 200, height: 100, padding: 6, placeholder: nil]
+    options = Keyword.merge(default_options, options)
+
+    %Sparkline{datapoints: datapoints, options: options}
+  end
+
+  @doc """
+  TODO: Add documentation
+  """
+  @spec show_dots(Sparkline.t()) :: Sparkline.t()
+  @spec show_dots(Sparkline.t(), dots_options()) :: Sparkline.t()
+  def show_dots(sparkline, options \\ []) do
+    default_dots_options = [radius: 1, color: "black"]
+    options = Keyword.merge(default_dots_options, options)
+
+    %Sparkline{sparkline | dots_options: options}
+  end
+
+  @doc """
+  TODO: Add documentation
+  """
+  @spec show_line(Sparkline.t()) :: Sparkline.t()
+  @spec show_line(Sparkline.t(), line_options()) :: Sparkline.t()
+  def show_line(sparkline, options \\ []) do
+    default_line_options = [width: 0.25, color: "black", smoothing: 0.2]
+    options = Keyword.merge(default_line_options, options)
+
+    %Sparkline{sparkline | line_options: options}
+  end
+
+  @doc """
+  TODO: Add documentation
+  """
+  @spec show_area(Sparkline.t()) :: Sparkline.t()
+  @spec show_area(Sparkline.t(), area_options()) :: Sparkline.t()
+  def show_area(sparkline, options \\ []) do
+    default_area_options = [color: "rgba(0, 0, 0, 0.2)"]
+    options = Keyword.merge(default_area_options, options)
+
+    %Sparkline{sparkline | area_options: options}
+  end
 
   @doc """
   Return a valid SVG document representing a line chart with the given datapoints.
@@ -143,24 +197,22 @@ defmodule Sparkline do
   {:ok, svg_string}
 
   """
-  @spec to_svg(datapoints()) :: {:ok, svg()} | {:error, atom()}
-  @spec to_svg(datapoints(), options()) :: {:ok, svg()} | {:error, atom()}
-  def to_svg(datapoints, options \\ []) do
-    options = Keyword.merge(@default_options, options)
-    padding = Keyword.get(options, :padding)
+  @spec to_svg(Sparkline.t()) :: {:ok, svg()} | {:error, atom()}
+  def to_svg(sparkline) do
+    padding = Keyword.get(sparkline.options, :padding)
 
-    with :ok <- Datapoint.check_dimension(Keyword.get(options, :width), padding),
-         :ok <- Datapoint.check_dimension(Keyword.get(options, :height), padding),
-         {:ok, datapoints} <- Datapoint.clean(datapoints) do
+    with :ok <- check_dimension(Keyword.get(sparkline.options, :width), padding),
+         :ok <- check_dimension(Keyword.get(sparkline.options, :height), padding),
+         {:ok, datapoints} <- Datapoint.clean(sparkline.datapoints) do
       svg =
         if Enum.empty?(datapoints) do
-          Draw.chart([], options)
+          Draw.chart(sparkline)
         else
           {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
+          datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
+          sparkline = %Sparkline{sparkline | datapoints: datapoints}
 
-          datapoints
-          |> Datapoint.resize(min_max_x, min_max_y, options)
-          |> Draw.chart(options)
+          Draw.chart(sparkline)
         end
 
       {:ok, svg}
@@ -179,10 +231,9 @@ defmodule Sparkline do
   svg_string
 
   """
-  @spec to_svg!(datapoints()) :: svg()
-  @spec to_svg!(datapoints(), options()) :: svg()
-  def to_svg!(datapoints, options \\ []) do
-    case to_svg(datapoints, options) do
+  @spec to_svg!(Sparkline.t()) :: svg()
+  def to_svg!(sparkline) do
+    case to_svg(sparkline) do
       {:ok, svg} -> svg
       {:error, reason} -> raise(Sparkline.Error, Atom.to_string(reason))
     end
@@ -200,5 +251,14 @@ defmodule Sparkline do
   @spec as_data_uri(svg()) :: String.t()
   def as_data_uri(svg) when is_binary(svg) do
     ["data:image/svg+xml;base64", Base.encode64(svg)] |> Enum.join(",")
+  end
+
+  # Private functions
+
+  @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
+  defp check_dimension(length, padding) do
+    if length - 2 * padding > 0,
+      do: :ok,
+      else: {:error, :invalid_dimension}
   end
 end
