@@ -142,9 +142,10 @@ defmodule Sparkline.Draw do
         ) :: {number(), number()}
   defp calculate_control_point(curr, prev, next, direction, options) do
     {length, angle} = calculate_line(prev, next)
+    smoothing = if options.line, do: options.line.smoothing, else: 0
 
     angle = if direction == :right, do: angle + :math.pi(), else: angle
-    length = length * options.line.smoothing
+    length = length * smoothing
 
     {
       curr.x + :math.cos(angle) * length,

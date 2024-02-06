@@ -199,7 +199,7 @@ defmodule Sparkline do
       |> Keyword.merge(options)
       |> Map.new()
 
-    %Sparkline{sparkline | options: %{sparkline.options | line: area_options}}
+    %Sparkline{sparkline | options: %{sparkline.options | area: area_options}}
   end
 
   @doc """
