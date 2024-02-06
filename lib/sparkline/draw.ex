@@ -5,11 +5,11 @@ defmodule Sparkline.Draw do
 
   @spec chart(Sparkline.t()) :: Sparkline.svg()
   def chart(%Sparkline{datapoints: []} = sparkline) do
-    placeholder = Keyword.get(sparkline.options, :placeholder)
+    %{options: %{width: width, height: height, placeholder: placeholder}} = sparkline
 
     """
     <svg width="100%" height="100%"
-      viewBox="0 0 #{Keyword.get(sparkline.options, :width)} #{Keyword.get(sparkline.options, :height)}"
+      viewBox="0 0 #{width} #{height}"
       xmlns="http://www.w3.org/2000/svg">
       #{if(placeholder != nil, do: placeholder(placeholder))}
     </svg>
@@ -19,19 +19,16 @@ defmodule Sparkline.Draw do
   def chart(%Sparkline{} = sparkline) do
     %{
       datapoints: datapoints,
-      options: options,
-      dots_options: dots_options,
-      line_options: line_options,
-      area_options: area_options
+      options: %{dots: dots_options, line: line_options, area: area_options} = options
     } = sparkline
 
     """
     <svg width="100%" height="100%"
-      viewBox="0 0 #{Keyword.get(options, :width)} #{Keyword.get(options, :height)}"
+      viewBox="0 0 #{options.width} #{options.height}"
       xmlns="http://www.w3.org/2000/svg">
-      #{if(area_options != nil, do: area(datapoints, options, line_options, area_options))}
-      #{if(line_options != nil, do: line(datapoints, options, line_options))}
-      #{if(dots_options != nil, do: dots(datapoints, dots_options))}
+      #{if(area_options != nil, do: area(datapoints, options))}
+      #{if(line_options != nil, do: line(datapoints, options))}
+      #{if(dots_options != nil, do: dots(datapoints, options))}
     </svg>
     """
   end
@@ -45,69 +42,62 @@ defmodule Sparkline.Draw do
     """
   end
 
-  @spec dots(Datapoint.points(), Sparkline.dots_options()) :: String.t()
-  defp dots(datapoints, dots_options) do
+  @spec dots(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  defp dots(datapoints, options) do
     Enum.map_join(datapoints, "", fn %{x: x, y: y} ->
       """
       <circle
         cx="#{format_float(x)}"
         cy="#{format_float(y)}"
-        r="#{Keyword.get(dots_options, :radius)}"
-        fill="#{Keyword.get(dots_options, :color)}" />
+        r="#{options.dots.radius}"
+        fill="#{options.dots.color}" />
       """
     end)
   end
 
-  @spec line(Datapoint.points(), Sparkline.options(), Sparkline.line_options()) :: String.t()
-  defp line([%{x: x, y: y}], options, line_options) do
-    left = x - Keyword.get(options, :width) / 10
-    right = x + Keyword.get(options, :width) / 10
+  @spec line(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  defp line([%{x: x, y: y}], options) do
+    left = x - options.width / 10
+    right = x + options.width / 10
 
     """
     <path
       d="M#{left},#{format_float(y)}L#{right},#{format_float(y)}"
       fill="none"
-      stroke="#{Keyword.get(line_options, :color)}"
-      stroke-width="#{Keyword.get(line_options, :width)}" />
+      stroke="#{options.line.color}"
+      stroke-width="#{options.line.width}" />
     """
   end
 
-  defp line(datapoints, _options, line_options) do
+  defp line(datapoints, options) do
     """
     <path
-      d="#{compute_curve(datapoints, line_options)}"
+      d="#{compute_curve(datapoints, options)}"
       fill="none"
-      stroke="#{Keyword.get(line_options, :color)}"
-      stroke-width="#{Keyword.get(line_options, :width)}" />
+      stroke="#{options.line.color}"
+      stroke-width="#{options.line.width}" />
     """
   end
 
-  @spec area(
-          Datapoint.points(),
-          Sparkline.options(),
-          Sparkline.line_options(),
-          Sparkline.area_options()
-        ) :: String.t()
-  defp area([_points], _options, _line_options, _area_options) do
-    ""
-  end
+  @spec area(Datapoint.points(), Sparkline.map_options()) :: String.t()
+  defp area([_points], _options), do: ""
 
-  defp area(datapoints, options, line_options, area_options) do
+  defp area(datapoints, options) do
     # Extract the x value of the first datapoint to know where to finish the area.
     [%{x: x, y: _y} | _] = datapoints
 
     """
     <path
-      d="#{[compute_curve(datapoints, line_options), "V", "#{Keyword.get(options, :height)}", "H", "#{x}", "Z"]}"
-      fill="#{Keyword.get(area_options, :color)}"
+      d="#{[compute_curve(datapoints, options), "V", "#{options.height}", "H", "#{x}", "Z"]}"
+      fill="#{options.area.color}"
       stroke="none" />
     """
   end
 
-  @spec compute_curve(Datapoint.points(), Sparkline.line_options()) :: iolist()
-  defp compute_curve([%{x: x, y: y} = curr | rest], line_options) do
+  @spec compute_curve(Datapoint.points(), Sparkline.map_options()) :: iolist()
+  defp compute_curve([%{x: x, y: y} = curr | rest], options) do
     ["M#{tuple_to_string({x, y})}"]
-    |> compute_curve(rest, curr, curr, line_options)
+    |> compute_curve(rest, curr, curr, options)
   end
 
   @spec compute_curve(
@@ -115,16 +105,16 @@ defmodule Sparkline.Draw do
           Datapoint.points(),
           Datapoint.point(),
           Datapoint.point(),
-          Sparkline.line_options()
+          Sparkline.map_options()
         ) :: iolist()
-  defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, line_options) do
+  defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, options) do
     acc
-    |> curve_command(prev2, prev1, curr, next, line_options)
-    |> compute_curve(rest, prev1, curr, line_options)
+    |> curve_command(prev2, prev1, curr, next, options)
+    |> compute_curve(rest, prev1, curr, options)
   end
 
-  defp compute_curve(acc, [curr], prev2, prev1, line_options) do
-    curve_command(acc, prev2, prev1, curr, curr, line_options)
+  defp compute_curve(acc, [curr], prev2, prev1, options) do
+    curve_command(acc, prev2, prev1, curr, curr, options)
   end
 
   @spec curve_command(
@@ -133,11 +123,11 @@ defmodule Sparkline.Draw do
           Datapoint.point(),
           Datapoint.point(),
           Datapoint.point(),
-          Sparkline.line_options()
+          Sparkline.map_options()
         ) :: iolist()
-  defp curve_command(acc, prev2, prev1, curr, next, line_options) do
-    cp1 = calculate_control_point(prev1, prev2, curr, :left, line_options)
-    cp2 = calculate_control_point(curr, prev1, next, :right, line_options)
+  defp curve_command(acc, prev2, prev1, curr, next, options) do
+    cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
+    cp2 = calculate_control_point(curr, prev1, next, :right, options)
     currrent = {curr.x, curr.y}
 
     [acc, "C", tuple_to_string(cp1), " ", tuple_to_string(cp2), " ", tuple_to_string(currrent)]
@@ -148,16 +138,13 @@ defmodule Sparkline.Draw do
           Datapoint.point(),
           Datapoint.point(),
           atom(),
-          Sparkline.line_options()
-        ) ::
-          {number(), number()}
-  defp calculate_control_point(curr, prev, next, direction, line_options) do
-    smoothing = Keyword.get(line_options, :smoothing)
-
+          Sparkline.map_options()
+        ) :: {number(), number()}
+  defp calculate_control_point(curr, prev, next, direction, options) do
     {length, angle} = calculate_line(prev, next)
 
     angle = if direction == :right, do: angle + :math.pi(), else: angle
-    length = length * smoothing
+    length = length * options.line.smoothing
 
     {
       curr.x + :math.cos(angle) * length,
