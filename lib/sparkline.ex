@@ -100,6 +100,7 @@ defmodule Sparkline do
           {:width, number()}
           | {:height, number()}
           | {:padding, number()}
+          | {:smoothing, float()}
           | {:placeholder, nil | String.t()}
 
   @typedoc "A general sparkline options list."
@@ -112,7 +113,7 @@ defmodule Sparkline do
   @type dots_options :: list(option())
 
   @typedoc "A line-related sparkline option."
-  @type line_option :: {:width, number()} | {:color, String.t()} | {:smoothing, float()}
+  @type line_option :: {:width, number()} | {:color, String.t()}
 
   @typedoc "A line-related sparkline options list."
   @type line_options :: list(option())
@@ -128,6 +129,7 @@ defmodule Sparkline do
           width: number(),
           height: number(),
           padding: number(),
+          smoothing: float(),
           placeholder: nil | String.t(),
           dots: nil | map(),
           line: nil | map(),
@@ -152,7 +154,7 @@ defmodule Sparkline do
   @spec new(datapoints(), options()) :: Sparkline.t()
   def new(datapoints, options \\ []) do
     options =
-      [width: 200, height: 100, padding: 6, placeholder: nil]
+      [width: 200, height: 100, padding: 6, smoothing: 0.2, placeholder: nil]
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
@@ -181,7 +183,7 @@ defmodule Sparkline do
   @spec show_line(Sparkline.t(), line_options()) :: Sparkline.t()
   def show_line(sparkline, options \\ []) do
     line_options =
-      [width: 0.25, color: "black", smoothing: 0.2]
+      [width: 0.25, color: "black"]
       |> Keyword.merge(options)
       |> Map.new()
 
