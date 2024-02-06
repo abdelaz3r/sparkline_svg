@@ -5,13 +5,6 @@ defmodule Sparkline.Datapoint do
   @type points :: list(point())
   @type min_max :: {number(), number()}
 
-  @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
-  def check_dimension(length, padding) do
-    if length - 2 * padding > 0,
-      do: :ok,
-      else: {:error, :invalid_dimension}
-  end
-
   @spec clean(Sparkline.datapoints()) :: {:ok, Sparkline.datapoints()} | {:error, atom()}
   def clean(datapoints) do
     {datapoints, _type} =
