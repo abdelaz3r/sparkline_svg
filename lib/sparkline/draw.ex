@@ -3,17 +3,16 @@ defmodule Sparkline.Draw do
 
   alias Sparkline.Datapoint
 
-  @spec chart(Sparkline.t()) :: Sparkline.svg()
+  @spec chart(Sparkline.t()) :: iolist()
   def chart(%Sparkline{datapoints: []} = sparkline) do
     %{options: %{width: width, height: height, placeholder: placeholder}} = sparkline
 
-    """
-    <svg width="100%" height="100%"
-      viewBox="0 0 #{width} #{height}"
-      xmlns="http://www.w3.org/2000/svg">
-      #{if(placeholder != nil, do: placeholder(placeholder))}
-    </svg>
-    """
+    [
+      ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
+      ~s' xmlns="http://www.w3.org/2000/svg">',
+      if(placeholder != nil, do: placeholder(placeholder), else: ""),
+      "</svg>"
+    ]
   end
 
   def chart(%Sparkline{} = sparkline) do
@@ -22,76 +21,64 @@ defmodule Sparkline.Draw do
       options: %{dots: dots_options, line: line_options, area: area_options} = options
     } = sparkline
 
-    """
-    <svg width="100%" height="100%"
-      viewBox="0 0 #{options.width} #{options.height}"
-      xmlns="http://www.w3.org/2000/svg">
-      #{if(area_options != nil, do: area(datapoints, options))}
-      #{if(line_options != nil, do: line(datapoints, options))}
-      #{if(dots_options != nil, do: dots(datapoints, options))}
-    </svg>
-    """
+    [
+      ~s'<svg width="100%" height="100%" viewBox="0 0 #{options.width} #{options.height}"',
+      ~s' xmlns="http://www.w3.org/2000/svg">',
+      if(area_options != nil, do: area(datapoints, options), else: ""),
+      if(line_options != nil, do: line(datapoints, options), else: ""),
+      if(dots_options != nil, do: dots(datapoints, options), else: ""),
+      ~s'</svg>'
+    ]
   end
 
-  @spec placeholder(String.t()) :: String.t()
+  @spec placeholder(String.t()) :: iolist()
   defp placeholder(placeholder) do
-    """
-    <text x="50%" y="50%" text-anchor="middle">
-      #{placeholder}
-    </text>
-    """
+    [~s'<text x="50%" y="50%" text-anchor="middle">', placeholder, ~s'</text>']
   end
 
-  @spec dots(Datapoint.points(), Sparkline.internal_options()) :: String.t()
+  @spec dots(Datapoint.points(), Sparkline.internal_options()) :: iolist()
   defp dots(datapoints, options) do
-    Enum.map_join(datapoints, "", fn %{x: x, y: y} ->
-      """
-      <circle
-        cx="#{format_float(x)}"
-        cy="#{format_float(y)}"
-        r="#{options.dots.radius}"
-        fill="#{options.dots.color}" />
-      """
+    %{dots: %{color: color, radius: radius}} = options
+
+    Enum.map(datapoints, fn %{x: x, y: y} ->
+      x = float_to_string(x)
+      y = float_to_string(y)
+
+      [~s'<circle cx="', x, ~s'" cy="', y, ~s'" r="#{radius}" fill="#{color}" />']
     end)
   end
 
-  @spec line(Datapoint.points(), Sparkline.internal_options()) :: String.t()
-  defp line([%{x: x, y: y}], options) do
-    left = x - options.width / 10
-    right = x + options.width / 10
+  @spec line(Datapoint.points(), Sparkline.internal_options()) :: iolist()
+  defp line([datapoint], options) do
+    %{line: %{color: color, width: width}} = options
 
-    """
-    <path
-      d="M#{left},#{format_float(y)}L#{right},#{format_float(y)}"
-      fill="none"
-      stroke="#{options.line.color}"
-      stroke-width="#{options.line.width}" />
-    """
+    left = datapoint.x - options.width / 10
+    right = datapoint.x + options.width / 10
+
+    path = ["M#{left},", float_to_string(datapoint.y), "L#{right},", float_to_string(datapoint.y)]
+    attrs = [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"']
+    [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
   defp line(datapoints, options) do
-    """
-    <path
-      d="#{compute_curve(datapoints, options)}"
-      fill="none"
-      stroke="#{options.line.color}"
-      stroke-width="#{options.line.width}" />
-    """
+    %{line: %{color: color, width: width}} = options
+
+    attrs = [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"']
+    [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
   end
 
-  @spec area(Datapoint.points(), Sparkline.internal_options()) :: String.t()
-  defp area([_points], _options), do: ""
+  @spec area(Datapoint.points(), Sparkline.internal_options()) :: iolist()
+  defp area([_points], _options), do: [""]
 
   defp area(datapoints, options) do
+    %{area: %{color: color}, height: height} = options
+
     # Extract the x value of the first datapoint to know where to finish the area.
     [%{x: x, y: _y} | _] = datapoints
 
-    """
-    <path
-      d="#{[compute_curve(datapoints, options), "V", "#{options.height}", "H", "#{x}", "Z"]}"
-      fill="#{options.area.color}"
-      stroke="none" />
-    """
+    path = [compute_curve(datapoints, options), "V#{height}H#{x}Z"]
+    attrs = [~s'fill="', color, ~s'" stroke="none"']
+    [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
   @spec compute_curve(Datapoint.points(), Sparkline.internal_options()) :: iolist()
@@ -163,13 +150,15 @@ defmodule Sparkline.Draw do
     }
   end
 
-  @spec tuple_to_string({number(), number()}) :: String.t()
+  @spec tuple_to_string({number(), number()}) :: iolist()
   defp tuple_to_string({x, y}) do
-    "#{format_float(x)},#{format_float(y)}"
+    [float_to_string(x), ",", float_to_string(y)]
   end
 
-  @spec format_float(float()) :: float()
-  defp format_float(float) when is_float(float) do
-    Float.round(float, 3)
+  @spec float_to_string(float()) :: String.t()
+  defp float_to_string(float) when is_float(float) do
+    float
+    |> Float.round(3)
+    |> Float.to_string()
   end
 end
