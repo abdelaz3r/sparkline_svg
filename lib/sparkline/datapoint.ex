@@ -89,7 +89,8 @@ defmodule Sparkline.Datapoint do
     {:ok, x, :number}
   end
 
-  defp clean_x(x, _type) when is_number(x) or x.__struct__ in [DateTime, Date, Time] do
+  defp clean_x(x, _type)
+       when is_number(x) or x.__struct__ in [NaiveDateTime, DateTime, Date, Time] do
     {:error, :mixed_datapoints_types}
   end
 
