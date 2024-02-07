@@ -301,7 +301,7 @@ defmodule Sparkline do
           Draw.chart(sparkline)
         end
 
-      {:ok, svg}
+      {:ok, :erlang.iolist_to_binary(svg)}
     end
   end
 
