@@ -130,24 +130,26 @@ defmodule Sparkline do
           | {:padding, number()}
           | {:smoothing, float()}
           | {:placeholder, nil | String.t()}
+          | {:class, nil | String.t()}
+          | {:placeholder_class, nil | String.t()}
 
   @typedoc "A general sparkline options list."
   @type options :: list(option())
 
   @typedoc "A dots-related sparkline option."
-  @type dots_option :: {:radius, number()} | {:color, String.t()}
+  @type dots_option :: {:radius, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A dots-related sparkline options list."
   @type dots_options :: list(option())
 
   @typedoc "A line-related sparkline option."
-  @type line_option :: {:width, number()} | {:color, String.t()}
+  @type line_option :: {:width, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A line-related sparkline options list."
   @type line_options :: list(option())
 
   @typedoc "A area-related sparkline option."
-  @type area_option :: {:color, String.t()}
+  @type area_option :: {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A area-related sparkline options list."
   @type area_options :: list(option())
@@ -159,6 +161,8 @@ defmodule Sparkline do
           padding: number(),
           smoothing: float(),
           placeholder: nil | String.t(),
+          class: nil | String.t(),
+          placeholder_class: nil | String.t(),
           dots: nil | map(),
           line: nil | map(),
           area: nil | map()
@@ -188,7 +192,15 @@ defmodule Sparkline do
   @spec new(datapoints(), options()) :: Sparkline.t()
   def new(datapoints, options \\ []) do
     options =
-      [width: 200, height: 100, padding: 6, smoothing: 0.2, placeholder: nil]
+      [
+        width: 200,
+        height: 100,
+        padding: 6,
+        smoothing: 0.2,
+        placeholder: nil,
+        class: nil,
+        placeholder_class: nil
+      ]
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
@@ -214,7 +226,7 @@ defmodule Sparkline do
   @spec show_dots(Sparkline.t(), dots_options()) :: Sparkline.t()
   def show_dots(sparkline, options \\ []) do
     dots_options =
-      [radius: 1, color: "black"]
+      [radius: 1, color: "black", class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
@@ -239,7 +251,7 @@ defmodule Sparkline do
   @spec show_line(Sparkline.t(), line_options()) :: Sparkline.t()
   def show_line(sparkline, options \\ []) do
     line_options =
-      [width: 0.25, color: "black"]
+      [width: 0.25, color: "black", class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
@@ -264,7 +276,7 @@ defmodule Sparkline do
   @spec show_area(Sparkline.t(), area_options()) :: Sparkline.t()
   def show_area(sparkline, options \\ []) do
     area_options =
-      [color: "rgba(0, 0, 0, 0.2)"]
+      [color: "rgba(0, 0, 0, 0.2)", class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
