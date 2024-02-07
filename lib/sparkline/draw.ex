@@ -5,37 +5,35 @@ defmodule Sparkline.Draw do
 
   @spec chart(Sparkline.t()) :: iolist()
   def chart(%Sparkline{datapoints: []} = sparkline) do
-    %{options: %{width: width, height: height, placeholder: placeholder, class: class}} =
+    %{options: %{width: width, height: height, class: class} = options} = sparkline
+
+    [
+      ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
+      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
+      ~s' xmlns="http://www.w3.org/2000/svg">',
+      placeholder(options),
+      "</svg>"
+    ]
+  end
+
+  def chart(%Sparkline{} = sparkline) do
+    %{datapoints: datapoints, options: %{width: width, height: height, class: class} = options} =
       sparkline
 
     [
       ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
       if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
       ~s' xmlns="http://www.w3.org/2000/svg">',
-      if(placeholder != nil, do: placeholder(sparkline.options), else: ""),
-      "</svg>"
-    ]
-  end
-
-  def chart(%Sparkline{} = sparkline) do
-    %{
-      datapoints: datapoints,
-      options:
-        %{class: class, dots: dots_options, line: line_options, area: area_options} = options
-    } = sparkline
-
-    [
-      ~s'<svg width="100%" height="100%" viewBox="0 0 #{options.width} #{options.height}"',
-      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
-      ~s' xmlns="http://www.w3.org/2000/svg">',
-      if(area_options != nil, do: area(datapoints, options), else: ""),
-      if(line_options != nil, do: line(datapoints, options), else: ""),
-      if(dots_options != nil, do: dots(datapoints, options), else: ""),
+      area(datapoints, options),
+      line(datapoints, options),
+      dots(datapoints, options),
       ~s'</svg>'
     ]
   end
 
   @spec placeholder(Sparkline.internal_options()) :: iolist()
+  defp placeholder(%{placeholder: nil}), do: ""
+
   defp placeholder(options) do
     %{placeholder: placeholder, placeholder_class: placeholder_class} = options
 
@@ -49,6 +47,8 @@ defmodule Sparkline.Draw do
   end
 
   @spec dots(Datapoint.points(), Sparkline.internal_options()) :: iolist()
+  defp dots(_datapoints, %{dots: nil}), do: ""
+
   defp dots(datapoints, options) do
     %{dots: %{color: color, radius: radius, class: class}} = options
 
@@ -66,6 +66,8 @@ defmodule Sparkline.Draw do
   end
 
   @spec line(Datapoint.points(), Sparkline.internal_options()) :: iolist()
+  defp line(_datapoints, %{line: nil}), do: ""
+
   defp line([datapoint], options) do
     %{line: %{color: color, width: width, class: class}} = options
 
@@ -93,7 +95,8 @@ defmodule Sparkline.Draw do
   end
 
   @spec area(Datapoint.points(), Sparkline.internal_options()) :: iolist()
-  defp area([_points], _options), do: [""]
+  defp area(_datapoints, %{area: nil}), do: ""
+  defp area([_points], _options), do: ""
 
   defp area(datapoints, options) do
     %{area: %{color: color, class: class}, height: height} = options
