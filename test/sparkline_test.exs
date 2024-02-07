@@ -167,6 +167,16 @@ defmodule SparklineTest do
               ~S'<svg width="100%" height="100%" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M1.0,9.0C1.0,9.0 9.0,1.0 9.0,1.0V10H1.0Z" fill="red" stroke="none" /><path d="M1.0,9.0C1.0,9.0 9.0,1.0 9.0,1.0" fill="none" stroke="red" stroke-width="1" /><circle cx="1.0" cy="9.0" r="2" fill="red" /><circle cx="9.0" cy="1.0" r="2" fill="red" /></svg>'}
   end
 
+  test "to_svg/2 with class options" do
+    assert Sparkline.new([{1, 1}, {2, 2}], class: "sparkline")
+           |> Sparkline.show_dots(class: "dot")
+           |> Sparkline.show_line(class: "line")
+           |> Sparkline.show_area(class: "area")
+           |> Sparkline.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" class="sparkline" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z" class="area" /><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" class="line" /><circle cx="6.0" cy="94.0" r="1" class="dot" /><circle cx="194.0" cy="6.0" r="1" class="dot" /></svg>'}
+  end
+
   test "as_data_uri/1" do
     assert [{1, 1}, {2, 2}]
            |> Sparkline.new()

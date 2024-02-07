@@ -5,12 +5,14 @@ defmodule Sparkline.Draw do
 
   @spec chart(Sparkline.t()) :: iolist()
   def chart(%Sparkline{datapoints: []} = sparkline) do
-    %{options: %{width: width, height: height, placeholder: placeholder}} = sparkline
+    %{options: %{width: width, height: height, placeholder: placeholder, class: class}} =
+      sparkline
 
     [
       ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
+      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
       ~s' xmlns="http://www.w3.org/2000/svg">',
-      if(placeholder != nil, do: placeholder(placeholder), else: ""),
+      if(placeholder != nil, do: placeholder(sparkline.options), else: ""),
       "</svg>"
     ]
   end
@@ -18,11 +20,13 @@ defmodule Sparkline.Draw do
   def chart(%Sparkline{} = sparkline) do
     %{
       datapoints: datapoints,
-      options: %{dots: dots_options, line: line_options, area: area_options} = options
+      options:
+        %{class: class, dots: dots_options, line: line_options, area: area_options} = options
     } = sparkline
 
     [
       ~s'<svg width="100%" height="100%" viewBox="0 0 #{options.width} #{options.height}"',
+      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
       ~s' xmlns="http://www.w3.org/2000/svg">',
       if(area_options != nil, do: area(datapoints, options), else: ""),
       if(line_options != nil, do: line(datapoints, options), else: ""),
@@ -31,39 +35,60 @@ defmodule Sparkline.Draw do
     ]
   end
 
-  @spec placeholder(String.t()) :: iolist()
-  defp placeholder(placeholder) do
-    [~s'<text x="50%" y="50%" text-anchor="middle">', placeholder, ~s'</text>']
+  @spec placeholder(Sparkline.internal_options()) :: iolist()
+  defp placeholder(options) do
+    %{placeholder: placeholder, placeholder_class: placeholder_class} = options
+
+    [
+      ~s'<text x="50%" y="50%" text-anchor="middle"',
+      if(placeholder_class != nil, do: [~s' class="', placeholder_class, ~s'"'], else: ""),
+      ~s'>',
+      placeholder,
+      ~s'</text>'
+    ]
   end
 
   @spec dots(Datapoint.points(), Sparkline.internal_options()) :: iolist()
   defp dots(datapoints, options) do
-    %{dots: %{color: color, radius: radius}} = options
+    %{dots: %{color: color, radius: radius, class: class}} = options
+
+    attrs =
+      if class == nil,
+        do: [~s'fill="', color, ~s'"'],
+        else: [~s'class="', class, ~s'"']
 
     Enum.map(datapoints, fn %{x: x, y: y} ->
       x = float_to_string(x)
       y = float_to_string(y)
 
-      [~s'<circle cx="', x, ~s'" cy="', y, ~s'" r="#{radius}" fill="#{color}" />']
+      [~s'<circle cx="', x, ~s'" cy="', y, ~s'" r="#{radius}" ', attrs, ~s' />']
     end)
   end
 
   @spec line(Datapoint.points(), Sparkline.internal_options()) :: iolist()
   defp line([datapoint], options) do
-    %{line: %{color: color, width: width}} = options
+    %{line: %{color: color, width: width, class: class}} = options
 
     left = datapoint.x - options.width / 10
     right = datapoint.x + options.width / 10
 
+    attrs =
+      if class == nil,
+        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
+        else: [~s'class="', class, ~s'"']
+
     path = ["M#{left},", float_to_string(datapoint.y), "L#{right},", float_to_string(datapoint.y)]
-    attrs = [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"']
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
   defp line(datapoints, options) do
-    %{line: %{color: color, width: width}} = options
+    %{line: %{color: color, width: width, class: class}} = options
 
-    attrs = [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"']
+    attrs =
+      if class == nil,
+        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
+        else: [~s'class="', class, ~s'"']
+
     [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
   end
 
@@ -71,13 +96,17 @@ defmodule Sparkline.Draw do
   defp area([_points], _options), do: [""]
 
   defp area(datapoints, options) do
-    %{area: %{color: color}, height: height} = options
+    %{area: %{color: color, class: class}, height: height} = options
 
     # Extract the x value of the first datapoint to know where to finish the area.
     [%{x: x, y: _y} | _] = datapoints
 
+    attrs =
+      if class == nil,
+        do: [~s'fill="', color, ~s'" stroke="none"'],
+        else: [~s'class="', class, ~s'"']
+
     path = [compute_curve(datapoints, options), "V#{height}H#{x}Z"]
-    attrs = [~s'fill="', color, ~s'" stroke="none"']
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
