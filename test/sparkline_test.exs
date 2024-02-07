@@ -22,6 +22,9 @@ defmodule SparklineTest do
 
     assert Sparkline.new([{Time.utc_now(), 1}, {2, 2}]) |> Sparkline.to_svg() ==
              {:error, :mixed_datapoints_types}
+
+    assert Sparkline.new([1, {2, 2}]) |> Sparkline.to_svg() == {:error, :mixed_datapoints_types}
+    assert Sparkline.new([{2, 2}, 1]) |> Sparkline.to_svg() == {:error, :mixed_datapoints_types}
   end
 
   test "to_svg/2 with invalid datapoints type (y value)" do
@@ -74,6 +77,11 @@ defmodule SparklineTest do
   test "to_svg/2 with various type of datapoints" do
     chart =
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+
+    assert Sparkline.new([1, 2])
+           |> Sparkline.show_line()
+           |> Sparkline.to_svg() ==
+             {:ok, chart}
 
     assert Sparkline.new([{1, 1}, {2, 2}])
            |> Sparkline.show_line()

@@ -11,15 +11,19 @@ defmodule Sparkline.Datapoint do
   @type min_max :: {number(), number()}
 
   @spec clean(Sparkline.datapoints()) :: {:ok, Sparkline.datapoints()} | {:error, atom()}
-  def clean(datapoints) do
+  def clean([{_x, _y} | _] = datapoints) do
     {datapoints, _type} =
-      Enum.reduce_while(datapoints, {[], nil}, fn {x, y}, {datapoints, type} ->
-        with {:ok, x, type} <- clean_x(x, type),
-             {:ok, y} <- clean_y(y) do
-          {:cont, {[{x, y} | datapoints], type}}
-        else
-          {:error, reason} -> {:halt, {{:error, reason}, type}}
-        end
+      Enum.reduce_while(datapoints, {[], nil}, fn
+        {x, y}, {datapoints, type} ->
+          with {:ok, x, type} <- clean_x(x, type),
+               {:ok, y} <- clean_y(y) do
+            {:cont, {[{x, y} | datapoints], type}}
+          else
+            {:error, reason} -> {:halt, {{:error, reason}, type}}
+          end
+
+        _only_y, {_datapoints, type} ->
+          {:halt, {{:error, :mixed_datapoints_types}, type}}
       end)
 
     case datapoints do
@@ -33,6 +37,22 @@ defmodule Sparkline.Datapoint do
           |> Enum.sort_by(fn {x, _} -> x end)
 
         {:ok, datapoints}
+    end
+  end
+
+  def clean(datapoints) do
+    datapoints =
+      datapoints
+      |> Enum.with_index()
+      |> Enum.reduce_while([], fn {y, index}, datapoints ->
+        if is_number(y),
+          do: {:cont, [{index, y} | datapoints]},
+          else: {:halt, {:error, :mixed_datapoints_types}}
+      end)
+
+    case datapoints do
+      {:error, reason} -> {:error, reason}
+      datapoints -> {:ok, Enum.reverse(datapoints)}
     end
   end
 

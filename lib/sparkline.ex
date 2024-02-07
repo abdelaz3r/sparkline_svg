@@ -107,7 +107,8 @@ defmodule Sparkline do
   numbers.
   """
   @type datapoint ::
-          {DateTime.t(), number()}
+          number()
+          | {DateTime.t(), number()}
           | {Date.t(), number()}
           | {Time.t(), number()}
           | {NaiveDateTime.t(), number()}
@@ -117,7 +118,8 @@ defmodule Sparkline do
   A list of datapoints. The data types in the list correspond to those defined for datapoint.
   """
   @type datapoints ::
-          list({DateTime.t(), number()})
+          list(number())
+          | list({DateTime.t(), number()})
           | list({Date.t(), number()})
           | list({Time.t(), number()})
           | list({NaiveDateTime.t(), number()})
@@ -140,19 +142,19 @@ defmodule Sparkline do
   @type dots_option :: {:radius, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A dots-related sparkline options list."
-  @type dots_options :: list(option())
+  @type dots_options :: list(dots_option())
 
   @typedoc "A line-related sparkline option."
   @type line_option :: {:width, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A line-related sparkline options list."
-  @type line_options :: list(option())
+  @type line_options :: list(line_option())
 
   @typedoc "A area-related sparkline option."
   @type area_option :: {:color, String.t()} | {:class, nil | String.t()}
 
   @typedoc "A area-related sparkline options list."
-  @type area_options :: list(option())
+  @type area_options :: list(area_option())
 
   @typedoc false
   @type internal_options :: %{
