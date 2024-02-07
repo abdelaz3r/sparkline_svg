@@ -98,34 +98,37 @@ defmodule Sparkline do
 
   alias Sparkline.Datapoint
   alias Sparkline.Draw
+  alias Sparkline.Marker
 
   @typedoc "A valid SVG string."
   @type svg :: String.t()
 
-  @typedoc """
-  A datapoint can be a pair of DateTime and number, Date and number, Time and number, or simply two
-  numbers.
-  """
-  @type datapoint ::
-          number()
-          | {DateTime.t(), number()}
-          | {Date.t(), number()}
-          | {Time.t(), number()}
-          | {NaiveDateTime.t(), number()}
-          | {number(), number()}
+  @typedoc false
+  @type x :: number() | DateTime.t() | Date.t() | Time.t() | NaiveDateTime.t()
+
+  @typedoc false
+  @type y :: number()
+
+  @typedoc false
+  @type datapoint :: y() | {x(), y()}
 
   @typedoc """
-  A list of datapoints. The data types in the list correspond to those defined for datapoint.
+  A list of datapoints.
   """
   @type datapoints ::
           list(number())
+          | list({number(), number()})
           | list({DateTime.t(), number()})
           | list({Date.t(), number()})
           | list({Time.t(), number()})
           | list({NaiveDateTime.t(), number()})
-          | list({number(), number()})
 
-  @typedoc "A general sparkline option."
+  @typedoc """
+  A marker position
+  """
+  @type marker :: x() | {x(), x()}
+
+  @typedoc false
   @type option ::
           {:width, number()}
           | {:height, number()}
@@ -135,29 +138,45 @@ defmodule Sparkline do
           | {:class, nil | String.t()}
           | {:placeholder_class, nil | String.t()}
 
-  @typedoc "A general sparkline options list."
+  @typedoc """
+  A general sparkline options keyword list.
+  """
   @type options :: list(option())
 
-  @typedoc "A dots-related sparkline option."
+  @typedoc false
   @type dots_option :: {:radius, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
-  @typedoc "A dots-related sparkline options list."
+  @typedoc """
+  A dots-related sparkline options keyword list.
+  """
   @type dots_options :: list(dots_option())
 
-  @typedoc "A line-related sparkline option."
+  @typedoc false
   @type line_option :: {:width, number()} | {:color, String.t()} | {:class, nil | String.t()}
 
-  @typedoc "A line-related sparkline options list."
+  @typedoc """
+  A line-related sparkline options list.
+  """
   @type line_options :: list(line_option())
 
-  @typedoc "A area-related sparkline option."
+  @typedoc false
   @type area_option :: {:color, String.t()} | {:class, nil | String.t()}
 
-  @typedoc "A area-related sparkline options list."
+  @typedoc """
+  A area-related sparkline options list.
+  """
   @type area_options :: list(area_option())
 
   @typedoc false
-  @type internal_options :: %{
+  @type marker_option :: nil
+
+  @typedoc """
+  A marker-related sparkline options list.
+  """
+  @type marker_options :: list(marker_option())
+
+  @typedoc false
+  @type opts :: %{
           width: number(),
           height: number(),
           padding: number(),
@@ -171,12 +190,13 @@ defmodule Sparkline do
         }
 
   @typedoc false
-  @type t :: %Sparkline{
+  @type t :: %__MODULE__{
           datapoints: datapoints(),
-          options: internal_options()
+          options: opts(),
+          markers: list(Marker.t())
         }
-  @enforce_keys [:datapoints, :options]
-  defstruct [:datapoints, :options]
+  @enforce_keys [:datapoints, :options, :markers]
+  defstruct [:datapoints, :options, :markers]
 
   @doc ~S"""
   Create a new sparkline struct with the given datapoints and options.
@@ -207,7 +227,7 @@ defmodule Sparkline do
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
-    %Sparkline{datapoints: datapoints, options: options}
+    %Sparkline{datapoints: datapoints, options: options, markers: []}
   end
 
   @doc ~S"""
@@ -283,6 +303,15 @@ defmodule Sparkline do
       |> Map.new()
 
     %Sparkline{sparkline | options: %{sparkline.options | area: area_options}}
+  end
+
+  @doc ~S"""
+  TODO.
+  """
+  @spec add_marker(Sparkline.t(), marker()) :: Sparkline.t()
+  @spec add_marker(Sparkline.t(), marker(), marker_options()) :: Sparkline.t()
+  def add_marker(sparkline, _marker, _options \\ []) do
+    sparkline
   end
 
   @doc ~S"""

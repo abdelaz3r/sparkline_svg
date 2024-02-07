@@ -125,7 +125,7 @@ defmodule Sparkline.Datapoint do
     {min_max_x, min_max_y}
   end
 
-  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.internal_options()) ::
+  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.opts()) ::
           points()
   def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = options.width
