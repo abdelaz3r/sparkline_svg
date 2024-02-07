@@ -42,33 +42,34 @@ defmodule Sparkline do
 
   Use the following options to customize the chart:
 
-  - `width`: The width of the chart, defaults to `200`.
-  - `height`: The height of the chart, defaults to `100`.
-  - `padding`: The padding of the chart, defaults to `6`.
-  - `smoothing`: The smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
+  - `:width`: the width of the chart, defaults to `200`.
+  - `:height`: the height of the chart, defaults to `100`.
+  - `:padding`: the padding of the chart, defaults to `6`.
+  - `:smoothing`: the smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
     defaults to `0.2`.
-  - `placeholder`: A placeholder for an empty chart, defaults to `nil`. If set to `nil`, the chart
+  - `:placeholder`: a placeholder for an empty chart, defaults to `nil`. If set to `nil`, the chart
     will be an empty SVG document. Alternatively, you can set it to a string to display a message
     when the chart is empty.
 
   ### Dots options
 
-  - `radius`: The radius of the dots, defaults to `1`.
-  - `color`: The color of the dots, defaults to `"black"`.
+  - `:radius`: the radius of the dots, defaults to `1`.
+  - `:color`: the color of the dots, defaults to `"black"`.
 
   ### Line options
 
-  - `width`: The width of the line, defaults to `0.25`.
-  - `color`: The color of the line, defaults to `"black"`.
+  - `:width`: the width of the line, defaults to `0.25`.
+  - `:color`: the color of the line, defaults to `"black"`.
 
   ### Area options
 
-  - `color`: The color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
+  - `:color`: the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
 
   ## Datapoints
 
-  A datapoint can be a pair of `DateTime` and `number`, `Date` and `number`, `Time` and `number`,
-  or simply two `numbers`. However, the datapoints in a list must all be of the same type.
+  A datapoint can be a pair of `DateTime` and `number()`, `Date` and `number()`, `Time` and
+  `number()`, `NaiveDateTime` and `number()`, or simply two `number()`. However, the datapoints
+  in a list must all be of the same type.
 
   ``` elixir
   # Datapoints
@@ -177,11 +178,11 @@ defmodule Sparkline do
 
   ## Examples
 
-    iex> Sparkline.new([{1, 1}, {2, 2}])
-    %Sparkline{datapoints: [{1, 1}, {2, 2}]}
+      iex> Sparkline.new([{1, 1}, {2, 2}])
+      %Sparkline{datapoints: [{1, 1}, {2, 2}]}
 
-    iex> Sparkline.new([{1, 1}, {2, 2}], width: 240, height: 80)
-    %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{width: 240, height: 80}}
+      iex> Sparkline.new([{1, 1}, {2, 2}], width: 240, height: 80)
+      %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{width: 240, height: 80}}
 
   """
   @spec new(datapoints()) :: Sparkline.t()
@@ -197,17 +198,18 @@ defmodule Sparkline do
   end
 
   @doc ~S"""
-  Take a sparkline struct and return a new sparkline struct with the given dots options. Calling
-  this function multiple times will override the previous dots options. If no options are given, the
-  dots will be shown with the default options.
+  Take a sparkline struct and return a new sparkline struct with the given dots options.
+
+  Calling this function multiple times will override the previous dots options. If no options are
+  given, the dots will be shown with the default options.
 
   ## Examples
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_dots()
-    %Sparkline{datapoints: [{1, 1}, {2, 2}]}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_dots()
+      %Sparkline{datapoints: [{1, 1}, {2, 2}]}
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_dots(radius: 0.5, color: "red")
-    %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{dots: %{radius: 0.5, color: "red"}}}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_dots(radius: 0.5, color: "red")
+      %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{dots: %{radius: 0.5, color: "red"}}}
 
   """
   @spec show_dots(Sparkline.t()) :: Sparkline.t()
@@ -222,17 +224,18 @@ defmodule Sparkline do
   end
 
   @doc ~S"""
-  Take a sparkline struct and return a new sparkline struct with the given line options. Calling
-  this function multiple times will override the previous line options. If no options are given, the
-  line will be shown with the default options.
+  Take a sparkline struct and return a new sparkline struct with the given line options.
+
+  Calling this function multiple times will override the previous line options. If no options are
+  given, the line will be shown with the default options.
 
   ## Examples
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_line()
-    %Sparkline{datapoints: [{1, 1}, {2, 2}]}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_line()
+      %Sparkline{datapoints: [{1, 1}, {2, 2}]}
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_line(width: 0.25, color: "black")
-    %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{line: %{width: 0.25, color: "black"}}}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_line(width: 0.25, color: "black")
+      %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{line: %{width: 0.25, color: "black"}}}
 
   """
   @spec show_line(Sparkline.t()) :: Sparkline.t()
@@ -247,17 +250,18 @@ defmodule Sparkline do
   end
 
   @doc ~S"""
-  Take a sparkline struct and return a new sparkline struct with the given area options. Calling
-  this function multiple times will override the previous area options. If no options are given, the
-  area will be shown with the default options.
+  Take a sparkline struct and return a new sparkline struct with the given area options.
+
+  Calling this function multiple times will override the previous area options. If no options are
+  given, the area will be shown with the default options.
 
   ## Examples
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_area()
-    %Sparkline{datapoints: [{1, 1}, {2, 2}]}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_area()
+      %Sparkline{datapoints: [{1, 1}, {2, 2}]}
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_area(color: "rgba(0, 0, 0, 0.2)")
-    %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{area: %{color: "rgba(0, 0, 0, 0.2"}}}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.show_area(color: "rgba(0, 0, 0, 0.2)")
+      %Sparkline{datapoints: [{1, 1}, {2, 2}], options: %{area: %{color: "rgba(0, 0, 0, 0.2"}}}
 
   """
   @spec show_area(Sparkline.t()) :: Sparkline.t()
@@ -276,11 +280,11 @@ defmodule Sparkline do
 
   Examples:
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg()
-    {:ok, svg}
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg()
+      {:ok, svg}
 
-    iex> Sparkline.new([{1, 1}, {2, 2}], width: 10, padding: 10) |> Sparkline.to_svg()
-    {:error, :invalid_dimension}
+      iex> Sparkline.new([{1, 1}, {2, 2}], width: 10, padding: 10) |> Sparkline.to_svg()
+      {:error, :invalid_dimension}
 
   """
   @spec to_svg(Sparkline.t()) :: {:ok, svg()} | {:error, atom()}
@@ -310,11 +314,11 @@ defmodule Sparkline do
 
   Examples:
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg!()
-    svg
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg!()
+      svg
 
-    iex> Sparkline.new([{1, 1}, {2, 2}], width: 10, padding: 10) |> Sparkline.to_svg!()
-    ** (Sparkline.Error) invalid_dimension
+      iex> Sparkline.new([{1, 1}, {2, 2}], width: 10, padding: 10) |> Sparkline.to_svg!()
+      ** (Sparkline.Error) invalid_dimension
 
   """
   @spec to_svg!(Sparkline.t()) :: svg()
@@ -330,8 +334,8 @@ defmodule Sparkline do
 
   Examples:
 
-    iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg!() |> Sparkline.as_data_uri()
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD..."
+      iex> Sparkline.new([{1, 1}, {2, 2}]) |> Sparkline.to_svg!() |> Sparkline.as_data_uri()
+      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD..."
 
   """
   @spec as_data_uri(svg()) :: String.t()
