@@ -2,6 +2,7 @@ defmodule Sparkline.Marker do
   @moduledoc false
 
   alias Sparkline.Marker
+  alias Sparkline.Type
 
   @type marker_opts :: %{}
 
@@ -24,8 +25,28 @@ defmodule Sparkline.Marker do
   end
 
   @spec clean(list(Marker.t()), Sparkline.x()) :: {:ok, list(Marker.t())} | {:error, atom()}
-  def clean(markers, _type) do
-    {:ok, markers}
+  def clean(markers, type) do
+    markers =
+      Enum.reduce_while(markers, [], fn
+        %Marker{position: {x1, x2}} = marker, markers ->
+          with {:ok, x1, _type} <- Type.cast_x(x1, type),
+               {:ok, x2, _type} <- Type.cast_x(x2, type) do
+            {:cont, [%Marker{marker | position: {x1, x2}} | markers]}
+          else
+            {:error, reason} -> {:halt, {:error, reason}}
+          end
+
+        %Marker{position: x} = marker, markers ->
+          case Type.cast_x(x, type) do
+            {:ok, x, _type} -> {:cont, [%Marker{marker | position: x} | markers]}
+            {:error, reason} -> {:halt, {:error, reason}}
+          end
+      end)
+
+    case markers do
+      {:error, reason} -> {:error, reason}
+      markers -> {:ok, markers}
+    end
   end
 
   @typedoc false

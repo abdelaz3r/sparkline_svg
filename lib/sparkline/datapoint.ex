@@ -1,6 +1,8 @@
 defmodule Sparkline.Datapoint do
   @moduledoc false
 
+  alias Sparkline.Type
+
   @typedoc false
   @type point :: %{x: number(), y: number()}
 
@@ -13,8 +15,8 @@ defmodule Sparkline.Datapoint do
     {datapoints, type} =
       Enum.reduce_while(datapoints, {[], nil}, fn
         {x, y}, {datapoints, type} ->
-          with {:ok, x, type} <- clean_x(x, type),
-               {:ok, y} <- clean_y(y) do
+          with {:ok, x, type} <- Type.cast_x(x, type),
+               {:ok, y} <- Type.cast_y(y) do
             {:cont, {[{x, y} | datapoints], type}}
           else
             {:error, reason} -> {:halt, {{:error, reason}, type}}
@@ -42,66 +44,21 @@ defmodule Sparkline.Datapoint do
     datapoints =
       datapoints
       |> Enum.with_index()
-      |> Enum.reduce_while([], fn {y, index}, datapoints ->
-        if is_number(y),
-          do: {:cont, [{index, y} | datapoints]},
-          else: {:halt, {:error, :mixed_datapoints_types}}
+      |> Enum.reduce_while([], fn
+        {{_, _}, _index}, _datapoints ->
+          {:halt, {:error, :mixed_datapoints_types}}
+
+        {y, index}, datapoints ->
+          case Type.cast_y(y) do
+            {:ok, y} -> {:cont, [{index, y} | datapoints]}
+            {:error, reason} -> {:halt, {:error, reason}}
+          end
       end)
 
     case datapoints do
       {:error, reason} -> {:error, reason}
       datapoints -> {:ok, Enum.reverse(datapoints), :number}
     end
-  end
-
-  @spec clean_x(Sparkline.x(), atom()) :: {:ok, number(), atom()} | {:error, atom()}
-  defp clean_x(x, nil) when is_number(x) do
-    clean_x(x, :number)
-  end
-
-  defp clean_x(%module{} = x, nil) when is_struct(x) do
-    clean_x(x, module)
-  end
-
-  defp clean_x(%DateTime{} = datetime, DateTime) do
-    {:ok, DateTime.to_unix(datetime), DateTime}
-  end
-
-  defp clean_x(%Date{} = date, Date) do
-    {:ok, datetime} = DateTime.new(date, ~T[00:00:00])
-    {:ok, DateTime.to_unix(datetime), Date}
-  end
-
-  defp clean_x(%Time{} = time, Time) do
-    {seconds, _milliseconds} = Time.to_seconds_after_midnight(time)
-    {:ok, seconds, Time}
-  end
-
-  defp clean_x(%NaiveDateTime{} = datetime, NaiveDateTime) do
-    {seconds, _} = NaiveDateTime.to_gregorian_seconds(datetime)
-    {:ok, seconds, NaiveDateTime}
-  end
-
-  defp clean_x(x, :number) when is_number(x) do
-    {:ok, x, :number}
-  end
-
-  defp clean_x(x, _type)
-       when is_number(x) or x.__struct__ in [NaiveDateTime, DateTime, Date, Time] do
-    {:error, :mixed_datapoints_types}
-  end
-
-  defp clean_x(_x, _type) do
-    {:error, :invalid_x_type}
-  end
-
-  @spec clean_y(Sparkline.y()) :: {:ok, Sparkline.y()} | {:error, atom()}
-  defp clean_y(y) when is_number(y) do
-    {:ok, y}
-  end
-
-  defp clean_y(_y) do
-    {:error, :invalid_y_type}
   end
 
   @typedoc false
