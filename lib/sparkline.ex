@@ -168,7 +168,11 @@ defmodule Sparkline do
   @type area_options :: list(area_option())
 
   @typedoc false
-  @type marker_option :: nil
+  @type marker_option ::
+          {:fill_color, String.t()}
+          | {:stroke_color, String.t()}
+          | {:stroke_width, String.t()}
+          | {:class, nil | String.t()}
 
   @typedoc """
   A marker-related sparkline options list.

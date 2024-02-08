@@ -125,29 +125,42 @@ defmodule Sparkline.Draw do
 
   @spec marker(Marker.t(), Sparkline.opts()) :: iolist()
   defp marker(%Marker{position: {_x1, _x2}} = marker, options) do
-    %{position: {x1, x2}} = marker
+    %{
+      position: {x1, x2},
+      options: %{fill_color: fill_color, stroke_color: color, stroke_width: width, class: class}
+    } = marker
+
     %{height: height} = options
-    stroke_width = 0.08
 
     attrs =
-      ~s'fill="rgba(0, 255, 255, 0.1)" stroke="rgba(0, 255, 255)" stroke-width="#{stroke_width}"'
+      if class == nil,
+        do: [~s'fill="', fill_color, ~s'" stroke="', color, ~s'" stroke-width="#{width}"'],
+        else: [~s'class="', class, ~s'"']
 
     [
       ~s'<rect x="',
       float_to_string(x1),
-      ~s'" y="#{-stroke_width}" width="',
+      ~s'" y="#{-width}" width="',
       float_to_string(x2 - x1),
-      ~s'" height="#{height + 2 * stroke_width}" ',
+      ~s'" height="#{height + 2 * width}" ',
       attrs,
       ~s' />'
     ]
   end
 
   defp marker(%Marker{position: _x} = marker, options) do
-    %{position: x} = marker
+    %{
+      position: x,
+      options: %{stroke_color: color, stroke_width: width, class: class}
+    } = marker
+
     %{height: height} = options
 
-    attrs = ~s'fill="none" stroke="red" stroke-width="0.08"'
+    attrs =
+      if class == nil,
+        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
+        else: [~s'class="', class, ~s'"']
+
     [~s'<path d="M', tuple_to_string({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
   end
 

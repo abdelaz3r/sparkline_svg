@@ -4,11 +4,16 @@ defmodule Sparkline.Marker do
   alias Sparkline.Marker
   alias Sparkline.Type
 
-  @type marker_opts :: %{}
+  @type marker_opts :: %{
+          fill_color: String.t(),
+          stroke_color: String.t(),
+          stroke_width: String.t(),
+          class: nil | String.t()
+        }
 
   @type t :: %Marker{
           position: Sparkline.marker(),
-          options: marker_opts
+          options: marker_opts()
         }
   @enforce_keys [:position, :options]
   defstruct [:position, :options]
@@ -17,7 +22,7 @@ defmodule Sparkline.Marker do
   @spec new(Sparkline.marker(), Sparkline.marker_options()) :: Marker.t()
   def new(position, options \\ []) do
     options =
-      []
+      [fill_color: "rgba(255, 0, 0, 0.2)", stroke_color: "red", stroke_width: 0.25, class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
