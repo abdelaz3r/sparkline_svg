@@ -39,6 +39,18 @@ defmodule SparklineMarkerTest do
               ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,0.0V100" fill="none" stroke="red" stroke-width="0.25" /></svg>'}
   end
 
+  test "to_svg/2 with area markers in reversed order" do
+    data_number = [{1, 1}, {2, 2}]
+
+    assert Sparkline.new(data_number) |> Sparkline.add_marker({1, 2}) |> Sparkline.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><rect x="6.0" y="-0.25" width="188.0" height="100.5" fill="rgba(255, 0, 0, 0.2)" stroke="red" stroke-width="0.25" /></svg>'}
+
+    assert Sparkline.new(data_number) |> Sparkline.add_marker({2, 1}) |> Sparkline.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><rect x="6.0" y="-0.25" width="188.0" height="100.5" fill="rgba(255, 0, 0, 0.2)" stroke="red" stroke-width="0.25" /></svg>'}
+  end
+
   test "to_svg/2 with multiple markers" do
     assert Sparkline.new([{1, 1}, {2, 2}])
            |> Sparkline.add_marker(1)

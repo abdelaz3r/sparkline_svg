@@ -139,9 +139,9 @@ defmodule Sparkline.Draw do
 
     [
       ~s'<rect x="',
-      float_to_string(x1),
+      float_to_string(min(x1, x2)),
       ~s'" y="#{-width}" width="',
-      float_to_string(x2 - x1),
+      float_to_string(abs(x2 - x1)),
       ~s'" height="#{height + 2 * width}" ',
       attrs,
       ~s' />'
