@@ -10,9 +10,10 @@ defmodule Sparkline.Datapoint do
   @typedoc false
   @type min_max :: {number(), number()}
 
-  @spec clean(Sparkline.datapoints()) :: {:ok, Sparkline.datapoints()} | {:error, atom()}
+  @spec clean(Sparkline.datapoints()) ::
+          {:ok, Sparkline.datapoints(), Sparkline.x()} | {:error, atom()}
   def clean([{_x, _y} | _] = datapoints) do
-    {datapoints, _type} =
+    {datapoints, type} =
       Enum.reduce_while(datapoints, {[], nil}, fn
         {x, y}, {datapoints, type} ->
           with {:ok, x, type} <- clean_x(x, type),
@@ -36,7 +37,7 @@ defmodule Sparkline.Datapoint do
           |> Enum.uniq_by(fn {x, _} -> x end)
           |> Enum.sort_by(fn {x, _} -> x end)
 
-        {:ok, datapoints}
+        {:ok, datapoints, type}
     end
   end
 
@@ -52,7 +53,7 @@ defmodule Sparkline.Datapoint do
 
     case datapoints do
       {:error, reason} -> {:error, reason}
-      datapoints -> {:ok, Enum.reverse(datapoints)}
+      datapoints -> {:ok, Enum.reverse(datapoints), :number}
     end
   end
 
