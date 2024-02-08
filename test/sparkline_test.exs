@@ -1,5 +1,6 @@
 defmodule SparklineTest do
   use ExUnit.Case, async: true
+  doctest Sparkline
 
   test "to_svg/2 with invalid dimension" do
     data = [{1, 1}, {2, 2}]
