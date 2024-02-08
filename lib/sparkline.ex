@@ -1,14 +1,20 @@
 defmodule Sparkline do
   @moduledoc ~S"""
-  `Sparkline` uses a list of datapoints to return a line chart in SVG format.
+  `Sparkline` is a library to generate SVG sparkline charts.
 
-  ## Usage example:
+  A [sparkline](https://en.wikipedia.org/wiki/Sparkline) is a small, simple chart that is drawn
+  without axes or coordinates. It presents the general shape of the variation of a dataset at a
+  glance.
+
+  `Sparkline` allows you to create a sparkline chart from various data shapes and show the dots,
+  the line, and the area under the line. You can also add markers to the chart to highlight
+  specific spots.
+
+  ## Usage example
 
   ``` elixir
-  # Datapoints
+  # Datapoints and general options
   datapoints = [{1, 1}, {2, 2}, {3, 3}]
-
-  # General options
   options = [width: 100, height: 40]
 
   # A very simple line chart
@@ -18,61 +24,47 @@ defmodule Sparkline do
   line_options = [width: 0.25, color: "black"]
   sparkline = Sparkline.show_line(sparkline, line_options)
 
+  # Render the chart to an SVG string
   {:ok, svg} = Sparkline.to_svg(sparkline) # or
   svg = Sparkline.to_svg!(sparkline)
   ```
 
-  ### Customization
-
-  `Sparkline` allows you to customize the chart showing or hiding the dots, the line, and the area
-  under the line.
-
-  ``` elixir
-  # A more complex sparkline
-  {:ok, svg} =
-    datapoints
-    |> Sparkline.new(width: 100, height: 40, padding: 0.5, smoothing: 0.1, placeholder: "No data")
-    |> Sparkline.show_dot(radius: 0.1, color: "rgb(255, 255, 255)")
-    |> Sparkline.show_line(width: 0.05, color: "rgba(166, 218, 149)")
-    |> Sparkline.show_area(color: "rgba(166, 218, 149, 0.2)")
-    |> Sparkline.to_svg()
-  ```
-
-  ## Options
-
-  Use the following options to customize the chart:
-
-  - `width`: The width of the chart, defaults to `200`.
-  - `height`: The height of the chart, defaults to `100`.
-  - `padding`: The padding of the chart, defaults to `6`.
-  - `smoothing`: The smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
-    defaults to `0.2`.
-  - `placeholder`: A placeholder for an empty chart, defaults to `nil`. If set to `nil`, the chart
-    will be an empty SVG document. Alternatively, you can set it to a string to display a message
-    when the chart is empty.
-
-  ### Dots options
-
-  - `radius`: The radius of the dots, defaults to `1`.
-  - `color`: The color of the dots, defaults to `"black"`.
-
-  ### Line options
-
-  - `width`: The width of the line, defaults to `0.25`.
-  - `color`: The color of the line, defaults to `"black"`.
-
-  ### Area options
-
-  - `color`: The color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
-
   ## Datapoints
 
-  A datapoint can be a pair of `DateTime` and `number`, `Date` and `number`, `Time` and `number`,
-  or simply two `numbers`. However, the datapoints in a list must all be of the same type.
+  Datapoints are the values that will be used to draw the chart. They can be:
+  - A **list of numbers**, where each number is a value for the y axis. The x axis will be the
+    index of the number in the list. The x value can be a `number`, a `DateTime`, a `Date`, a
+    `Time`, or a `NaiveDateTime`.
+  - A **list of tuples** with two values. The first value is the x axis and the second value is
+    the y axis. The y value must be a number.
 
+  All values in the list must be of the same type.
+
+  <!-- tabs-open -->
+  ### Simple datapoints
+  ``` elixir
+  # Number datapoints
+  datapoints = [1, 2, 3]
+  datapoints = [1.1, 1.2, 1.3]
+
+  # Datapoints with DateTime
+  datapoints = [~U[2021-01-01 00:00:00Z], ~U[2021-01-02 00:00:00Z], ~U[2021-01-03 00:00:00Z]]
+
+  # Datapoints with Date
+  datapoints = [~D[2021-01-01], ~D[2021-01-02], ~D[2021-01-03]]
+
+  # Datapoints with Time
+  datapoints = [~T[00:01:00], ~T[00:02:00], ~T[00:03:00]]
+
+  # Datapoints with NaiveDateTime
+  datapoints = [~N[2021-01-01 00:00:00], ~N[2021-01-02 00:00:00], ~N[2021-01-03 00:00:00]]
+  ```
+
+  ### Tuple-based datapoints
   ``` elixir
   # Datapoints
   datapoints = [{1, 1}, {2, 2}, {3, 3}]
+  datapoints = [{1.1, 1}, {1.2, 2}, {1.3, 3}]
 
   # Datapoints with DateTime
   datapoints = [
@@ -94,6 +86,134 @@ defmodule Sparkline do
     {~N[2021-01-03 00:00:00], 3}
   ]
   ```
+  <!-- tabs-close -->
+
+  ## Markers
+
+  Markers are used to highlight specific spots on the chart. They differ from the datapoints and
+  therefore are set separately from it. You can add as many markers as you want to a chart.
+
+  There are two types of markers:
+  - A single marker that will be rendered as a vertical line.
+  - A range marker that will be rendered as a rectangle.
+
+  Markers are not used to calculate the boundaries of the chart. If a marker is set outside the
+  range of the chart, it will be rendered but won't be visible.
+
+  <!-- tabs-open -->
+  ### Single marker
+  ``` elixir
+  svg =
+    datapoints
+    |> Sparkline.new()
+    |> Sparkline.show_line()
+    |> Sparkline.add_marker(2)
+    |> Sparkline.add_marker([3, 4])
+    |> Sparkline.to_svg!()
+  ```
+
+  ### Range marker
+  ``` elixir
+  svg =
+    datapoints
+    |> Sparkline.new()
+    |> Sparkline.show_line()
+    |> Sparkline.add_marker({1, 2})
+    |> Sparkline.add_marker([{3, 4}, {5, 6}])
+    |> Sparkline.to_svg!()
+  ```
+  <!-- tabs-close -->
+
+  ## Customization
+
+  `Sparkline` allows you to customize the chart showing or hiding the dots, the line, and the area
+  under the line.
+
+  There are two ways to customize the chart:
+  - Using the options like color or width.
+  - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
+
+  <!-- tabs-open -->
+  ### Options
+  ``` elixir
+  svg =
+    datapoints
+    |> Sparkline.new(width: 100, height: 40, padding: 0.5, smoothing: 0.1, placeholder: "No data")
+    |> Sparkline.show_dots(radius: 0.1, color: "rgb(255, 255, 255)")
+    |> Sparkline.show_line(width: 0.5, color: "rgb(166, 218, 149)")
+    |> Sparkline.show_area(color: "rgba(166, 218, 149, 0.2)")
+    |> Sparkline.add_marker(1, stroke_color: "red", stroke_width: 0.5)
+    |> Sparkline.to_svg!()
+  ```
+
+  ### CSS classes
+  ``` elixir
+  svg =
+    datapoints
+    |> Sparkline.new(smoothing: 0.1, placeholder: "No data", class: "sparkline")
+    |> Sparkline.show_dots(class: "sparkline-dots")
+    |> Sparkline.show_line(class: "sparkline-line")
+    |> Sparkline.show_area(class: "sparkline-area")
+    |> Sparkline.add_marker(1, class: "sparkline-marker")
+    |> Sparkline.to_svg!()
+  ```
+
+  ### Tailwind classes
+  ``` elixir
+  svg =
+    datapoints
+    |> Sparkline.new(smoothing: 0.1, placeholder: "No data", class: "bg-transparent")
+    |> Sparkline.show_dots(class: "fill-green")
+    |> Sparkline.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
+    |> Sparkline.show_area(class: "fill-green/10")
+    |> Sparkline.add_marker(1, class: "stroke-red stroke-[0.5px] fill-transparent")
+    |> Sparkline.to_svg!()
+  ```
+  <!-- tabs-close -->
+
+  When using the CSS classes to style the chart, the other options will be ignored.
+
+  Some options, like `padding`, `smoothing`, and `placeholder`, are used internally to calculate
+  the boundaries of the chart and won't be targetable with CSS classes.
+
+  ### Available options
+
+  Use the following options to customize the chart:
+
+  - `:width` - the width of the chart, defaults to `200`.
+  - `:height` - the height of the chart, defaults to `100`.
+  - `:padding` - the padding of the chart, defaults to `6`. Not targetable with CSS classes.
+  - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
+    defaults to `0.2`. Not targetable with CSS classes.
+  - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
+    with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
+    display a message when the chart is empty. Not targetable with CSS classes.
+  - `:class` - a CSS class list for the chart, defaults to `nil`.
+
+  ### Dots options
+
+  - `:radius` - the radius of the dots, defaults to `1`.
+  - `:color` - the color of the dots, defaults to `"black"`.
+  - `:class` - a CSS class list for the dots, defaults to `nil`.
+
+  ### Line options
+
+  - `:width` - the width of the line, defaults to `0.25`.
+  - `:color` - the color of the line, defaults to `"black"`.
+  - `:class` - a CSS class list for the line, defaults to `nil`.
+
+  ### Area options
+
+  - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
+  - `:class` - a CSS class list for the area, defaults to `nil`.
+
+  ### Marker options
+
+  - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
+  - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
+  - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.2)"`.
+  - `:class` - a CSS class list for the marker, defaults to `nil`.
+
   """
 
   alias Sparkline.Datapoint
