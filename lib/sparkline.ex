@@ -100,84 +100,63 @@ defmodule Sparkline do
   alias Sparkline.Draw
   alias Sparkline.Marker
 
-  @typedoc "A valid SVG string."
-  @type svg :: String.t()
-
-  @typedoc false
+  @typedoc "A value for the x axis of the chart."
   @type x :: number() | DateTime.t() | Date.t() | Time.t() | NaiveDateTime.t()
 
-  @typedoc false
+  @typedoc "A number value for the y axis of the chart."
   @type y :: number()
 
-  @typedoc false
+  @typedoc "A datapoint for the chart."
   @type datapoint :: y() | {x(), y()}
 
   @typedoc """
-  A list of datapoints.
+  A list of datapoint.
+
+  It can be a list of various types of datapoints, but all the datapoints in the list must be of the
+  same type.
   """
   @type datapoints ::
-          list(number())
-          | list({number(), number()})
-          | list({DateTime.t(), number()})
-          | list({Date.t(), number()})
-          | list({Time.t(), number()})
-          | list({NaiveDateTime.t(), number()})
+          list(y())
+          | list({number(), y()})
+          | list({DateTime.t(), y()})
+          | list({Date.t(), y()})
+          | list({Time.t(), y()})
+          | list({NaiveDateTime.t(), y()})
 
-  @typedoc """
-  A marker position
-  """
+  @typedoc "A value or a two-tuple value for the x axis of the chart."
   @type marker :: x() | {x(), x()}
 
-  @typedoc false
-  @type option ::
-          {:width, number()}
-          | {:height, number()}
-          | {:padding, number()}
-          | {:smoothing, float()}
-          | {:placeholder, nil | String.t()}
-          | {:class, nil | String.t()}
-          | {:placeholder_class, nil | String.t()}
+  @typedoc "Keyword list of options for the chart."
+  @type options ::
+          list(
+            {:width, number()}
+            | {:height, number()}
+            | {:padding, number()}
+            | {:smoothing, number()}
+            | {:placeholder, nil | String.t()}
+            | {:class, nil | String.t()}
+            | {:placeholder_class, nil | String.t()}
+          )
 
-  @typedoc """
-  A general sparkline options keyword list.
-  """
-  @type options :: list(option())
+  @typedoc "Keyword list of options for the dots of the chart."
+  @type dots_options ::
+          list({:radius, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
-  @typedoc false
-  @type dots_option :: {:radius, number()} | {:color, String.t()} | {:class, nil | String.t()}
+  @typedoc "Keyword list of options for the line of the chart."
+  @type line_options ::
+          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
-  @typedoc """
-  A dots-related sparkline options keyword list.
-  """
-  @type dots_options :: list(dots_option())
+  @typedoc "Keyword list of options for the area under the line of the chart."
+  @type area_options :: list({:color, String.t()} | {:class, nil | String.t()})
 
-  @typedoc false
-  @type line_option :: {:width, number()} | {:color, String.t()} | {:class, nil | String.t()}
-
-  @typedoc """
-  A line-related sparkline options list.
-  """
-  @type line_options :: list(line_option())
-
-  @typedoc false
-  @type area_option :: {:color, String.t()} | {:class, nil | String.t()}
-
-  @typedoc """
-  A area-related sparkline options list.
-  """
-  @type area_options :: list(area_option())
-
-  @typedoc false
-  @type marker_option ::
-          {:fill_color, String.t()}
-          | {:stroke_color, String.t()}
-          | {:stroke_width, String.t()}
-          | {:class, nil | String.t()}
-
-  @typedoc """
-  A marker-related sparkline options list.
-  """
-  @type marker_options :: list(marker_option())
+  @typedoc "Keyword list of options for a marker of the chart."
+  @type marker_options ::
+          list(
+            {:fill_color, String.t()}
+            | {:stroke_color, String.t()}
+            | {:stroke_width, String.t()}
+            | {:class, nil | String.t()}
+          )
 
   @typedoc false
   @type opts :: %{
