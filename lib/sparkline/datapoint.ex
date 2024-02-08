@@ -7,9 +7,6 @@ defmodule Sparkline.Datapoint do
   @typedoc false
   @type points :: list(point())
 
-  @typedoc false
-  @type min_max :: {number(), number()}
-
   @spec clean(Sparkline.datapoints()) ::
           {:ok, Sparkline.datapoints(), Sparkline.x()} | {:error, atom()}
   def clean([{_x, _y} | _] = datapoints) do
@@ -57,8 +54,7 @@ defmodule Sparkline.Datapoint do
     end
   end
 
-  @spec clean_x(DateTime.t() | Date.t() | Time.t() | number(), atom()) ::
-          {:ok, number(), atom()} | {:error, atom()}
+  @spec clean_x(Sparkline.x(), atom()) :: {:ok, number(), atom()} | {:error, atom()}
   defp clean_x(x, nil) when is_number(x) do
     clean_x(x, :number)
   end
@@ -99,7 +95,7 @@ defmodule Sparkline.Datapoint do
     {:error, :invalid_x_type}
   end
 
-  @spec clean_y(number()) :: {:ok, number()} | {:error, atom()}
+  @spec clean_y(Sparkline.y()) :: {:ok, Sparkline.y()} | {:error, atom()}
   defp clean_y(y) when is_number(y) do
     {:ok, y}
   end
@@ -107,6 +103,9 @@ defmodule Sparkline.Datapoint do
   defp clean_y(_y) do
     {:error, :invalid_y_type}
   end
+
+  @typedoc false
+  @typep min_max :: {number(), number()}
 
   @spec get_min_max(Sparkline.datapoints()) :: {min_max(), min_max()}
   def get_min_max(datapoints) do
@@ -126,8 +125,7 @@ defmodule Sparkline.Datapoint do
     {min_max_x, min_max_y}
   end
 
-  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.opts()) ::
-          points()
+  @spec resize(Sparkline.datapoints(), min_max(), min_max(), Sparkline.opts()) :: points()
   def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = options.width
     height = options.height

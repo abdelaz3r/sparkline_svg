@@ -309,9 +309,16 @@ defmodule Sparkline do
   TODO.
   """
   @spec add_marker(Sparkline.t(), marker()) :: Sparkline.t()
-  @spec add_marker(Sparkline.t(), marker(), marker_options()) :: Sparkline.t()
-  def add_marker(sparkline, _marker, _options \\ []) do
-    sparkline
+  @spec add_marker(Sparkline.t(), marker() | list(marker()), marker_options()) :: Sparkline.t()
+  def add_marker(sparkline, markers, options \\ [])
+
+  def add_marker(sparkline, markers, options) when is_list(markers) do
+    markers = Enum.map(markers, fn marker -> Marker.new(marker, options) end)
+    %Sparkline{sparkline | markers: markers ++ sparkline.markers}
+  end
+
+  def add_marker(sparkline, marker, options) do
+    add_marker(sparkline, [marker], options)
   end
 
   @doc ~S"""
@@ -332,19 +339,26 @@ defmodule Sparkline do
 
     with :ok <- check_dimension(width, padding),
          :ok <- check_dimension(height, padding),
-         {:ok, datapoints} <- Datapoint.clean(sparkline.datapoints) do
-      svg =
+         {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
+         {:ok, markers} <- Marker.clean(sparkline.markers, type) do
+      sparkline =
         if Enum.empty?(datapoints) do
-          Draw.chart(sparkline)
+          sparkline
         else
           {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
-          datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
-          sparkline = %Sparkline{sparkline | datapoints: datapoints}
 
-          Draw.chart(sparkline)
+          datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
+          markers = Marker.resize(markers, min_max_x, min_max_y, sparkline.options)
+
+          %Sparkline{sparkline | datapoints: datapoints, markers: markers}
         end
 
-      {:ok, :erlang.iolist_to_binary(svg)}
+      svg =
+        sparkline
+        |> Draw.chart()
+        |> :erlang.iolist_to_binary()
+
+      {:ok, svg}
     end
   end
 
