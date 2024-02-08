@@ -2,6 +2,7 @@ defmodule Sparkline.Draw do
   @moduledoc false
 
   alias Sparkline.Datapoint
+  alias Sparkline.Marker
 
   @spec chart(Sparkline.t()) :: iolist()
   def chart(%Sparkline{datapoints: []} = sparkline) do
@@ -17,8 +18,11 @@ defmodule Sparkline.Draw do
   end
 
   def chart(%Sparkline{} = sparkline) do
-    %{datapoints: datapoints, options: %{width: width, height: height, class: class} = options} =
-      sparkline
+    %{
+      datapoints: datapoints,
+      markers: markers,
+      options: %{width: width, height: height, class: class} = options
+    } = sparkline
 
     [
       ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
@@ -27,6 +31,7 @@ defmodule Sparkline.Draw do
       area(datapoints, options),
       line(datapoints, options),
       dots(datapoints, options),
+      markers(markers, options),
       ~s'</svg>'
     ]
   end
@@ -111,6 +116,39 @@ defmodule Sparkline.Draw do
 
     path = [compute_curve(datapoints, options), "V#{height}H#{x}Z"]
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
+  end
+
+  @spec markers(list(Marker.t()), Sparkline.opts()) :: iolist()
+  defp markers(markers, options) do
+    Enum.map(markers, fn marker -> marker(marker, options) end)
+  end
+
+  @spec marker(Marker.t(), Sparkline.opts()) :: iolist()
+  defp marker(%Marker{position: {_x1, _x2}} = marker, options) do
+    %{position: {x1, x2}} = marker
+    %{height: height} = options
+    stroke_width = 0.08
+
+    attrs =
+      ~s'fill="rgba(0, 255, 255, 0.1)" stroke="rgba(0, 255, 255)" stroke-width="#{stroke_width}"'
+
+    [
+      ~s'<rect x="',
+      float_to_string(x1),
+      ~s'" y="#{-stroke_width}" width="',
+      float_to_string(x2 - x1),
+      ~s'" height="#{height + 2 * stroke_width}" ',
+      attrs,
+      ~s' />'
+    ]
+  end
+
+  defp marker(%Marker{position: _x} = marker, options) do
+    %{position: x} = marker
+    %{height: height} = options
+
+    attrs = ~s'fill="none" stroke="red" stroke-width="0.08"'
+    [~s'<path d="M', tuple_to_string({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
   end
 
   @spec compute_curve(Datapoint.points(), Sparkline.opts()) :: iolist()
