@@ -52,8 +52,27 @@ defmodule Sparkline.Marker do
   @typedoc false
   @typep min_max :: {number(), number()}
 
-  @spec resize(list(Marker.t()), min_max(), min_max(), Sparkline.opts()) :: Sparkline.marker()
-  def resize(markers, {_min_x, _max_x}, {_min_y, _max_y}, _options) do
-    markers
+  @spec resize(list(Marker.t()), min_max(), Sparkline.opts()) :: list(Marker.t())
+  def resize(markers, min_max_x, options) do
+    Enum.map(markers, fn marker ->
+      case marker.position do
+        {x1, x2} ->
+          x1 = resize_x(x1, min_max_x, options)
+          x2 = resize_x(x2, min_max_x, options)
+
+          %Marker{marker | position: {x1, x2}}
+
+        x ->
+          %Marker{marker | position: resize_x(x, min_max_x, options)}
+      end
+    end)
+  end
+
+  @spec resize_x(number(), min_max(), Sparkline.opts()) :: number()
+  defp resize_x(x, {min_x, max_x}, options) do
+    width = options.width
+    padding = options.padding
+
+    (x - min_x) / (max_x - min_x) * (width - padding * 2) + padding
   end
 end

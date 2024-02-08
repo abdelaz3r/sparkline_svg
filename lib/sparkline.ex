@@ -348,7 +348,7 @@ defmodule Sparkline do
           {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
 
           datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
-          markers = Marker.resize(markers, min_max_x, min_max_y, sparkline.options)
+          markers = Marker.resize(markers, min_max_x, sparkline.options)
 
           %Sparkline{sparkline | datapoints: datapoints, markers: markers}
         end
