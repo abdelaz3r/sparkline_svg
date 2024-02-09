@@ -1,12 +1,12 @@
 defmodule Sparkline do
   @moduledoc ~S"""
-  `Sparkline` is a library to generate SVG sparkline charts.
+  Sparkline is a library to generate SVG sparkline charts.
 
   A [sparkline](https://en.wikipedia.org/wiki/Sparkline) is a small, simple chart that is drawn
   without axes or coordinates. It presents the general shape of the variation of a dataset at a
   glance.
 
-  `Sparkline` allows you to create a sparkline chart from various data shapes and show the dots,
+  Sparkline allows you to create a sparkline chart from various data shapes and show the dots,
   the line, and the area under the line. You can also add markers to the chart to highlight
   specific spots.
 
@@ -15,13 +15,13 @@ defmodule Sparkline do
   ``` elixir
   # Datapoints and general options
   datapoints = [1, 3, 2, 2, 5]
-  options = [width: 100, height: 40]
+  options = [width: 200, height: 40]
 
   # A very simple line chart
   sparkline = Sparkline.new(datapoints, options)
 
   # Display what you want
-  line_options = [width: 0.25, color: "black"]
+  line_options = [width: 0.3, color: "green"]
   sparkline = Sparkline.show_line(sparkline, line_options)
 
   # Render the chart to an SVG string
@@ -32,11 +32,11 @@ defmodule Sparkline do
   ## Datapoints
 
   Datapoints are the values that will be used to draw the chart. They can be:
-  - A **list of numbers**, where each number is a value for the y axis. The x axis will be the
+  - A **list of numbers**, where each number is a value for the `y` axis. The `x` axis will be the
     index of the number in the list.
-  - A **list of tuples** with two values. The first value is the x axis and the second value is
-    the y axis. The x value can be a `number`, a `DateTime`, a `Date`, a `Time`, or a
-    `NaiveDateTime`. The y value must be a `number`.
+  - A **list of tuples** with two values. The first value is the `x` axis and the second value is
+    the `y` axis. The `x` value can be a `number`, a `DateTime`, a `Date`, a `Time`, or a
+    `NaiveDateTime`. The `y` value must be a `number`.
 
   All values in the list must be of the same type.
 
@@ -126,11 +126,11 @@ defmodule Sparkline do
 
   ## Customization
 
-  `Sparkline` allows you to customize the chart showing or hiding the dots, the line, and the area
+  Sparkline allows you to customize the chart showing or hiding the dots, the line, and the area
   under the line.
 
   There are two ways to customize the chart:
-  - Using the options like color or width.
+  - Using the options like `:color` or `:width`.
   - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
 
   <!-- tabs-open -->
@@ -181,10 +181,10 @@ defmodule Sparkline do
   Use the following options to customize the chart:
 
   - `:width` - the width of the chart, defaults to `200`.
-  - `:height` - the height of the chart, defaults to `100`.
-  - `:padding` - the padding of the chart, defaults to `6`. Not targetable with CSS classes.
-  - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.5` it becomes unreadable),
-    defaults to `0.2`. Not targetable with CSS classes.
+  - `:height` - the height of the chart, defaults to `50`.
+  - `:padding` - the padding of the chart, defaults to `2`. Not targetable with CSS classes.
+  - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes unreadable),
+    defaults to `0.15`. Not targetable with CSS classes.
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
     with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
     display a message when the chart is empty. Not targetable with CSS classes.
@@ -204,14 +204,14 @@ defmodule Sparkline do
 
   ### Area options
 
-  - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.2)"`.
+  - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`.
   - `:class` - a CSS class list for the area, defaults to `nil`.
 
   ### Marker options
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
-  - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.2)"`.
+  - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
   - `:class` - a CSS class list for the marker, defaults to `nil`.
 
   """
@@ -311,7 +311,7 @@ defmodule Sparkline do
 
       iex> chart = Sparkline.new([1, 2])
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
 
       iex> chart = Sparkline.new([1, 2], width: 240, height: 80)
       iex> Sparkline.to_svg!(chart)
@@ -324,9 +324,9 @@ defmodule Sparkline do
     options =
       [
         width: 200,
-        height: 100,
-        padding: 6,
-        smoothing: 0.2,
+        height: 50,
+        padding: 2,
+        smoothing: 0.15,
         placeholder: nil,
         class: nil,
         placeholder_class: nil
@@ -348,11 +348,11 @@ defmodule Sparkline do
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_dots()
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><circle cx="6.0" cy="94.0" r="1" fill="black" /><circle cx="194.0" cy="6.0" r="1" fill="black" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="1" fill="black" /><circle cx="198.0" cy="2.0" r="1" fill="black" /></svg>'
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_dots(radius: 0.5, color: "red")
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><circle cx="6.0" cy="94.0" r="0.5" fill="red" /><circle cx="194.0" cy="6.0" r="0.5" fill="red" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="0.5" fill="red" /><circle cx="198.0" cy="2.0" r="0.5" fill="red" /></svg>'
 
   """
   @spec show_dots(Sparkline.t()) :: Sparkline.t()
@@ -376,11 +376,11 @@ defmodule Sparkline do
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_line()
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_line(width: 0.1, color: "green")
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
 
   """
   @spec show_line(Sparkline.t()) :: Sparkline.t()
@@ -404,18 +404,18 @@ defmodule Sparkline do
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_area()
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z" fill="rgba(0, 0, 0, 0.2)" stroke="none" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /></svg>'
 
       iex> chart = Sparkline.new([1, 2]) |> Sparkline.show_area(color: "rgba(0, 255, 255, 0.2)")
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
 
   """
   @spec show_area(Sparkline.t()) :: Sparkline.t()
   @spec show_area(Sparkline.t(), area_options()) :: Sparkline.t()
   def show_area(sparkline, options \\ []) do
     area_options =
-      [color: "rgba(0, 0, 0, 0.2)", class: nil]
+      [color: "rgba(0, 0, 0, 0.1)", class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
@@ -437,19 +437,15 @@ defmodule Sparkline do
 
       iex> chart = Sparkline.new([1, 3]) |> Sparkline.add_marker(2)
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M382.0,0.0V100" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" /></svg>'
 
       iex> chart = Sparkline.new([1, 3]) |> Sparkline.add_marker({2.1, 2.4})
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><rect x="400.8" y="-0.25" width="56.4" height="100.5" fill="rgba(255, 0, 0, 0.2)" stroke="red" stroke-width="0.25" /></svg>'
-
-      iex> chart = Sparkline.new([1, 3]) |> Sparkline.add_marker([2.2, 2.5])
-      iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M476.0,0.0V100" fill="none" stroke="red" stroke-width="0.25" /><path d="M419.6,0.0V100" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><rect x="413.6" y="-0.25" width="58.8" height="50.5" fill="rgba(255, 0, 0, 0.1)" stroke="red" stroke-width="0.25" /></svg>'
 
       iex> chart = Sparkline.new([1, 3]) |> Sparkline.add_marker(2, stroke_color: "rgba(0, 255, 0, 0.2)")
       iex> Sparkline.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M382.0,0.0V100" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
   @spec add_marker(Sparkline.t(), marker()) :: Sparkline.t()
@@ -471,7 +467,7 @@ defmodule Sparkline do
   ## Examples
 
       iex> Sparkline.new([1, 2]) |> Sparkline.to_svg()
-      {:ok, ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"></svg>'}
+      {:ok, ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
 
       iex> Sparkline.new([1, 2], width: 10, padding: 10) |> Sparkline.to_svg()
       {:error, :invalid_dimension}
@@ -512,7 +508,7 @@ defmodule Sparkline do
   ## Examples
 
       iex> Sparkline.new([1, 2]) |> Sparkline.to_svg!()
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
 
       iex> Sparkline.new([1, 2], width: 10, padding: 10) |> Sparkline.to_svg!()
       ** (Sparkline.Error) invalid_dimension
@@ -537,7 +533,7 @@ defmodule Sparkline do
 
       iex> svg = Sparkline.new([1, 2]) |> Sparkline.to_svg!()
       iex> Sparkline.as_data_uri(svg)
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4="
+      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
   @spec as_data_uri(String.t()) :: String.t()

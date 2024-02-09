@@ -45,18 +45,18 @@ defmodule SparklineTest do
            |> Sparkline.show_area()
            |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
   end
 
   test "to_svg/2 with empty chart and placeholder" do
     assert Sparkline.new([], placeholder: "No data") |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'}
   end
 
   test "to_svg/2 with one point chart" do
     one_point_chart_dots =
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><circle cx="100.0" cy="50.0" r="1" fill="black" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="100.0" cy="25.0" r="1" fill="black" /></svg>'
 
     assert Sparkline.new([{1, 0}]) |> Sparkline.show_dots() |> Sparkline.to_svg() ==
              {:ok, one_point_chart_dots}
@@ -66,18 +66,18 @@ defmodule SparklineTest do
 
     assert Sparkline.new([{1, 0}]) |> Sparkline.show_line() |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M80.0,50.0L120.0,50.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M80.0,25.0L120.0,25.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'}
   end
 
   test "to_svg/2 with only zeros as values" do
     assert Sparkline.new([{1, 0}, {2, 0}]) |> Sparkline.show_line() |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,50.0C43.6,50.0 156.4,50.0 194.0,50.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,25.0C31.4,25.0 168.6,25.0 198.0,25.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'}
   end
 
   test "to_svg/2 with various type of datapoints" do
     chart =
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
     assert Sparkline.new([1, 2])
            |> Sparkline.show_line()
@@ -147,7 +147,7 @@ defmodule SparklineTest do
            |> Sparkline.show_dots(radius: 2, color: "red")
            |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><circle cx="6.0" cy="94.0" r="2" fill="red" /><circle cx="194.0" cy="6.0" r="2" fill="red" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="2" fill="red" /><circle cx="198.0" cy="2.0" r="2" fill="red" /></svg>'}
   end
 
   test "to_svg/2 with non-default options (for line)" do
@@ -155,7 +155,7 @@ defmodule SparklineTest do
            |> Sparkline.show_line(width: 1, color: "red")
            |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" fill="none" stroke="red" stroke-width="1" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="red" stroke-width="1" /></svg>'}
   end
 
   test "to_svg/2 with non-default options (for area)" do
@@ -163,7 +163,7 @@ defmodule SparklineTest do
            |> Sparkline.show_area(color: "red")
            |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z" fill="red" stroke="none" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="red" stroke="none" /></svg>'}
   end
 
   test "to_svg/2 with non-default options (all)" do
@@ -183,7 +183,7 @@ defmodule SparklineTest do
            |> Sparkline.show_area(class: "area")
            |> Sparkline.to_svg() ==
              {:ok,
-              ~S'<svg width="100%" height="100%" viewBox="0 0 200 100" class="sparkline" xmlns="http://www.w3.org/2000/svg"><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0V100H6.0Z" class="area" /><path d="M6.0,94.0C43.6,76.4 156.4,23.6 194.0,6.0" class="line" /><circle cx="6.0" cy="94.0" r="1" class="dot" /><circle cx="194.0" cy="6.0" r="1" class="dot" /></svg>'}
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" class="sparkline" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" class="area" /><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" class="line" /><circle cx="2.0" cy="48.0" r="1" class="dot" /><circle cx="198.0" cy="2.0" r="1" class="dot" /></svg>'}
   end
 
   test "as_data_uri/1" do
@@ -192,6 +192,6 @@ defmodule SparklineTest do
            |> Sparkline.show_line()
            |> Sparkline.to_svg!()
            |> Sparkline.as_data_uri() ==
-             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNi4wLDk0LjBDNDMuNiw3Ni40IDE1Ni40LDIzLjYgMTk0LjAsNi4wIiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjAuMjUiIC8+PC9zdmc+"
+             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yLjAsNDguMEMzMS40LDQxLjEgMTY4LjYsOC45IDE5OC4wLDIuMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwLjI1IiAvPjwvc3ZnPg=="
   end
 end
