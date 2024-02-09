@@ -22,7 +22,7 @@ defmodule Sparkline.Marker do
   @spec new(Sparkline.marker(), Sparkline.marker_options()) :: Marker.t()
   def new(position, options \\ []) do
     options =
-      [fill_color: "rgba(255, 0, 0, 0.2)", stroke_color: "red", stroke_width: 0.25, class: nil]
+      [fill_color: "rgba(255, 0, 0, 0.1)", stroke_color: "red", stroke_width: 0.25, class: nil]
       |> Keyword.merge(options)
       |> Map.new()
 
