@@ -20,8 +20,8 @@ defmodule Sparkline.MixProject do
         main: "Sparkline",
         extras: [
           {"README.md", [title: "About"]},
-          {"markdown/EXAMPLES.md", [title: "Examples"]},
-          {"markdown/CHANGELOG.md", [title: "Changelog"]},
+          {"documents/EXAMPLES.md", [title: "Examples"]},
+          {"documents/CHANGELOG.md", [title: "Changelog"]},
           {"LICENSE", [title: "License"]}
         ],
         authors: ["Gil Clavien"]
