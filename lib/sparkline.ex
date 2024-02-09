@@ -14,7 +14,7 @@ defmodule Sparkline do
 
   ``` elixir
   # Datapoints and general options
-  datapoints = [{1, 1}, {2, 2}, {3, 3}]
+  datapoints = [1, 3, 2, 2, 5]
   options = [width: 100, height: 40]
 
   # A very simple line chart
@@ -33,10 +33,10 @@ defmodule Sparkline do
 
   Datapoints are the values that will be used to draw the chart. They can be:
   - A **list of numbers**, where each number is a value for the y axis. The x axis will be the
-    index of the number in the list. The x value can be a `number`, a `DateTime`, a `Date`, a
-    `Time`, or a `NaiveDateTime`.
+    index of the number in the list.
   - A **list of tuples** with two values. The first value is the x axis and the second value is
-    the y axis. The y value must be a number.
+    the y axis. The x value can be a `number`, a `DateTime`, a `Date`, a `Time`, or a
+    `NaiveDateTime`. The y value must be a `number`.
 
   All values in the list must be of the same type.
 
@@ -423,7 +423,7 @@ defmodule Sparkline do
   end
 
   @doc ~S"""
-  A one or many markers to a sparkline struct with the given options.
+  Add one or many markers to a sparkline struct with the given options.
 
   When calling this function with a list of markers, the options will be applied to all the markers.
 
