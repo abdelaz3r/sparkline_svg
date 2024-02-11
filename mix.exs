@@ -47,15 +47,10 @@ defmodule Sparkline.MixProject do
 
   defp package() do
     [
-      files: [
-        "lib",
-        "mix.exs",
-        "README.md",
-        "LICENSE"
-      ],
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE* documents),
       licenses: ["Apache 2.0"],
       links: %{
-        "GitHub (Elixir library)" => @repo_url
+        "GitHub" => @repo_url
       },
       maintainers: ["Gil Clavien"]
     ]

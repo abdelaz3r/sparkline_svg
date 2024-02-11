@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0 (2024-02-10)
+## v0.1.0 (2024-02-11)
 
   * Enhancements
     * First public release
