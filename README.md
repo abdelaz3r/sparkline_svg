@@ -1,8 +1,8 @@
-# Sparkline
+# Sparkline SVG
 
 **TODO: add cover IMAGE**
 
-`Sparkline` is an Elixir library to generate SVG sparkline charts.
+**Sparkline SVG** is an Elixir library to generate SVG sparkline charts.
 
 **TODO: Link to documentation on hex**
 
@@ -12,7 +12,7 @@ A [sparkline](https://en.wikipedia.org/wiki/Sparkline) is a small, simple chart 
 without axes or coordinates. It presents the general shape of the variation of a dataset at a
 glance.
 
-`Sparkline` allows you to create a sparkline chart from various data shapes and show the dots,
+Sparkline SVG allows you to create a sparkline chart from various data shapes and show the dots,
 the line, and the area under the line. You can also add markers to the chart to highlight
 specific spots.
 
@@ -31,7 +31,7 @@ Markers are used to highlight specific spots on the chart. There are two types o
 
 ### Customization
 
-`Sparkline` allows you to customize the chart showing or hiding the dots, the line, and the area
+Sparkline SVG allows you to customize the chart showing or hiding the dots, the line, and the area
 under the line. There are two ways to customize the chart:
 - Using the options like color or width.
 - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
@@ -42,12 +42,12 @@ This library is currently under active development and it’s API is likely to c
 
 ## Installation
 
-The package can be installed by adding `:sparkline` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `:sparkline_svg` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:sparkline, "~> 0.1.0"}
+    {:sparkline_svg, "~> 0.1.0"}
   ]
 end
 ```
@@ -60,14 +60,14 @@ datapoints = [1, 3, 2, 2, 5]
 options = [width: 100, height: 40]
 
 # A very simple line chart
-sparkline = Sparkline.new(datapoints, options)
+sparkline = SparklineSvg.new(datapoints, options)
 
 # Display what you want
 line_options = [width: 0.25, color: "black"]
-sparkline = Sparkline.show_line(sparkline, line_options)
+sparkline = SparklineSvg.show_line(sparkline, line_options)
 
 # Render the chart to an SVG string
-{:ok, svg} = Sparkline.to_svg(sparkline)
+{:ok, svg} = SparklineSvg.to_svg(sparkline)
 ```
 
 ## Examples
@@ -83,25 +83,25 @@ marker = 25
 marker_area = {10, 15}
 
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgba(6, 182, 212, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(6, 182, 212, 0.2)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgba(6, 182, 212, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(6, 182, 212, 0.2)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
-![A cyan sparkline with a line, area, and markers](https://raw.githubusercontent.com/abdelaz3r/sparkline/main/documents/assets/light-sparkline-example.png)
+![A cyan sparkline with a line, area, and markers](https://raw.githubusercontent.com/abdelaz3r/sparkline_svg/main/documents/assets/light-sparkline-example.png)
 
 ### A green sparkline, on dark background, with a line, and area
 
 ``` elixir
 # Data source
 [4, 4, 6, 3, 2, 1, 3, 5, 7, 7, 7, 6, 9, 11, 11, 5, 7, 6, 9, 19, 19, 20, 21, 20, 17, 20, 19, 17]
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(40, 255, 118, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(40, 255, 118, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(40, 255, 118, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(40, 255, 118, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
-![A green sparkline, on dark background, with a line, and area](https://raw.githubusercontent.com/abdelaz3r/sparkline/main/documents/assets/dark-sparkline-example.png)
+![A green sparkline, on dark background, with a line, and area](https://raw.githubusercontent.com/abdelaz3r/sparkline_svg/main/documents/assets/dark-sparkline-example.png)

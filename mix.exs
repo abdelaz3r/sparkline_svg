@@ -1,14 +1,14 @@
-defmodule Sparkline.MixProject do
+defmodule SparklineSvg.MixProject do
   use Mix.Project
 
   @version "0.1.0"
-  @repo_url "https://github.com/abdelaz3r/sparkline"
+  @repo_url "https://github.com/abdelaz3r/sparkline_svg"
 
   def project do
     [
-      app: :sparkline,
-      name: "Sparkline",
-      description: "Sparkline is an Elixir library to generate SVG sparkline charts.",
+      app: :sparkline_svg,
+      name: "Sparkline SVG",
+      description: "Sparkline SVG is an Elixir library to generate SVG sparkline charts.",
       version: @version,
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -17,7 +17,7 @@ defmodule Sparkline.MixProject do
       source_url: @repo_url,
       homepage_url: @repo_url,
       docs: [
-        main: "Sparkline",
+        main: "SparklineSvg",
         extras: [
           {"README.md", [title: "About"]},
           {"documents/EXAMPLES.md", [title: "Examples"]},
