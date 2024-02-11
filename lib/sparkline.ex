@@ -318,19 +318,21 @@ defmodule Sparkline do
       ~S'<svg width="100%" height="100%" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg"></svg>'
 
   """
+  @default_opts [
+    width: 200,
+    height: 50,
+    padding: 2,
+    smoothing: 0.15,
+    placeholder: nil,
+    class: nil,
+    placeholder_class: nil
+  ]
+
   @spec new(datapoints()) :: Sparkline.t()
   @spec new(datapoints(), options()) :: Sparkline.t()
   def new(datapoints, options \\ []) do
     options =
-      [
-        width: 200,
-        height: 50,
-        padding: 2,
-        smoothing: 0.15,
-        placeholder: nil,
-        class: nil,
-        placeholder_class: nil
-      ]
+      @default_opts
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
@@ -355,11 +357,14 @@ defmodule Sparkline do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="0.5" fill="red" /><circle cx="198.0" cy="2.0" r="0.5" fill="red" /></svg>'
 
   """
+
+  @default_dots_opts [radius: 1, color: "black", class: nil]
+
   @spec show_dots(Sparkline.t()) :: Sparkline.t()
   @spec show_dots(Sparkline.t(), dots_options()) :: Sparkline.t()
   def show_dots(sparkline, options \\ []) do
     dots_options =
-      [radius: 1, color: "black", class: nil]
+      @default_dots_opts
       |> Keyword.merge(options)
       |> Map.new()
 
@@ -383,11 +388,14 @@ defmodule Sparkline do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
 
   """
+
+  @default_line_opts [width: 0.25, color: "black", class: nil]
+
   @spec show_line(Sparkline.t()) :: Sparkline.t()
   @spec show_line(Sparkline.t(), line_options()) :: Sparkline.t()
   def show_line(sparkline, options \\ []) do
     line_options =
-      [width: 0.25, color: "black", class: nil]
+      @default_line_opts
       |> Keyword.merge(options)
       |> Map.new()
 
@@ -411,11 +419,14 @@ defmodule Sparkline do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
 
   """
+
+  @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
+
   @spec show_area(Sparkline.t()) :: Sparkline.t()
   @spec show_area(Sparkline.t(), area_options()) :: Sparkline.t()
   def show_area(sparkline, options \\ []) do
     area_options =
-      [color: "rgba(0, 0, 0, 0.1)", class: nil]
+      @default_area_opts
       |> Keyword.merge(options)
       |> Map.new()
 
