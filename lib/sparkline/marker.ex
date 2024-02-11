@@ -18,11 +18,18 @@ defmodule Sparkline.Marker do
   @enforce_keys [:position, :options]
   defstruct [:position, :options]
 
+  @default_opts [
+    fill_color: "rgba(255, 0, 0, 0.1)",
+    stroke_color: "red",
+    stroke_width: 0.25,
+    class: nil
+  ]
+
   @spec new(Sparkline.marker()) :: Marker.t()
   @spec new(Sparkline.marker(), Sparkline.marker_options()) :: Marker.t()
   def new(position, options \\ []) do
     options =
-      [fill_color: "rgba(255, 0, 0, 0.1)", stroke_color: "red", stroke_width: 0.25, class: nil]
+      @default_opts
       |> Keyword.merge(options)
       |> Map.new()
 
