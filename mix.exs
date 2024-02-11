@@ -10,7 +10,7 @@ defmodule Sparkline.MixProject do
       name: "Sparkline",
       description: "Sparkline is an Elixir library to generate SVG sparkline charts.",
       version: @version,
-      elixir: "~> 1.12",
+      elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
