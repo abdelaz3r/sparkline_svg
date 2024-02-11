@@ -171,10 +171,9 @@ defmodule Sparkline do
   ```
   <!-- tabs-close -->
 
-  When using the CSS classes to style the chart, the other options will be ignored.
-
-  Some options, like `padding`, `smoothing`, and `placeholder`, are used internally to calculate
-  the boundaries of the chart and won't be targetable with CSS classes.
+  When using the CSS classes to style the chart, the other options like `:color` or `:width` will
+  be ignored. However, some options (`:width`, `:height`, `padding`, `smoothing`, and
+  `placeholder`), are used internally to render the chart and are required in any case.
 
   ### Available options
 
@@ -183,36 +182,40 @@ defmodule Sparkline do
   - `:width` - the width of the chart, defaults to `200`.
   - `:height` - the height of the chart, defaults to `50`.
   - `:padding` - the padding of the chart, defaults to `2`. Not targetable with CSS classes.
-  - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes unreadable),
-    defaults to `0.15`. Not targetable with CSS classes.
+    Padding has to be set to a value which `padding * 2 < width` and `padding * 2 < height`
+    otherwise a `:invalid_dimension` error will be raised.
+  - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes
+    unreadable), defaults to `0.15`. Not targetable with CSS classes.
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
     with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
     display a message when the chart is empty. Not targetable with CSS classes.
-  - `:class` - a CSS class list for the chart, defaults to `nil`.
+  - `:class` - the value of the HTML class attribut of the chart, defaults to `nil`.
+  - `:placeholder_class` - the value of the HTML class attribut of the placeholder, defaults to
+  `nil`. It is the only way to style the placeholder.
 
   ### Dots options
 
   - `:radius` - the radius of the dots, defaults to `1`.
   - `:color` - the color of the dots, defaults to `"black"`.
-  - `:class` - a CSS class list for the dots, defaults to `nil`.
+  - `:class` - the value of the HTML class attribut of the dots, defaults to `nil`.
 
   ### Line options
 
   - `:width` - the width of the line, defaults to `0.25`.
   - `:color` - the color of the line, defaults to `"black"`.
-  - `:class` - a CSS class list for the line, defaults to `nil`.
+  - `:class` - the value of the HTML class attribut of the line, defaults to `nil`.
 
   ### Area options
 
   - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`.
-  - `:class` - a CSS class list for the area, defaults to `nil`.
+  - `:class` - the value of the HTML class attribut of the area, defaults to `nil`.
 
   ### Marker options
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
-  - `:class` - a CSS class list for the marker, defaults to `nil`.
+  - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
 
   """
 
