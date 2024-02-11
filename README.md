@@ -4,7 +4,7 @@
 
 **Sparkline SVG** is simple, zero-dependency, Elixir library to generate SVG sparkline charts.
 
-Documentation can be found at [https://hexdocs.pm/packages/sparkline_svg](https://hexdocs.pm/packages/sparkline_svg).
+Documentation can be found at [https://hexdocs.pm/sparkline_svg](https://hexdocs.pm/sparkline_svg).
 
 ## Overview
 
