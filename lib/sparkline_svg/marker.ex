@@ -1,8 +1,8 @@
-defmodule Sparkline.Marker do
+defmodule SparklineSvg.Marker do
   @moduledoc false
 
-  alias Sparkline.Marker
-  alias Sparkline.Type
+  alias SparklineSvg.Marker
+  alias SparklineSvg.Type
 
   @type marker_opts :: %{
           fill_color: String.t(),
@@ -12,7 +12,7 @@ defmodule Sparkline.Marker do
         }
 
   @type t :: %Marker{
-          position: Sparkline.marker(),
+          position: SparklineSvg.marker(),
           options: marker_opts()
         }
   @enforce_keys [:position, :options]
@@ -25,8 +25,8 @@ defmodule Sparkline.Marker do
     class: nil
   ]
 
-  @spec new(Sparkline.marker()) :: Marker.t()
-  @spec new(Sparkline.marker(), Sparkline.marker_options()) :: Marker.t()
+  @spec new(SparklineSvg.marker()) :: Marker.t()
+  @spec new(SparklineSvg.marker(), SparklineSvg.marker_options()) :: Marker.t()
   def new(position, options \\ []) do
     options =
       @default_opts
@@ -36,7 +36,7 @@ defmodule Sparkline.Marker do
     %Marker{position: position, options: options}
   end
 
-  @spec clean(list(Marker.t()), Sparkline.x()) :: {:ok, list(Marker.t())} | {:error, atom()}
+  @spec clean(list(Marker.t()), SparklineSvg.x()) :: {:ok, list(Marker.t())} | {:error, atom()}
   def clean(markers, type) do
     markers =
       Enum.reduce_while(markers, [], fn
@@ -64,7 +64,7 @@ defmodule Sparkline.Marker do
   @typedoc false
   @typep min_max :: {number(), number()}
 
-  @spec resize(list(Marker.t()), min_max(), Sparkline.opts()) :: list(Marker.t())
+  @spec resize(list(Marker.t()), min_max(), SparklineSvg.opts()) :: list(Marker.t())
   def resize(markers, min_max_x, options) do
     Enum.map(markers, fn marker ->
       case marker.position do
@@ -80,7 +80,7 @@ defmodule Sparkline.Marker do
     end)
   end
 
-  @spec resize_x(number(), min_max(), Sparkline.opts()) :: number()
+  @spec resize_x(number(), min_max(), SparklineSvg.opts()) :: number()
   defp resize_x(x, {min_x, max_x}, options) do
     width = options.width
     padding = options.padding

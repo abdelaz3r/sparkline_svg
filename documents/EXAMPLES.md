@@ -21,12 +21,12 @@ marker_area = {10, 15}
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgba(6, 182, 212, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(6, 182, 212, 0.2)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgba(6, 182, 212, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(6, 182, 212, 0.2)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -36,12 +36,12 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgb(22, 197, 245)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(22, 197, 245, 0.4)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgb(22, 197, 245)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(22, 197, 245, 0.4)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -57,12 +57,12 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgba(13, 148, 136, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(13, 148, 136, 0.2)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgba(13, 148, 136, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(13, 148, 136, 0.2)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -72,12 +72,12 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgb(23, 227, 209)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(23, 227, 209, 0.4)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgb(23, 227, 209)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(23, 227, 209, 0.4)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -93,12 +93,12 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgba(67, 56, 202, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(67, 56, 202, 0.2)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgba(67, 56, 202, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(67, 56, 202, 0.2)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(236, 72, 153, 0.8)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(236, 72, 153, 0.4)", stroke_width: 0.4, fill_color: "rgba(236, 72, 153, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -108,12 +108,12 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgb(102, 89, 255)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(102, 89, 255, 0.4)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgb(102, 89, 255)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(102, 89, 255, 0.4)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(255, 68, 166, 0.6)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(255, 68, 166, 0.4)", stroke_width: 0.4, fill_color: "rgba(255, 68, 166, 0.3)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -129,12 +129,12 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgb(0, 0, 0)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(0, 0, 0, 0.9)")
-|> Sparkline.add_marker(marker, stroke_color: "rgb(243, 244, 246", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(243, 244, 246, 0.8)", stroke_width: 0.4, fill_color: "rgba(243, 244, 246, 0.1)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgb(0, 0, 0)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(0, 0, 0, 0.9)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgb(243, 244, 246", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(243, 244, 246, 0.8)", stroke_width: 0.4, fill_color: "rgba(243, 244, 246, 0.1)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -144,12 +144,12 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(smoothing: 0.05)
-|> Sparkline.show_line(color: "rgb(240, 240, 240)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(240, 240, 240, 0.9)")
-|> Sparkline.add_marker(marker, stroke_color: "rgba(40, 40, 40, 0.9)", stroke_width: 0.4)
-|> Sparkline.add_marker(marker_area, stroke_color: "rgba(40, 40, 40, 0.8)", stroke_width: 0.4, fill_color: "rgba(40, 40, 40, 0.3)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(smoothing: 0.05)
+|> SparklineSvg.show_line(color: "rgb(240, 240, 240)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(240, 240, 240, 0.9)")
+|> SparklineSvg.add_marker(marker, stroke_color: "rgba(40, 40, 40, 0.9)", stroke_width: 0.4)
+|> SparklineSvg.add_marker(marker_area, stroke_color: "rgba(40, 40, 40, 0.8)", stroke_width: 0.4, fill_color: "rgba(40, 40, 40, 0.3)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -165,10 +165,10 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(245, 158, 11, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(245, 158, 11, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(245, 158, 11, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(245, 158, 11, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -178,10 +178,10 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(255, 165, 22, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(255, 165, 22, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(255, 165, 22, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(255, 165, 22, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -197,10 +197,10 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(34, 197, 94, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(34, 197, 94, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(34, 197, 94, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(34, 197, 94, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -210,10 +210,10 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(40, 255, 118, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(40, 255, 118, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(40, 255, 118, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(40, 255, 118, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -229,10 +229,10 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(14, 165, 233, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(14, 165, 233, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(14, 165, 233, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(14, 165, 233, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -242,10 +242,10 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(18, 181, 255, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(18, 181, 255, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(18, 181, 255, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(18, 181, 255, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -261,10 +261,10 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(168, 85, 247, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(168, 85, 247, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(168, 85, 247, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(168, 85, 247, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -274,10 +274,10 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(173, 98, 255, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(173, 98, 255, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(173, 98, 255, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(173, 98, 255, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">
@@ -293,10 +293,10 @@ data
 ### Light theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(244, 63, 94, 0.5)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(244, 63, 94, 0.2)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(244, 63, 94, 0.5)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(244, 63, 94, 0.2)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #ded7d7; border-radius: 10px; background: #ffffff;">
@@ -306,10 +306,10 @@ data
 ### Dark theme
 ``` elixir
 data
-|> Sparkline.new(width: 200, height: 30, smoothing: 0)
-|> Sparkline.show_line(color: "rgba(255, 83, 112, 0.8)", width: 0.4)
-|> Sparkline.show_area(color: "rgba(255, 83, 112, 0.4)")
-|> Sparkline.to_svg!()
+|> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
+|> SparklineSvg.show_line(color: "rgba(255, 83, 112, 0.8)", width: 0.4)
+|> SparklineSvg.show_area(color: "rgba(255, 83, 112, 0.4)")
+|> SparklineSvg.to_svg!()
 ```
 
 <div style="padding: 10px 6px; margin-bottom: 24px; border: solid 1px #0a101c; border-radius: 10px; background: #030812;">

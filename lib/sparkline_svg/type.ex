@@ -1,7 +1,7 @@
-defmodule Sparkline.Type do
+defmodule SparklineSvg.Type do
   @moduledoc false
 
-  @spec cast_x(Sparkline.x(), atom()) :: {:ok, number(), atom()} | {:error, atom()}
+  @spec cast_x(SparklineSvg.x(), atom()) :: {:ok, number(), atom()} | {:error, atom()}
   def cast_x(x, nil) when is_number(x), do: cast_x(x, :number)
   def cast_x(%module{} = x, nil) when is_struct(x), do: cast_x(x, module)
 
@@ -37,7 +37,7 @@ defmodule Sparkline.Type do
     {:error, :invalid_x_type}
   end
 
-  @spec cast_y(Sparkline.y()) :: {:ok, Sparkline.y()} | {:error, atom()}
+  @spec cast_y(SparklineSvg.y()) :: {:ok, SparklineSvg.y()} | {:error, atom()}
   def cast_y(y) when is_number(y) do
     {:ok, y}
   end
