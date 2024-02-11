@@ -1,10 +1,10 @@
 # Sparkline SVG
 
-**TODO: add cover IMAGE**
+![Sparkline SVG](https://raw.githubusercontent.com/abdelaz3r/sparkline_svg/main/documents/assets/cover.png)
 
-**Sparkline SVG** is an Elixir library to generate SVG sparkline charts.
+**Sparkline SVG** is simple, zero-dependency, Elixir library to generate SVG sparkline charts.
 
-**TODO: Link to documentation on hex**
+Documentation can be found at [https://hexdocs.pm/packages/sparkline_svg](https://hexdocs.pm/packages/sparkline_svg).
 
 ## Overview
 
