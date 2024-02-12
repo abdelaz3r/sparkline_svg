@@ -222,6 +222,7 @@ defmodule SparklineSvg do
   alias SparklineSvg.Datapoint
   alias SparklineSvg.Draw
   alias SparklineSvg.Marker
+  alias SparklineSvg.ReferenceLine
 
   @typedoc "A value for the x axis of the chart."
   @type x :: number() | DateTime.t() | Date.t() | Time.t() | NaiveDateTime.t()
@@ -262,6 +263,9 @@ defmodule SparklineSvg do
           | list({Time.t(), Time.t()})
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
+  @typedoc "The type of reference line."
+  @type reference_line :: :max | :min | :avg | :median
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
@@ -294,6 +298,9 @@ defmodule SparklineSvg do
             | {:class, nil | String.t()}
           )
 
+  @typedoc "Keyword list of options for a reference line."
+  @type reference_line_options :: list({:type, reference_line()})
+
   @typedoc false
   @type opts :: %{
           width: number(),
@@ -312,10 +319,11 @@ defmodule SparklineSvg do
   @type t :: %__MODULE__{
           datapoints: datapoints(),
           options: opts(),
-          markers: list(Marker.t())
+          markers: list(Marker.t()),
+          reference_lines: map()
         }
-  @enforce_keys [:datapoints, :options, :markers]
-  defstruct [:datapoints, :options, :markers]
+  @enforce_keys [:datapoints, :options, :markers, :reference_lines]
+  defstruct [:datapoints, :options, :markers, :reference_lines]
 
   @doc ~S"""
   Create a new sparkline struct with the given datapoints and options.
@@ -353,7 +361,7 @@ defmodule SparklineSvg do
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
-    %SparklineSvg{datapoints: datapoints, options: options, markers: []}
+    %SparklineSvg{datapoints: datapoints, options: options, markers: [], reference_lines: %{}}
   end
 
   @doc ~S"""
@@ -447,6 +455,18 @@ defmodule SparklineSvg do
       |> Map.new()
 
     %SparklineSvg{sparkline | options: %{sparkline.options | area: area_options}}
+  end
+
+  @doc ~S"""
+  TODO.
+  """
+
+  @spec show_reference_line(SparklineSvg.t()) :: SparklineSvg.t()
+  @spec show_reference_line(SparklineSvg.t(), reference_line_options()) :: SparklineSvg.t()
+  def show_reference_line(sparkline, options \\ []) do
+    ref_line = ReferenceLine.new(options)
+    reference_lines = Map.put(sparkline.reference_lines, ref_line.type, ref_line)
+    %SparklineSvg{sparkline | reference_lines: reference_lines}
   end
 
   @doc ~S"""
