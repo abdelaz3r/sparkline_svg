@@ -68,4 +68,12 @@ defmodule SparklineSvgMarkerTest do
              {:ok,
               ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" /><path d="M198.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" /><rect x="2.0" y="-0.25" width="196.0" height="50.5" fill="rgba(255, 0, 0, 0.1)" stroke="red" stroke-width="0.25" /></svg>'}
   end
+
+  test "to_svg/2 with empty markers" do
+    assert SparklineSvg.new([{1, 1}, {2, 2}])
+           |> SparklineSvg.add_marker([])
+           |> SparklineSvg.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
+  end
 end
