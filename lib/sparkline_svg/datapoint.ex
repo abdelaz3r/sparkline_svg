@@ -3,12 +3,6 @@ defmodule SparklineSvg.Datapoint do
 
   alias SparklineSvg.Type
 
-  @typedoc false
-  @type point :: %{x: number(), y: number()}
-
-  @typedoc false
-  @type points :: list(point())
-
   @spec clean(SparklineSvg.datapoints()) ::
           {:ok, SparklineSvg.datapoints(), SparklineSvg.x()} | {:error, atom()}
   def clean([{_x, _y} | _] = datapoints) do
@@ -82,7 +76,8 @@ defmodule SparklineSvg.Datapoint do
     {min_max_x, min_max_y}
   end
 
-  @spec resize(SparklineSvg.datapoints(), min_max(), min_max(), SparklineSvg.opts()) :: points()
+  @spec resize(SparklineSvg.datapoints(), min_max(), min_max(), SparklineSvg.opts()) ::
+          SparklineSvg.points()
   def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
     width = options.width
     height = options.height
