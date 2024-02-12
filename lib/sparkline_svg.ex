@@ -249,6 +249,19 @@ defmodule SparklineSvg do
   @typedoc "A value or a two-tuple value for the x axis of the chart."
   @type marker :: x() | {x(), x()}
 
+  @typedoc "A list of values or a list of two-tuple values for the x axis of the chart."
+  @type markers ::
+          list(number())
+          | list(DateTime.t())
+          | list(Date.t())
+          | list(Time.t())
+          | list(NaiveDateTime.t())
+          | list({number(), number()})
+          | list({DateTime.t(), DateTime.t()})
+          | list({Date.t(), Date.t()})
+          | list({Time.t(), Time.t()})
+          | list({NaiveDateTime.t(), NaiveDateTime.t()})
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
@@ -277,7 +290,7 @@ defmodule SparklineSvg do
           list(
             {:fill_color, String.t()}
             | {:stroke_color, String.t()}
-            | {:stroke_width, String.t()}
+            | {:stroke_width, number()}
             | {:class, nil | String.t()}
           )
 
@@ -462,9 +475,8 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
-  @spec add_marker(SparklineSvg.t(), marker()) :: SparklineSvg.t()
-  @spec add_marker(SparklineSvg.t(), marker() | list(marker()), marker_options()) ::
-          SparklineSvg.t()
+  @spec add_marker(SparklineSvg.t(), marker() | markers()) :: SparklineSvg.t()
+  @spec add_marker(SparklineSvg.t(), marker() | markers(), marker_options()) :: SparklineSvg.t()
   def add_marker(sparkline, markers, options \\ [])
 
   def add_marker(sparkline, markers, options) when is_list(markers) do
