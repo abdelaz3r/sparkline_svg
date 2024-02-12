@@ -76,4 +76,28 @@ defmodule SparklineSvgMarkerTest do
              {:ok,
               ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
   end
+
+  test "to_svg/2 with markers and options" do
+    assert SparklineSvg.new([{1, 1}, {2, 2}])
+           |> SparklineSvg.add_marker(1, stroke_width: 1, stroke_color: "blue")
+           |> SparklineSvg.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="blue" stroke-width="1" /></svg>'}
+
+    assert SparklineSvg.new([{1, 1}, {2, 2}])
+           |> SparklineSvg.add_marker([1.2, 1.8],
+             stroke_width: 1,
+             stroke_color: "blue",
+             fill_color: "orange"
+           )
+           |> SparklineSvg.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M158.8,0.0V50" fill="none" stroke="blue" stroke-width="1" /><path d="M41.2,0.0V50" fill="none" stroke="blue" stroke-width="1" /></svg>'}
+
+    assert SparklineSvg.new([{1, 1}, {2, 2}])
+           |> SparklineSvg.add_marker(1, class: "sparkline-marker")
+           |> SparklineSvg.to_svg() ==
+             {:ok,
+              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" class="sparkline-marker" /></svg>'}
+  end
 end
