@@ -1,10 +1,16 @@
 # Sparkline SVG
 
+[![Module Version](https://img.shields.io/hexpm/v/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/sparkline_svg/)
+[![Total Download](https://img.shields.io/hexpm/dt/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg)
+[![License](https://img.shields.io/hexpm/l/sparkline_svg.svg)](https://github.com/abdelaz3r/sparkline_svg/blob/main/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/abdelaz3r/sparkline_svg.svg)](https://github.com/abdelaz3r/sparkline_svg/commits/main)
+
 ![Sparkline SVG](https://raw.githubusercontent.com/abdelaz3r/sparkline_svg/main/documents/assets/cover.png)
 
 **Sparkline SVG** is simple, zero-dependency, Elixir library to generate SVG sparkline charts.
 
-Documentation can be found at [https://hexdocs.pm/sparkline_svg](https://hexdocs.pm/sparkline_svg).
+[Online documentation](https://hexdocs.pm/sparkline_svg)
 
 ## Overview
 
