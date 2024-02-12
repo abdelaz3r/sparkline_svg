@@ -1,7 +1,6 @@
 defmodule SparklineSvg.Draw do
   @moduledoc false
 
-  alias SparklineSvg.Datapoint
   alias SparklineSvg.Marker
 
   @spec chart(SparklineSvg.t()) :: iolist()
@@ -51,7 +50,7 @@ defmodule SparklineSvg.Draw do
     ]
   end
 
-  @spec dots(Datapoint.points(), SparklineSvg.opts()) :: iolist()
+  @spec dots(SparklineSvg.points(), SparklineSvg.opts()) :: iolist()
   defp dots(_datapoints, %{dots: nil}), do: ""
 
   defp dots(datapoints, options) do
@@ -70,7 +69,7 @@ defmodule SparklineSvg.Draw do
     end)
   end
 
-  @spec line(Datapoint.points(), SparklineSvg.opts()) :: iolist()
+  @spec line(SparklineSvg.points(), SparklineSvg.opts()) :: iolist()
   defp line(_datapoints, %{line: nil}), do: ""
 
   defp line([datapoint], options) do
@@ -99,7 +98,7 @@ defmodule SparklineSvg.Draw do
     [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
   end
 
-  @spec area(Datapoint.points(), SparklineSvg.opts()) :: iolist()
+  @spec area(SparklineSvg.points(), SparklineSvg.opts()) :: iolist()
   defp area(_datapoints, %{area: nil}), do: ""
   defp area([_points], _options), do: ""
 
@@ -164,7 +163,7 @@ defmodule SparklineSvg.Draw do
     [~s'<path d="M', tuple_to_string({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
   end
 
-  @spec compute_curve(Datapoint.points(), SparklineSvg.opts()) :: iolist()
+  @spec compute_curve(SparklineSvg.points(), SparklineSvg.opts()) :: iolist()
   defp compute_curve([%{x: x, y: y} = curr | rest], options) do
     ["M#{tuple_to_string({x, y})}"]
     |> compute_curve(rest, curr, curr, options)
@@ -172,9 +171,9 @@ defmodule SparklineSvg.Draw do
 
   @spec compute_curve(
           iolist(),
-          Datapoint.points(),
-          Datapoint.point(),
-          Datapoint.point(),
+          SparklineSvg.points(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
           SparklineSvg.opts()
         ) :: iolist()
   defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, options) do
@@ -189,10 +188,10 @@ defmodule SparklineSvg.Draw do
 
   @spec curve_command(
           iolist(),
-          Datapoint.point(),
-          Datapoint.point(),
-          Datapoint.point(),
-          Datapoint.point(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
           SparklineSvg.opts()
         ) :: iolist()
   defp curve_command(acc, prev2, prev1, curr, next, options) do
@@ -204,9 +203,9 @@ defmodule SparklineSvg.Draw do
   end
 
   @spec calculate_control_point(
-          Datapoint.point(),
-          Datapoint.point(),
-          Datapoint.point(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
+          SparklineSvg.point(),
           atom(),
           SparklineSvg.opts()
         ) :: {number(), number()}
@@ -222,7 +221,7 @@ defmodule SparklineSvg.Draw do
     }
   end
 
-  @spec calculate_line(Datapoint.point(), Datapoint.point()) :: {number(), number()}
+  @spec calculate_line(SparklineSvg.point(), SparklineSvg.point()) :: {number(), number()}
   defp calculate_line(%{x: x1, y: y1}, %{x: x2, y: y2}) do
     length_x = x2 - x1
     length_y = y2 - y1

@@ -264,7 +264,7 @@ defmodule SparklineSvg do
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
   @typedoc "The type of reference line."
-  @type reference_line :: :max | :min | :avg | :median
+  @type ref_line :: :max | :min | :avg | :median
 
   @typedoc "Keyword list of options for the chart."
   @type options ::
@@ -299,7 +299,7 @@ defmodule SparklineSvg do
           )
 
   @typedoc "Keyword list of options for a reference line."
-  @type reference_line_options :: list({:type, reference_line()})
+  @type ref_line_options :: list()
 
   @typedoc false
   @type opts :: %{
@@ -316,14 +316,23 @@ defmodule SparklineSvg do
         }
 
   @typedoc false
+  @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
+
+  @typedoc false
+  @type point :: %{x: number(), y: number()}
+
+  @typedoc false
+  @type points :: list(point())
+
+  @typedoc false
   @type t :: %__MODULE__{
           datapoints: datapoints(),
           options: opts(),
           markers: list(Marker.t()),
-          reference_lines: map()
+          ref_lines: ref_lines()
         }
-  @enforce_keys [:datapoints, :options, :markers, :reference_lines]
-  defstruct [:datapoints, :options, :markers, :reference_lines]
+  @enforce_keys [:datapoints, :options, :markers, :ref_lines]
+  defstruct [:datapoints, :options, :markers, :ref_lines]
 
   @doc ~S"""
   Create a new sparkline struct with the given datapoints and options.
@@ -361,7 +370,7 @@ defmodule SparklineSvg do
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
-    %SparklineSvg{datapoints: datapoints, options: options, markers: [], reference_lines: %{}}
+    %SparklineSvg{datapoints: datapoints, options: options, markers: [], ref_lines: %{}}
   end
 
   @doc ~S"""
@@ -461,12 +470,13 @@ defmodule SparklineSvg do
   TODO.
   """
 
-  @spec show_reference_line(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_reference_line(SparklineSvg.t(), reference_line_options()) :: SparklineSvg.t()
-  def show_reference_line(sparkline, options \\ []) do
-    ref_line = ReferenceLine.new(options)
-    reference_lines = Map.put(sparkline.reference_lines, ref_line.type, ref_line)
-    %SparklineSvg{sparkline | reference_lines: reference_lines}
+  @spec show_ref_line(SparklineSvg.t(), ref_line()) :: SparklineSvg.t()
+  @spec show_ref_line(SparklineSvg.t(), ref_line(), ref_line_options()) :: SparklineSvg.t()
+  def show_ref_line(sparkline, type, options \\ []) do
+    ref_line = ReferenceLine.new(type, options)
+    ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
+
+    %SparklineSvg{sparkline | ref_lines: ref_lines}
   end
 
   @doc ~S"""
@@ -527,21 +537,11 @@ defmodule SparklineSvg do
     with :ok <- check_dimension(width, padding),
          :ok <- check_dimension(height, padding),
          {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
-         {:ok, markers} <- Marker.clean(sparkline.markers, type) do
-      sparkline =
-        if Enum.empty?(datapoints) do
-          sparkline
-        else
-          {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
-
-          datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
-          markers = Marker.resize(markers, min_max_x, sparkline.options)
-
-          %SparklineSvg{sparkline | datapoints: datapoints, markers: markers}
-        end
-
+         {:ok, markers} <- Marker.clean(sparkline.markers, type),
+         {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
       svg =
-        sparkline
+        %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
+        |> compute()
         |> Draw.chart()
         |> :erlang.iolist_to_binary()
 
@@ -589,6 +589,29 @@ defmodule SparklineSvg do
   end
 
   # Private functions
+
+  @spec compute(SparklineSvg.t()) :: SparklineSvg.t()
+  defp compute(%SparklineSvg{datapoints: []} = sparkline) do
+    sparkline
+  end
+
+  defp compute(%SparklineSvg{} = sparkline) do
+    %{datapoints: datapoints, ref_lines: ref_lines, markers: markers, options: options} =
+      sparkline
+
+    {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
+
+    datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, options)
+    ref_lines = ReferenceLine.compute(ref_lines, datapoints)
+    markers = Marker.resize(markers, min_max_x, options)
+
+    %SparklineSvg{
+      sparkline
+      | datapoints: datapoints,
+        markers: markers,
+        ref_lines: ref_lines
+    }
+  end
 
   @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
   defp check_dimension(length, padding) do
