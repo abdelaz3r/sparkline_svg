@@ -2,9 +2,10 @@
 
 [![Module Version](https://img.shields.io/hexpm/v/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/sparkline_svg/)
-<!--[![Total Download](https://img.shields.io/hexpm/dt/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg) -->
 [![License](https://img.shields.io/hexpm/l/sparkline_svg.svg)](https://github.com/abdelaz3r/sparkline_svg/blob/main/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/abdelaz3r/sparkline_svg.svg)](https://github.com/abdelaz3r/sparkline_svg/commits/main)
+
+<!--[![Total Download](https://img.shields.io/hexpm/dt/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg) -->
 
 **Sparkline SVG** is simple, zero-dependency, Elixir library to generate SVG sparkline charts.
 
@@ -40,23 +41,7 @@ under the line. There are two ways to customize the chart:
 - Using the options like color or width.
 - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
 
-## Status
-
-This library is currently under active development and it’s API is likely to change.
-
-## Installation
-
-The package can be installed by adding `:sparkline_svg` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:sparkline_svg, "~> 0.1.0"}
-  ]
-end
-```
-
-## Usage example
+### Usage example
 
 ``` elixir
 # Datapoints and general options
@@ -73,6 +58,24 @@ sparkline = SparklineSvg.show_line(sparkline, line_options)
 # Render the chart to an SVG string
 {:ok, svg} = SparklineSvg.to_svg(sparkline)
 ```
+
+For more usage examples, visit the [documentation](https://hexdocs.pm/sparkline_svg).
+
+## Installation
+
+The package can be installed by adding `:sparkline_svg` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:sparkline_svg, "~> 0.1.0"}
+  ]
+end
+```
+
+## Status
+
+This library is currently under active development and it’s API is likely to change.
 
 ## Examples
 
