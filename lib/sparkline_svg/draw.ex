@@ -2,6 +2,7 @@ defmodule SparklineSvg.Draw do
   @moduledoc false
 
   alias SparklineSvg.Marker
+  alias SparklineSvg.ReferenceLine
 
   @spec chart(SparklineSvg.t()) :: iolist()
   def chart(%SparklineSvg{datapoints: []} = sparkline) do
@@ -20,6 +21,7 @@ defmodule SparklineSvg.Draw do
     %{
       datapoints: datapoints,
       markers: markers,
+      ref_lines: ref_lines,
       options: %{width: width, height: height, class: class} = options
     } = sparkline
 
@@ -31,6 +33,7 @@ defmodule SparklineSvg.Draw do
       line(datapoints, options),
       dots(datapoints, options),
       markers(markers, options),
+      ref_lines(ref_lines, options),
       ~s'</svg>'
     ]
   end
@@ -161,6 +164,29 @@ defmodule SparklineSvg.Draw do
         else: [~s'class="', class, ~s'"']
 
     [~s'<path d="M', tuple_to_string({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
+  end
+
+  @spec ref_lines(SparklineSvg.ref_lines(), SparklineSvg.opts()) :: iolist()
+  defp ref_lines(ref_lines, options) do
+    Enum.map(ref_lines, fn {_type, ref_line} -> ref_line(ref_line, options) end)
+  end
+
+  @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
+  defp ref_line(ref_line, options) do
+    %{value: value, options: %{color: color, width: width, class: class}} = ref_line
+    %{padding: x1, width: graph_width, height: height} = options
+    y = height - value
+
+    attrs =
+      if class == nil,
+        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
+        else: [~s'class="', class, ~s'"']
+
+    [
+      ~s'<line x1="#{x1}" y1="#{y}" x2="#{graph_width - x1}" y2="#{y}" ',
+      attrs,
+      ~s' />'
+    ]
   end
 
   @spec compute_curve(SparklineSvg.points(), SparklineSvg.opts()) :: iolist()
