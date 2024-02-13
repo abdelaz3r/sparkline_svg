@@ -299,7 +299,8 @@ defmodule SparklineSvg do
           )
 
   @typedoc "Keyword list of options for a reference line."
-  @type ref_line_options :: list()
+  @type ref_line_options ::
+          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
   @typedoc false
   @type opts :: %{
