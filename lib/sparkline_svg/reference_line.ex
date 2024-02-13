@@ -47,23 +47,33 @@ defmodule SparklineSvg.ReferenceLine do
     |> Map.new()
   end
 
-  defp do_compute(:max, _datapoints) do
-    # TODO.
-    0
+  defp do_compute(:max, datapoints) do
+    %{y: y} = Enum.max_by(datapoints, fn %{y: y} -> y end)
+    y
   end
 
-  defp do_compute(:min, _datapoints) do
-    # TODO.
-    0
+  defp do_compute(:min, datapoints) do
+    %{y: y} = Enum.min_by(datapoints, fn %{y: y} -> y end)
+    y
   end
 
-  defp do_compute(:avg, _datapoints) do
-    # TODO.
-    0
+  defp do_compute(:avg, datapoints) do
+    {sum, count} =
+      Enum.reduce(datapoints, {0, 0}, fn %{y: y}, {sum, count} -> {sum + y, count + 1} end)
+
+    sum / count
   end
 
-  defp do_compute(:median, _datapoints) do
-    # TODO.
-    0
+  defp do_compute(:median, datapoints) do
+    sorted_datapoints = Enum.sort_by(datapoints, fn %{y: y} -> y end)
+    length = Enum.count(sorted_datapoints)
+
+    if rem(length, 2) == 0 do
+      index = div(length, 2)
+      (sorted_datapoints |> Enum.at(index - 1)).y
+    else
+      index = div(length, 2)
+      (sorted_datapoints |> Enum.at(index)).y
+    end
   end
 end
