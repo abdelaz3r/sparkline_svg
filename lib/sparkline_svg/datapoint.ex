@@ -1,10 +1,11 @@
 defmodule SparklineSvg.Datapoint do
   @moduledoc false
 
+  alias SparklineSvg.Core
   alias SparklineSvg.Type
 
   @spec clean(SparklineSvg.datapoints()) ::
-          {:ok, SparklineSvg.datapoints(), SparklineSvg.x()} | {:error, atom()}
+          {:ok, Core.points(), SparklineSvg.x()} | {:error, atom()}
   def clean([{_x, _y} | _] = datapoints) do
     {datapoints, type} =
       Enum.reduce_while(datapoints, {[], nil}, fn
@@ -53,41 +54,5 @@ defmodule SparklineSvg.Datapoint do
       {:error, reason} -> {:error, reason}
       datapoints -> {:ok, Enum.reverse(datapoints), :number}
     end
-  end
-
-  @typedoc false
-  @typep min_max :: {number(), number()}
-
-  @spec get_min_max(SparklineSvg.datapoints()) :: {min_max(), min_max()}
-  def get_min_max(datapoints) do
-    {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
-    {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
-    [{x, y} | _tail] = datapoints
-
-    min_max_x = if max_x - min_x == 0, do: {0, 2 * x}, else: {min_x, max_x}
-
-    min_max_y =
-      cond do
-        max_y - min_y != 0 -> {min_y, max_y}
-        y == 0 -> {-1, 1}
-        true -> {0, 2 * y}
-      end
-
-    {min_max_x, min_max_y}
-  end
-
-  @spec resize(SparklineSvg.datapoints(), min_max(), min_max(), SparklineSvg.opts()) ::
-          SparklineSvg.points()
-  def resize(datapoints, {min_x, max_x}, {min_y, max_y}, options) do
-    width = options.width
-    height = options.height
-    padding = options.padding
-
-    Enum.map(datapoints, fn {x, y} ->
-      %{
-        x: (x - min_x) / (max_x - min_x) * (width - padding * 2) + padding,
-        y: height - (y - min_y) / (max_y - min_y) * (height - padding * 2) - padding
-      }
-    end)
   end
 end
