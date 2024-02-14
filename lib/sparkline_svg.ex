@@ -8,7 +8,7 @@ defmodule SparklineSvg do
 
   SparklineSvg allows you to create a sparkline chart from various data shapes and show the dots,
   the line, and the area under the line. You can also add markers to the chart to highlight
-  specific spots.
+  specific spots. You can also show common reference lines.
 
   ## Usage example
 
@@ -124,10 +124,31 @@ defmodule SparklineSvg do
   ```
   <!-- tabs-close -->
 
+  ## Reference lines
+
+  Reference lines are used to show common reference line on the chart. You can add as many
+  reference lines as you want. Reference lines are displayed as horizontal lines that span the
+  entire width of the chart.
+
+  There are four types of currently supported reference lines:
+  - `:max` - show the maximum value of the chart.
+  - `:min` - show the minimum value of the chart.
+  - `:avg` - show the average value of the chart.
+  - `:median` - show the median value of the chart.
+
+  ``` elixir
+  svg =
+    datapoints
+    |> SparklineSvg.new()
+    |> SparklineSvg.show_line()
+    |> SparklineSvg.show_ref_line(:max, color: "red")
+    |> SparklineSvg.to_svg!()
+  ```
+
   ## Customization
 
   SparklineSvg allows you to customize the chart showing or hiding the dots, the line, and the area
-  under the line.
+  under the line as well as markers and reference lines.
 
   There are two ways to customize the chart:
   - Using the options like `:color` or `:width`.
@@ -138,11 +159,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, smoothing: 0.1, placeholder: "No data")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data")
     |> SparklineSvg.show_dots(radius: 0.1, color: "rgb(255, 255, 255)")
     |> SparklineSvg.show_line(width: 0.5, color: "rgb(166, 218, 149)")
     |> SparklineSvg.show_area(color: "rgba(166, 218, 149, 0.2)")
     |> SparklineSvg.add_marker(1, stroke_color: "red", stroke_width: 0.5)
+    |> SparklineSvg.show_ref_line(:max, width: 0.3, color: "red")
     |> SparklineSvg.to_svg!()
   ```
 
@@ -150,11 +172,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(smoothing: 0.1, placeholder: "No data", class: "sparkline")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "sparkline")
     |> SparklineSvg.show_dots(class: "sparkline-dots")
     |> SparklineSvg.show_line(class: "sparkline-line")
     |> SparklineSvg.show_area(class: "sparkline-area")
     |> SparklineSvg.add_marker(1, class: "sparkline-marker")
+    |> SparklineSvg.show_ref_line(:max, class: "sparkline-max-value")
     |> SparklineSvg.to_svg!()
   ```
 
@@ -162,11 +185,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(smoothing: 0.1, placeholder: "No data", class: "bg-transparent")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "bg-transparent")
     |> SparklineSvg.show_dots(class: "fill-green")
     |> SparklineSvg.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
     |> SparklineSvg.show_area(class: "fill-green/10")
     |> SparklineSvg.add_marker(1, class: "stroke-red stroke-[0.5px] fill-transparent")
+    |> SparklineSvg.show_ref_line(:max, class="stroke-red stroke-[0.3px]")
     |> SparklineSvg.to_svg!()
   ```
   <!-- tabs-close -->
@@ -216,6 +240,12 @@ defmodule SparklineSvg do
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
   - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
+
+  ### Reference line options
+
+  - `:width` - the width of the reference line, defaults to `0.25`.
+  - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
+  - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
 
   """
 
