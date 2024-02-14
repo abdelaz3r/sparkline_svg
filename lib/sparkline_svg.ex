@@ -8,7 +8,7 @@ defmodule SparklineSvg do
 
   SparklineSvg allows you to create a sparkline chart from various data shapes and show the dots,
   the line, and the area under the line. You can also add markers to the chart to highlight
-  specific spots.
+  specific spots. You can also show common reference lines.
 
   ## Usage example
 
@@ -124,10 +124,31 @@ defmodule SparklineSvg do
   ```
   <!-- tabs-close -->
 
+  ## Reference lines
+
+  Reference lines are used to show common reference line on the chart. You can add as many
+  reference lines as you want. Reference lines are displayed as horizontal lines that span the
+  entire width of the chart.
+
+  There are four types of currently supported reference lines:
+  - `:max` - show the maximum value of the chart.
+  - `:min` - show the minimum value of the chart.
+  - `:avg` - show the average value of the chart.
+  - `:median` - show the median value of the chart.
+
+  ``` elixir
+  svg =
+    datapoints
+    |> SparklineSvg.new()
+    |> SparklineSvg.show_line()
+    |> SparklineSvg.show_ref_line(:max, color: "red")
+    |> SparklineSvg.to_svg!()
+  ```
+
   ## Customization
 
   SparklineSvg allows you to customize the chart showing or hiding the dots, the line, and the area
-  under the line.
+  under the line as well as markers and reference lines.
 
   There are two ways to customize the chart:
   - Using the options like `:color` or `:width`.
@@ -138,11 +159,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, smoothing: 0.1, placeholder: "No data")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data")
     |> SparklineSvg.show_dots(radius: 0.1, color: "rgb(255, 255, 255)")
     |> SparklineSvg.show_line(width: 0.5, color: "rgb(166, 218, 149)")
     |> SparklineSvg.show_area(color: "rgba(166, 218, 149, 0.2)")
     |> SparklineSvg.add_marker(1, stroke_color: "red", stroke_width: 0.5)
+    |> SparklineSvg.show_ref_line(:max, width: 0.3, color: "red")
     |> SparklineSvg.to_svg!()
   ```
 
@@ -150,11 +172,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(smoothing: 0.1, placeholder: "No data", class: "sparkline")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "sparkline")
     |> SparklineSvg.show_dots(class: "sparkline-dots")
     |> SparklineSvg.show_line(class: "sparkline-line")
     |> SparklineSvg.show_area(class: "sparkline-area")
     |> SparklineSvg.add_marker(1, class: "sparkline-marker")
+    |> SparklineSvg.show_ref_line(:max, class: "sparkline-max-value")
     |> SparklineSvg.to_svg!()
   ```
 
@@ -162,11 +185,12 @@ defmodule SparklineSvg do
   ``` elixir
   svg =
     datapoints
-    |> SparklineSvg.new(smoothing: 0.1, placeholder: "No data", class: "bg-transparent")
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "bg-transparent")
     |> SparklineSvg.show_dots(class: "fill-green")
     |> SparklineSvg.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
     |> SparklineSvg.show_area(class: "fill-green/10")
     |> SparklineSvg.add_marker(1, class: "stroke-red stroke-[0.5px] fill-transparent")
+    |> SparklineSvg.show_ref_line(:max, class="stroke-red stroke-[0.3px]")
     |> SparklineSvg.to_svg!()
   ```
   <!-- tabs-close -->
@@ -217,11 +241,19 @@ defmodule SparklineSvg do
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
   - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
 
+  ### Reference line options
+
+  - `:width` - the width of the reference line, defaults to `0.25`.
+  - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
+  - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
+
   """
 
+  alias SparklineSvg.Core
   alias SparklineSvg.Datapoint
   alias SparklineSvg.Draw
   alias SparklineSvg.Marker
+  alias SparklineSvg.ReferenceLine
 
   @typedoc "A value for the x axis of the chart."
   @type x :: number() | DateTime.t() | Date.t() | Time.t() | NaiveDateTime.t()
@@ -262,6 +294,9 @@ defmodule SparklineSvg do
           | list({Time.t(), Time.t()})
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
+  @typedoc "The type of reference line."
+  @type ref_line :: :max | :min | :avg | :median
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
@@ -294,6 +329,10 @@ defmodule SparklineSvg do
             | {:class, nil | String.t()}
           )
 
+  @typedoc "Keyword list of options for a reference line."
+  @type ref_line_options ::
+          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
+
   @typedoc false
   @type opts :: %{
           width: number(),
@@ -309,13 +348,17 @@ defmodule SparklineSvg do
         }
 
   @typedoc false
+  @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
+
+  @typedoc false
   @type t :: %__MODULE__{
           datapoints: datapoints(),
           options: opts(),
-          markers: list(Marker.t())
+          markers: list(Marker.t()),
+          ref_lines: ref_lines()
         }
-  @enforce_keys [:datapoints, :options, :markers]
-  defstruct [:datapoints, :options, :markers]
+  @enforce_keys [:datapoints, :options, :markers, :ref_lines]
+  defstruct [:datapoints, :options, :markers, :ref_lines]
 
   @doc ~S"""
   Create a new sparkline struct with the given datapoints and options.
@@ -344,8 +387,8 @@ defmodule SparklineSvg do
     placeholder_class: nil
   ]
 
-  @spec new(datapoints()) :: SparklineSvg.t()
-  @spec new(datapoints(), options()) :: SparklineSvg.t()
+  @spec new(datapoints()) :: t()
+  @spec new(datapoints(), options()) :: t()
   def new(datapoints, options \\ []) do
     options =
       @default_opts
@@ -353,7 +396,7 @@ defmodule SparklineSvg do
       |> Map.new()
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
-    %SparklineSvg{datapoints: datapoints, options: options, markers: []}
+    %SparklineSvg{datapoints: datapoints, options: options, markers: [], ref_lines: %{}}
   end
 
   @doc ~S"""
@@ -376,8 +419,8 @@ defmodule SparklineSvg do
 
   @default_dots_opts [radius: 1, color: "black", class: nil]
 
-  @spec show_dots(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_dots(SparklineSvg.t(), dots_options()) :: SparklineSvg.t()
+  @spec show_dots(t()) :: t()
+  @spec show_dots(t(), dots_options()) :: t()
   def show_dots(sparkline, options \\ []) do
     dots_options =
       @default_dots_opts
@@ -407,8 +450,8 @@ defmodule SparklineSvg do
 
   @default_line_opts [width: 0.25, color: "black", class: nil]
 
-  @spec show_line(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_line(SparklineSvg.t(), line_options()) :: SparklineSvg.t()
+  @spec show_line(t()) :: t()
+  @spec show_line(t(), line_options()) :: t()
   def show_line(sparkline, options \\ []) do
     line_options =
       @default_line_opts
@@ -438,8 +481,8 @@ defmodule SparklineSvg do
 
   @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
 
-  @spec show_area(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_area(SparklineSvg.t(), area_options()) :: SparklineSvg.t()
+  @spec show_area(t()) :: t()
+  @spec show_area(t(), area_options()) :: t()
   def show_area(sparkline, options \\ []) do
     area_options =
       @default_area_opts
@@ -447,6 +490,31 @@ defmodule SparklineSvg do
       |> Map.new()
 
     %SparklineSvg{sparkline | options: %{sparkline.options | area: area_options}}
+  end
+
+  @doc ~S"""
+  Add one reference line to a sparkline struct with the given options.
+
+  Available reference lines are `:max`, `:min`, `:avg`, and `:median`.
+
+  ## Examples
+
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, color: "red")
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+  """
+
+  @spec show_ref_line(t(), ref_line()) :: t()
+  @spec show_ref_line(t(), ref_line(), ref_line_options()) :: t()
+  def show_ref_line(sparkline, type, options \\ []) do
+    ref_line = ReferenceLine.new(type, options)
+    ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
+
+    %SparklineSvg{sparkline | ref_lines: ref_lines}
   end
 
   @doc ~S"""
@@ -475,8 +543,8 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
-  @spec add_marker(SparklineSvg.t(), marker() | markers()) :: SparklineSvg.t()
-  @spec add_marker(SparklineSvg.t(), marker() | markers(), marker_options()) :: SparklineSvg.t()
+  @spec add_marker(t(), marker() | markers()) :: t()
+  @spec add_marker(t(), marker() | markers(), marker_options()) :: t()
   def add_marker(sparkline, markers, options \\ [])
 
   def add_marker(sparkline, markers, options) when is_list(markers) do
@@ -500,30 +568,20 @@ defmodule SparklineSvg do
       {:error, :invalid_dimension}
 
   """
-  @spec to_svg(SparklineSvg.t()) :: {:ok, String.t()} | {:error, atom()}
+  @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
     %{width: width, height: height, padding: padding} = sparkline.options
 
     with :ok <- check_dimension(width, padding),
          :ok <- check_dimension(height, padding),
          {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
-         {:ok, markers} <- Marker.clean(sparkline.markers, type) do
-      sparkline =
-        if Enum.empty?(datapoints) do
-          sparkline
-        else
-          {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
-
-          datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, sparkline.options)
-          markers = Marker.resize(markers, min_max_x, sparkline.options)
-
-          %SparklineSvg{sparkline | datapoints: datapoints, markers: markers}
-        end
-
+         {:ok, markers} <- Marker.clean(sparkline.markers, type),
+         {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
       svg =
-        sparkline
+        %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
+        |> Core.compute()
         |> Draw.chart()
-        |> :erlang.iolist_to_binary()
+        |> IO.iodata_to_binary()
 
       {:ok, svg}
     end
@@ -541,7 +599,7 @@ defmodule SparklineSvg do
       ** (SparklineSvg.Error) invalid_dimension
 
   """
-  @spec to_svg!(SparklineSvg.t()) :: String.t()
+  @spec to_svg!(t()) :: String.t()
   def to_svg!(sparkline) do
     case to_svg(sparkline) do
       {:ok, svg} -> svg

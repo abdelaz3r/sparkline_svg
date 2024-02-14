@@ -19,7 +19,10 @@ glance.
 
 Sparkline SVG allows you to create a sparkline chart from various data shapes and show the dots,
 the line, and the area under the line. You can also add markers to the chart to highlight
-specific spots.
+specific spots. You can also show common reference lines.
+
+The library is highly customizable and allows you to use CSS to style the chart as well as keyword
+options.
 
 ### Datapoints
 
@@ -33,6 +36,12 @@ Datapoints are the values that will be used to draw the chart. They can be:
 Markers are used to highlight specific spots on the chart. There are two types of markers:
 - A single marker that will be rendered as a vertical line.
 - A range marker that will be rendered as a rectangle.
+
+### Reference lines
+
+Reference lines are used to show common reference lines on the chart. There are four types of
+currently supported reference lines (maximum, minimum, average, and median) that will be rendered
+as horizontal lines.
 
 ### Customization
 
