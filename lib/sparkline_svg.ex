@@ -219,6 +219,7 @@ defmodule SparklineSvg do
 
   """
 
+  alias SparklineSvg.Core
   alias SparklineSvg.Datapoint
   alias SparklineSvg.Draw
   alias SparklineSvg.Marker
@@ -320,12 +321,6 @@ defmodule SparklineSvg do
   @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
 
   @typedoc false
-  @type point :: %{x: number(), y: number()}
-
-  @typedoc false
-  @type points :: list(point())
-
-  @typedoc false
   @type t :: %__MODULE__{
           datapoints: datapoints(),
           options: opts(),
@@ -362,8 +357,8 @@ defmodule SparklineSvg do
     placeholder_class: nil
   ]
 
-  @spec new(datapoints()) :: SparklineSvg.t()
-  @spec new(datapoints(), options()) :: SparklineSvg.t()
+  @spec new(datapoints()) :: t()
+  @spec new(datapoints(), options()) :: t()
   def new(datapoints, options \\ []) do
     options =
       @default_opts
@@ -394,8 +389,8 @@ defmodule SparklineSvg do
 
   @default_dots_opts [radius: 1, color: "black", class: nil]
 
-  @spec show_dots(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_dots(SparklineSvg.t(), dots_options()) :: SparklineSvg.t()
+  @spec show_dots(t()) :: t()
+  @spec show_dots(t(), dots_options()) :: t()
   def show_dots(sparkline, options \\ []) do
     dots_options =
       @default_dots_opts
@@ -425,8 +420,8 @@ defmodule SparklineSvg do
 
   @default_line_opts [width: 0.25, color: "black", class: nil]
 
-  @spec show_line(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_line(SparklineSvg.t(), line_options()) :: SparklineSvg.t()
+  @spec show_line(t()) :: t()
+  @spec show_line(t(), line_options()) :: t()
   def show_line(sparkline, options \\ []) do
     line_options =
       @default_line_opts
@@ -456,8 +451,8 @@ defmodule SparklineSvg do
 
   @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
 
-  @spec show_area(SparklineSvg.t()) :: SparklineSvg.t()
-  @spec show_area(SparklineSvg.t(), area_options()) :: SparklineSvg.t()
+  @spec show_area(t()) :: t()
+  @spec show_area(t(), area_options()) :: t()
   def show_area(sparkline, options \\ []) do
     area_options =
       @default_area_opts
@@ -471,8 +466,8 @@ defmodule SparklineSvg do
   TODO.
   """
 
-  @spec show_ref_line(SparklineSvg.t(), ref_line()) :: SparklineSvg.t()
-  @spec show_ref_line(SparklineSvg.t(), ref_line(), ref_line_options()) :: SparklineSvg.t()
+  @spec show_ref_line(t(), ref_line()) :: t()
+  @spec show_ref_line(t(), ref_line(), ref_line_options()) :: t()
   def show_ref_line(sparkline, type, options \\ []) do
     ref_line = ReferenceLine.new(type, options)
     ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
@@ -506,8 +501,8 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
-  @spec add_marker(SparklineSvg.t(), marker() | markers()) :: SparklineSvg.t()
-  @spec add_marker(SparklineSvg.t(), marker() | markers(), marker_options()) :: SparklineSvg.t()
+  @spec add_marker(t(), marker() | markers()) :: t()
+  @spec add_marker(t(), marker() | markers(), marker_options()) :: t()
   def add_marker(sparkline, markers, options \\ [])
 
   def add_marker(sparkline, markers, options) when is_list(markers) do
@@ -531,7 +526,7 @@ defmodule SparklineSvg do
       {:error, :invalid_dimension}
 
   """
-  @spec to_svg(SparklineSvg.t()) :: {:ok, String.t()} | {:error, atom()}
+  @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
     %{width: width, height: height, padding: padding} = sparkline.options
 
@@ -542,9 +537,9 @@ defmodule SparklineSvg do
          {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
       svg =
         %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
-        |> compute()
+        |> Core.compute()
         |> Draw.chart()
-        |> :erlang.iolist_to_binary()
+        |> IO.iodata_to_binary()
 
       {:ok, svg}
     end
@@ -562,7 +557,7 @@ defmodule SparklineSvg do
       ** (SparklineSvg.Error) invalid_dimension
 
   """
-  @spec to_svg!(SparklineSvg.t()) :: String.t()
+  @spec to_svg!(t()) :: String.t()
   def to_svg!(sparkline) do
     case to_svg(sparkline) do
       {:ok, svg} -> svg
@@ -590,29 +585,6 @@ defmodule SparklineSvg do
   end
 
   # Private functions
-
-  @spec compute(SparklineSvg.t()) :: SparklineSvg.t()
-  defp compute(%SparklineSvg{datapoints: []} = sparkline) do
-    sparkline
-  end
-
-  defp compute(%SparklineSvg{} = sparkline) do
-    %{datapoints: datapoints, ref_lines: ref_lines, markers: markers, options: options} =
-      sparkline
-
-    {min_max_x, min_max_y} = Datapoint.get_min_max(datapoints)
-
-    datapoints = Datapoint.resize(datapoints, min_max_x, min_max_y, options)
-    ref_lines = ReferenceLine.compute(ref_lines, datapoints)
-    markers = Marker.resize(markers, min_max_x, options)
-
-    %SparklineSvg{
-      sparkline
-      | datapoints: datapoints,
-        markers: markers,
-        ref_lines: ref_lines
-    }
-  end
 
   @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
   defp check_dimension(length, padding) do
