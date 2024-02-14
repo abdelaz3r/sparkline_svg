@@ -463,7 +463,19 @@ defmodule SparklineSvg do
   end
 
   @doc ~S"""
-  TODO.
+  Add one reference line to a sparkline struct with the given options.
+
+  Available reference lines are `:max`, `:min`, `:avg`, and `:median`.
+
+  ## Examples
+
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, color: "red")
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
   """
 
   @spec show_ref_line(t(), ref_line()) :: t()
