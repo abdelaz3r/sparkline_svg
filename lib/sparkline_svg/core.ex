@@ -82,18 +82,14 @@ defmodule SparklineSvg.Core do
   @spec calc_resize_ref_lines(SparklineSvg.ref_lines(), points(), min_max(), SparklineSvg.opts()) ::
           SparklineSvg.ref_lines()
   defp calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options) do
-    keys = Map.keys(ref_lines)
-
-    Enum.reduce(keys, ref_lines, fn type, ref_lines ->
+    ref_lines
+    |> Enum.map(fn {type, ref_line} ->
       value = cal_ref_line(type, datapoints)
+      position = resize_y(value, min_max_y, options)
 
-      {_, ref_lines} =
-        Map.get_and_update(ref_lines, type, fn ref_line ->
-          {ref_line, %ReferenceLine{ref_line | value: resize_y(value, min_max_y, options)}}
-        end)
-
-      ref_lines
+      {type, %ReferenceLine{ref_line | position: position, value: value}}
     end)
+    |> Map.new()
   end
 
   @spec cal_ref_line(SparklineSvg.ref_line(), points()) :: y()
