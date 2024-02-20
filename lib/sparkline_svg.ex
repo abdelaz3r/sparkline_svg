@@ -572,10 +572,12 @@ defmodule SparklineSvg do
   def to_svg(sparkline) do
     case compute(sparkline) do
       {:ok, sparkline} ->
-        sparkline
-        |> Draw.chart()
-        |> IO.iodata_to_binary()
-        |> then(&{:ok, &1})
+        sparkline =
+          sparkline
+          |> Draw.chart()
+          |> IO.iodata_to_binary()
+
+        {:ok, sparkline}
 
       {:error, reason} ->
         {:error, reason}
