@@ -12,10 +12,11 @@ defmodule SparklineSvg.ReferenceLine do
   @type t :: %ReferenceLine{
           type: SparklineSvg.ref_line(),
           value: nil | number(),
+          position: nil | number(),
           options: ref_line_opts()
         }
-  @enforce_keys [:type, :value, :options]
-  defstruct [:type, :value, :options]
+  @enforce_keys [:type, :value, :position, :options]
+  defstruct [:type, :value, :position, :options]
 
   @valid_types [:max, :min, :avg, :median]
   @default_opts [width: 0.25, color: "rgba(0, 0, 0, 0.5)", class: nil]
@@ -28,7 +29,7 @@ defmodule SparklineSvg.ReferenceLine do
       |> Keyword.merge(options)
       |> Map.new()
 
-    %ReferenceLine{type: type, value: nil, options: options}
+    %ReferenceLine{type: type, value: nil, position: nil, options: options}
   end
 
   @spec clean(SparklineSvg.ref_lines()) :: {:ok, SparklineSvg.ref_lines()} | {:error, atom()}

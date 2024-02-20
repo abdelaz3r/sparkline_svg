@@ -570,20 +570,17 @@ defmodule SparklineSvg do
   """
   @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
-    %{width: width, height: height, padding: padding} = sparkline.options
+    case compute(sparkline) do
+      {:ok, sparkline} ->
+        sparkline =
+          sparkline
+          |> Draw.chart()
+          |> IO.iodata_to_binary()
 
-    with :ok <- check_dimension(width, padding),
-         :ok <- check_dimension(height, padding),
-         {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
-         {:ok, markers} <- Marker.clean(sparkline.markers, type),
-         {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
-      svg =
-        %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
-        |> Core.compute()
-        |> Draw.chart()
-        |> IO.iodata_to_binary()
+        {:ok, sparkline}
 
-      {:ok, svg}
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -626,7 +623,35 @@ defmodule SparklineSvg do
     ["data:image/svg+xml;base64", Base.encode64(svg)] |> Enum.join(",")
   end
 
+  # Callbacks for testing
+
+  if Mix.env() == :test do
+    @doc ~S"""
+    Take a sparkline struct and return a new sparkline computed and checked struct but without
+    rendering it to an SVG document.
+    """
+    @spec dry_run(t()) :: {:ok, t()} | {:error, atom()}
+    def dry_run(sparkline), do: compute(sparkline)
+  end
+
   # Private functions
+
+  @spec compute(t()) :: {:ok, t()} | {:error, atom()}
+  defp compute(sparkline) do
+    %{width: width, height: height, padding: padding} = sparkline.options
+
+    with :ok <- check_dimension(width, padding),
+         :ok <- check_dimension(height, padding),
+         {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
+         {:ok, markers} <- Marker.clean(sparkline.markers, type),
+         {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
+      sparkline =
+        %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
+        |> Core.compute()
+
+      {:ok, sparkline}
+    end
+  end
 
   @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
   defp check_dimension(length, padding) do
