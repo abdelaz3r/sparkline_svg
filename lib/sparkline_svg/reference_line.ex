@@ -6,6 +6,7 @@ defmodule SparklineSvg.ReferenceLine do
   @type ref_line_opts :: %{
           width: String.t(),
           color: String.t(),
+          dasharray: String.t(),
           class: nil | String.t()
         }
 
@@ -19,7 +20,7 @@ defmodule SparklineSvg.ReferenceLine do
   defstruct [:type, :value, :position, :options]
 
   @valid_types [:max, :min, :avg, :median]
-  @default_opts [width: 0.25, color: "rgba(0, 0, 0, 0.5)", class: nil]
+  @default_opts [width: 0.25, color: "rgba(0, 0, 0, 0.5)", dasharray: "", class: nil]
 
   @spec new(SparklineSvg.ref_line()) :: ReferenceLine.t()
   @spec new(SparklineSvg.ref_line(), SparklineSvg.ref_line_options()) :: ReferenceLine.t()
