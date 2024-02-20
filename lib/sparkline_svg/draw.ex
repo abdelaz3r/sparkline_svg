@@ -74,27 +74,33 @@ defmodule SparklineSvg.Draw do
   defp line(_datapoints, %{line: nil}), do: ""
 
   defp line([{x, y}], options) do
-    %{line: %{color: color, width: width, class: class}} = options
+    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
 
     left = x - options.width / 10
     right = x + options.width / 10
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     path = ["M#{left},", cast(y), "L#{right},", cast(y)]
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
   defp line(datapoints, options) do
-    %{line: %{color: color, width: width, class: class}} = options
+    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
   end
@@ -151,15 +157,23 @@ defmodule SparklineSvg.Draw do
   defp marker(%Marker{position: _x} = marker, options) do
     %{
       position: x,
-      options: %{stroke_color: color, stroke_width: width, class: class}
+      options: %{
+        stroke_color: color,
+        stroke_width: width,
+        stroke_dasharray: dasharray,
+        class: class
+      }
     } = marker
 
     %{height: height} = options
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [~s'<path d="M', cast({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
   end
@@ -171,14 +185,19 @@ defmodule SparklineSvg.Draw do
 
   @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
   defp ref_line(ref_line, options) do
-    %{position: y, options: %{color: color, width: width, class: class}} = ref_line
+    %{position: y, options: %{color: color, width: width, dasharray: dasharray, class: class}} =
+      ref_line
+
     %{padding: x1, width: graph_width} = options
     y = cast(y)
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [
       ~s'<line x1="#{x1}" y1="#{y}" x2="#{graph_width - x1}" y2="#{y}" ',

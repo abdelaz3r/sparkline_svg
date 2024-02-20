@@ -58,6 +58,11 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_line(width: 1, color: "red")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="red" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2])
+           |> SparklineSvg.show_line(width: 1, dasharray: "2 3")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="1" stroke-dasharray="2 3" /></svg>'
   end
 
   test "to_svg!/1 with non-default options (for area)" do
@@ -98,6 +103,11 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.add_marker(0, stroke_width: 1, stroke_color: "blue")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="blue" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2])
+           |> SparklineSvg.add_marker(0, stroke_dasharray: "3 2")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" stroke-dasharray="3 2" /></svg>'
   end
 
   test "to_svg!/1 with area markers and options" do
@@ -156,6 +166,12 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_ref_line(:max, width: 1, color: "blue")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="blue" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2, 3, 1])
+           |> SparklineSvg.show_line()
+           |> SparklineSvg.show_ref_line(:max, width: 1, dasharray: "3 2")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="1" stroke-dasharray="3 2" /></svg>'
   end
 
   test "to_svg!/1 with ref line and class options" do

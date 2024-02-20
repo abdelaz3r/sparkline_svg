@@ -227,6 +227,8 @@ defmodule SparklineSvg do
 
   - `:width` - the width of the line, defaults to `0.25`.
   - `:color` - the color of the line, defaults to `"black"`.
+  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the line, defaults to `""`.
+    Valid dasharray values can be found [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribut of the line, defaults to `nil`.
 
   ### Area options
@@ -238,6 +240,9 @@ defmodule SparklineSvg do
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
+  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribut of the marker, defaults
+    to `""`. Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
   - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
 
@@ -245,6 +250,9 @@ defmodule SparklineSvg do
 
   - `:width` - the width of the reference line, defaults to `0.25`.
   - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
+  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the reference line, defaults
+    to `""`. Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
 
   """
@@ -315,7 +323,12 @@ defmodule SparklineSvg do
 
   @typedoc "Keyword list of options for the line of the chart."
   @type line_options ::
-          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
+          list(
+            {:width, number()}
+            | {:color, String.t()}
+            | {:dasharray, String.t()}
+            | {:class, nil | String.t()}
+          )
 
   @typedoc "Keyword list of options for the area under the line of the chart."
   @type area_options :: list({:color, String.t()} | {:class, nil | String.t()})
@@ -326,6 +339,7 @@ defmodule SparklineSvg do
             {:fill_color, String.t()}
             | {:stroke_color, String.t()}
             | {:stroke_width, number()}
+            | {:stroke_dasharray, String.t()}
             | {:class, nil | String.t()}
           )
 
@@ -448,7 +462,7 @@ defmodule SparklineSvg do
 
   """
 
-  @default_line_opts [width: 0.25, color: "black", class: nil]
+  @default_line_opts [width: 0.25, color: "black", dasharray: "", class: nil]
 
   @spec show_line(t()) :: t()
   @spec show_line(t(), line_options()) :: t()
