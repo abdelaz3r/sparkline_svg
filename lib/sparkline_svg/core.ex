@@ -113,14 +113,15 @@ defmodule SparklineSvg.Core do
   defp calc_ref_line(:median, datapoints) do
     sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
     length = Enum.count(sorted_datapoints)
+    mid = div(length, 2)
 
     if rem(length, 2) == 0 do
-      {_x, left} = Enum.at(sorted_datapoints, div(length, 2) - 1)
-      {_x, right} = Enum.at(sorted_datapoints, div(length, 2))
+      {_x, left} = Enum.at(sorted_datapoints, mid - 1)
+      {_x, right} = Enum.at(sorted_datapoints, mid)
 
       (left + right) / 2
     else
-      {_x, y} = Enum.at(sorted_datapoints, div(length, 2))
+      {_x, y} = Enum.at(sorted_datapoints, mid)
       y
     end
   end
