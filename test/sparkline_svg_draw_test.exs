@@ -58,6 +58,11 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_line(width: 1, color: "red")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="red" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2])
+           |> SparklineSvg.show_line(width: 1, dasharray: "2 3")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="1" stroke-dasharray="2 3" /></svg>'
   end
 
   test "to_svg!/1 with non-default options (for area)" do

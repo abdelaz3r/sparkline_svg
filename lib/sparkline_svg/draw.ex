@@ -74,27 +74,33 @@ defmodule SparklineSvg.Draw do
   defp line(_datapoints, %{line: nil}), do: ""
 
   defp line([{x, y}], options) do
-    %{line: %{color: color, width: width, class: class}} = options
+    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
 
     left = x - options.width / 10
     right = x + options.width / 10
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     path = ["M#{left},", cast(y), "L#{right},", cast(y)]
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
   defp line(datapoints, options) do
-    %{line: %{color: color, width: width, class: class}} = options
+    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
   end
