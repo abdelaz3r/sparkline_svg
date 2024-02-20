@@ -84,7 +84,7 @@ defmodule SparklineSvg.Core do
   defp calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options) do
     ref_lines
     |> Enum.map(fn {type, ref_line} ->
-      value = cal_ref_line(type, datapoints)
+      value = calc_ref_line(type, datapoints)
       position = resize_y(value, min_max_y, options)
 
       {type, %ReferenceLine{ref_line | position: position, value: value}}
@@ -92,25 +92,25 @@ defmodule SparklineSvg.Core do
     |> Map.new()
   end
 
-  @spec cal_ref_line(SparklineSvg.ref_line(), points()) :: y()
-  defp cal_ref_line(:max, datapoints) do
+  @spec calc_ref_line(SparklineSvg.ref_line(), points()) :: y()
+  defp calc_ref_line(:max, datapoints) do
     {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
     y
   end
 
-  defp cal_ref_line(:min, datapoints) do
+  defp calc_ref_line(:min, datapoints) do
     {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
     y
   end
 
-  defp cal_ref_line(:avg, datapoints) do
+  defp calc_ref_line(:avg, datapoints) do
     {sum, count} =
       Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
 
     sum / count
   end
 
-  defp cal_ref_line(:median, datapoints) do
+  defp calc_ref_line(:median, datapoints) do
     sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
     length = Enum.count(sorted_datapoints)
 
