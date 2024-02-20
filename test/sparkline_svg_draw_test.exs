@@ -161,6 +161,12 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_ref_line(:max, width: 1, color: "blue")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="blue" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2, 3, 1])
+           |> SparklineSvg.show_line()
+           |> SparklineSvg.show_ref_line(:max, width: 1, dasharray: "3 2")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="1" stroke-dasharray="3 2" /></svg>'
   end
 
   test "to_svg!/1 with ref line and class options" do

@@ -177,14 +177,19 @@ defmodule SparklineSvg.Draw do
 
   @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
   defp ref_line(ref_line, options) do
-    %{position: y, options: %{color: color, width: width, class: class}} = ref_line
+    %{position: y, options: %{color: color, width: width, dasharray: dasharray, class: class}} =
+      ref_line
+
     %{padding: x1, width: graph_width} = options
     y = cast(y)
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [
       ~s'<line x1="#{x1}" y1="#{y}" x2="#{graph_width - x1}" y2="#{y}" ',

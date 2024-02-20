@@ -247,6 +247,9 @@ defmodule SparklineSvg do
 
   - `:width` - the width of the reference line, defaults to `0.25`.
   - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
+  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the reference line, defaults
+    to `""`. Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
 
   """
