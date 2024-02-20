@@ -103,6 +103,11 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.add_marker(0, stroke_width: 1, stroke_color: "blue")
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="blue" stroke-width="1" /></svg>'
+
+    assert SparklineSvg.new([1, 2])
+           |> SparklineSvg.add_marker(0, stroke_dasharray: "3 2")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" stroke-dasharray="3 2" /></svg>'
   end
 
   test "to_svg!/1 with area markers and options" do

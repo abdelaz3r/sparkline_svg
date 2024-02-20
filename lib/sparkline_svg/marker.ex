@@ -8,6 +8,7 @@ defmodule SparklineSvg.Marker do
           fill_color: String.t(),
           stroke_color: String.t(),
           stroke_width: String.t(),
+          stroke_dasharray: String.t(),
           class: nil | String.t()
         }
 
@@ -22,6 +23,7 @@ defmodule SparklineSvg.Marker do
     fill_color: "rgba(255, 0, 0, 0.1)",
     stroke_color: "red",
     stroke_width: 0.25,
+    stroke_dasharray: "",
     class: nil
   ]
 

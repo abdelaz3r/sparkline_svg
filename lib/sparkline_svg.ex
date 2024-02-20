@@ -240,6 +240,9 @@ defmodule SparklineSvg do
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
+  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribut of the marker, defaults
+    to `""`. Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
   - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
 
@@ -336,6 +339,7 @@ defmodule SparklineSvg do
             {:fill_color, String.t()}
             | {:stroke_color, String.t()}
             | {:stroke_width, number()}
+            | {:stroke_dasharray, String.t()}
             | {:class, nil | String.t()}
           )
 

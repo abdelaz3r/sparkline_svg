@@ -157,15 +157,23 @@ defmodule SparklineSvg.Draw do
   defp marker(%Marker{position: _x} = marker, options) do
     %{
       position: x,
-      options: %{stroke_color: color, stroke_width: width, class: class}
+      options: %{
+        stroke_color: color,
+        stroke_width: width,
+        stroke_dasharray: dasharray,
+        class: class
+      }
     } = marker
 
     %{height: height} = options
 
     attrs =
-      if class == nil,
-        do: [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"'],
-        else: [~s'class="', class, ~s'"']
+      if class == nil do
+        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
+        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
+      else
+        [~s'class="', class, ~s'"']
+      end
 
     [~s'<path d="M', cast({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
   end
