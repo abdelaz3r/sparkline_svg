@@ -171,7 +171,7 @@ defmodule SparklineSvg.Draw do
 
   @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
   defp ref_line(ref_line, options) do
-    %{value: y, options: %{color: color, width: width, class: class}} = ref_line
+    %{position: y, options: %{color: color, width: width, class: class}} = ref_line
     %{padding: x1, width: graph_width} = options
     y = cast(y)
 
