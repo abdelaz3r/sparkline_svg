@@ -114,12 +114,15 @@ defmodule SparklineSvg.Core do
     sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
     length = Enum.count(sorted_datapoints)
 
-    {_x, y} =
-      if rem(length, 2) == 0,
-        do: Enum.at(sorted_datapoints, div(length, 2) - 1),
-        else: Enum.at(sorted_datapoints, div(length, 2))
+    if rem(length, 2) == 0 do
+      {_x, left} = Enum.at(sorted_datapoints, div(length, 2))
+      {_x, right} = Enum.at(sorted_datapoints, div(length, 2) + 1)
 
-    y
+      (left + right) / 2
+    else
+      {_x, y} = Enum.at(sorted_datapoints, div(length, 2))
+      y
+    end
   end
 
   @spec resize_x(number(), min_max(), SparklineSvg.opts()) :: number()
