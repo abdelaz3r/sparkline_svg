@@ -157,7 +157,15 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_line()
            |> SparklineSvg.show_ref_line(:median)
            |> SparklineSvg.to_svg!() ==
-             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="13.5" x2="198" y2="13.5" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="36.5" x2="198" y2="36.5" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+  end
+
+  test "to_svg!/1 with empty chart and median ref line" do
+    assert SparklineSvg.new([])
+           |> SparklineSvg.show_line()
+           |> SparklineSvg.show_ref_line(:median)
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
   end
 
   test "to_svg!/1 with ref line and options" do

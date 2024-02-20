@@ -50,7 +50,7 @@ defmodule SparklineSvgMRefLineTest do
 
   test "valid :median ref line" do
     {:ok, sparkline} =
-      SparklineSvg.new([1, 2, 3])
+      SparklineSvg.new([1, 2, 4])
       |> SparklineSvg.show_ref_line(:median)
       |> SparklineSvg.dry_run()
 
@@ -61,7 +61,7 @@ defmodule SparklineSvgMRefLineTest do
       |> SparklineSvg.show_ref_line(:median)
       |> SparklineSvg.dry_run()
 
-    assert sparkline.ref_lines.median.value == 2.5
+    assert sparkline.ref_lines.median.value == 1.5
   end
 
   test ":median ref line with empty chart" do
@@ -83,6 +83,6 @@ defmodule SparklineSvgMRefLineTest do
     assert sparkline.ref_lines.max.value == 3
     assert sparkline.ref_lines.min.value == 1
     assert sparkline.ref_lines.avg.value == 1.75
-    assert sparkline.ref_lines.median.value == 2.5
+    assert sparkline.ref_lines.median.value == 1.5
   end
 end

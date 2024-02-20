@@ -115,8 +115,8 @@ defmodule SparklineSvg.Core do
     length = Enum.count(sorted_datapoints)
 
     if rem(length, 2) == 0 do
-      {_x, left} = Enum.at(sorted_datapoints, div(length, 2))
-      {_x, right} = Enum.at(sorted_datapoints, div(length, 2) + 1)
+      {_x, left} = Enum.at(sorted_datapoints, div(length, 2) - 1)
+      {_x, right} = Enum.at(sorted_datapoints, div(length, 2))
 
       (left + right) / 2
     else
