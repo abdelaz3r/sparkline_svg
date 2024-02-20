@@ -1,42 +1,88 @@
 defmodule SparklineSvgMRefLineTest do
   use ExUnit.Case, async: true
 
-  test "to_svg/2 with invalid ref line" do
-    assert SparklineSvg.new([{1, 1}, {2, 2}])
-           |> SparklineSvg.show_ref_line(:unknown)
-           |> SparklineSvg.to_svg() ==
+  test "invalid ref line" do
+    assert SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:foo) |> SparklineSvg.dry_run() ==
              {:error, :invalid_ref_line_type}
   end
 
-  test "to_svg/2 with valid max ref line" do
-    assert SparklineSvg.new([1, 2, 1], smoothing: 0)
-           |> SparklineSvg.show_line()
-           |> SparklineSvg.show_ref_line(:max)
-           |> SparklineSvg.to_svg!() ==
-             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C2.0,48.0 100.0,2.0 100.0,2.0C100.0,2.0 198.0,48.0 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+  test "valid :max ref line" do
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3, 1]) |> SparklineSvg.show_ref_line(:max) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.max.value == 3
   end
 
-  test "to_svg/2 with valid min ref line" do
-    assert SparklineSvg.new([1, 2, 1], smoothing: 0)
-           |> SparklineSvg.show_line()
-           |> SparklineSvg.show_ref_line(:min)
-           |> SparklineSvg.to_svg!() ==
-             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C2.0,48.0 100.0,2.0 100.0,2.0C100.0,2.0 198.0,48.0 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="48.0" x2="198" y2="48.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+  test ":max ref line with empty chart" do
+    {:ok, sparkline} =
+      SparklineSvg.new([]) |> SparklineSvg.show_ref_line(:max) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.max.value == nil
   end
 
-  test "to_svg/2 with valid avg ref line" do
-    assert SparklineSvg.new([1, 2, 1], smoothing: 0)
-           |> SparklineSvg.show_line()
-           |> SparklineSvg.show_ref_line(:avg)
-           |> SparklineSvg.to_svg!() ==
-             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C2.0,48.0 100.0,2.0 100.0,2.0C100.0,2.0 198.0,48.0 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="32.667" x2="198" y2="32.667" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+  test "valid :min ref line" do
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3, 1]) |> SparklineSvg.show_ref_line(:min) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.min.value == 1
   end
 
-  test "to_svg/2 with valid median ref line" do
-    assert SparklineSvg.new([1, 2, 3], smoothing: 0)
-           |> SparklineSvg.show_line()
-           |> SparklineSvg.show_ref_line(:median)
-           |> SparklineSvg.to_svg!() ==
-             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C2.0,48.0 100.0,25.0 100.0,25.0C100.0,25.0 198.0,2.0 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+  test ":min ref line with empty chart" do
+    {:ok, sparkline} =
+      SparklineSvg.new([]) |> SparklineSvg.show_ref_line(:min) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.min.value == nil
+  end
+
+  test "valid :avg ref line" do
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3, 1]) |> SparklineSvg.show_ref_line(:avg) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.avg.value == 1.75
+  end
+
+  test ":avg ref line with empty chart" do
+    {:ok, sparkline} =
+      SparklineSvg.new([]) |> SparklineSvg.show_ref_line(:avg) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.avg.value == nil
+  end
+
+  test "valid :median ref line" do
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3])
+      |> SparklineSvg.show_ref_line(:median)
+      |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.median.value == 2
+
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3, 1])
+      |> SparklineSvg.show_ref_line(:median)
+      |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.median.value == 2.5
+  end
+
+  test ":median ref line with empty chart" do
+    {:ok, sparkline} =
+      SparklineSvg.new([]) |> SparklineSvg.show_ref_line(:median) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.median.value == nil
+  end
+
+  test "valid multiple ref lines" do
+    {:ok, sparkline} =
+      SparklineSvg.new([1, 2, 3, 1])
+      |> SparklineSvg.show_ref_line(:max)
+      |> SparklineSvg.show_ref_line(:min)
+      |> SparklineSvg.show_ref_line(:avg)
+      |> SparklineSvg.show_ref_line(:median)
+      |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines.max.value == 3
+    assert sparkline.ref_lines.min.value == 1
+    assert sparkline.ref_lines.avg.value == 1.75
+    assert sparkline.ref_lines.median.value == 2.5
   end
 end
