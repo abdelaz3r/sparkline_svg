@@ -52,7 +52,7 @@ defmodule SparklineSvgTest do
     {:ok, sparkline} = SparklineSvg.new(data) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
 
-    data = [{Time.utc_now(), 1}, {Time.utc_now() |> Time.add(1, :hour), 2}]
+    data = [{Time.utc_now(), 1}, {Time.utc_now() |> Time.add(1, :second), 2}]
     {:ok, sparkline} = SparklineSvg.new(data) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
 
