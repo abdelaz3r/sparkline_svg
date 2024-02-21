@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.0 (2024-02-21)
+
+  * Enhancements
+    * Support `:max` reference line
+    * Support `:min` reference line
+    * Support `:avg` reference line
+    * Support `:median` reference line
+    * Support `:dasharray` option for lines, markers, and reference lines
+
 ## v0.1.1 (2024-02-12)
 
   * Bug fixes
