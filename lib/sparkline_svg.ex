@@ -637,7 +637,7 @@ defmodule SparklineSvg do
     ["data:image/svg+xml;base64", Base.encode64(svg)] |> Enum.join(",")
   end
 
-  # Callbacks for testing
+  # Functions for test only
 
   if Mix.env() == :test do
     @doc ~S"""
