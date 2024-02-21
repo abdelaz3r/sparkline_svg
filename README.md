@@ -7,9 +7,10 @@
 
 <!--[![Total Download](https://img.shields.io/hexpm/dt/sparkline_svg.svg)](https://hex.pm/packages/sparkline_svg) -->
 
-**Sparkline SVG** is simple, zero-dependency, Elixir library to generate SVG sparkline charts.
+**Sparkline SVG** is simple yet customizable, zero-dependency, Elixir library to generate SVG
+sparkline charts.
 
-[Online documentation](https://hexdocs.pm/sparkline_svg)
+[Online documentation](https://hexdocs.pm/sparkline_svg).
 
 ## Overview
 
@@ -19,10 +20,11 @@ glance.
 
 Sparkline SVG allows you to create a sparkline chart from various data shapes and show the dots,
 the line, and the area under the line. You can also add markers to the chart to highlight
-specific spots. You can also show common reference lines.
+specific spots as well as show common reference lines.
 
-The library is highly customizable and allows you to use CSS to style the chart as well as keyword
-options.
+This library follow the Unix philosophy: Make each program do one thing well. It only generates SVG
+sparkline charts. The library is highly customizable and allows you to use CSS to style the chart 
+as well as keyword options.
 
 ### Datapoints
 
@@ -40,8 +42,8 @@ Markers are used to highlight specific spots on the chart. There are two types o
 ### Reference lines
 
 Reference lines are used to show common reference lines on the chart. There are four types of
-currently supported reference lines (maximum, minimum, average, and median) that will be rendered
-as horizontal lines.
+currently supported reference lines (`maximum`, `minimum`, `average`, and `median`) that will
+be rendered as horizontal lines.
 
 ### Customization
 
@@ -77,7 +79,7 @@ The package can be installed by adding `:sparkline_svg` to your list of dependen
 ```elixir
 def deps do
   [
-    {:sparkline_svg, "~> 0.1.0"}
+    {:sparkline_svg, "~> 0.2.0"}
   ]
 end
 ```
@@ -88,7 +90,9 @@ This library is currently under active development and it’s API is likely to c
 
 ## Examples
 
-### A cyan sparkline with a line, area, and markers
+### Light sparkline
+
+A cyan sparkline with a line, area, and markers
 
 ``` elixir
 # Data source
@@ -109,11 +113,15 @@ data
 
 ![A cyan sparkline with a line, area, and markers](https://raw.githubusercontent.com/abdelaz3r/sparkline_svg/main/documents/assets/light-sparkline-example.png)
 
-### A green sparkline, on dark background, with a line, and area
+### Dark sparkline
+
+A green sparkline, on dark background, with a line, and area
 
 ``` elixir
 # Data source
-[4, 4, 6, 3, 2, 1, 3, 5, 7, 7, 7, 6, 9, 11, 11, 5, 7, 6, 9, 19, 19, 20, 21, 20, 17, 20, 19, 17]
+data = [4, 4, 6, 3, 2, 1, 3, 5, 7, 7, 7, 6, 9, 11, 11, 5, 7, 6, 9, 19, 19, 20, 21, 20, 17, 20, 19, 17]
+
+data
 |> SparklineSvg.new(width: 200, height: 30, smoothing: 0)
 |> SparklineSvg.show_line(color: "rgba(40, 255, 118, 0.8)", width: 0.4)
 |> SparklineSvg.show_area(color: "rgba(40, 255, 118, 0.4)")

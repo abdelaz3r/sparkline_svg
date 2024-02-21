@@ -100,6 +100,9 @@ defmodule SparklineSvg do
   Markers are not used to calculate the boundaries of the chart. If a marker is set outside the
   range of the chart, it will be rendered but won't be visible.
 
+  We always set the `x` value of the marker (position on the x axis). The marker must be of the
+  same type as the `x` axis of the chart.
+
   <!-- tabs-open -->
   ### Single marker
   ``` elixir
@@ -190,7 +193,7 @@ defmodule SparklineSvg do
     |> SparklineSvg.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
     |> SparklineSvg.show_area(class: "fill-green/10")
     |> SparklineSvg.add_marker(1, class: "stroke-red stroke-[0.5px] fill-transparent")
-    |> SparklineSvg.show_ref_line(:max, class="stroke-red stroke-[0.3px]")
+    |> SparklineSvg.show_ref_line(:max, class: "stroke-red stroke-[0.3px]")
     |> SparklineSvg.to_svg!()
   ```
   <!-- tabs-close -->
@@ -401,6 +404,7 @@ defmodule SparklineSvg do
     placeholder_class: nil
   ]
 
+  @doc since: "0.1.0"
   @spec new(datapoints()) :: t()
   @spec new(datapoints(), options()) :: t()
   def new(datapoints, options \\ []) do
@@ -433,6 +437,7 @@ defmodule SparklineSvg do
 
   @default_dots_opts [radius: 1, color: "black", class: nil]
 
+  @doc since: "0.1.0"
   @spec show_dots(t()) :: t()
   @spec show_dots(t(), dots_options()) :: t()
   def show_dots(sparkline, options \\ []) do
@@ -464,6 +469,7 @@ defmodule SparklineSvg do
 
   @default_line_opts [width: 0.25, color: "black", dasharray: "", class: nil]
 
+  @doc since: "0.1.0"
   @spec show_line(t()) :: t()
   @spec show_line(t(), line_options()) :: t()
   def show_line(sparkline, options \\ []) do
@@ -495,6 +501,7 @@ defmodule SparklineSvg do
 
   @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
 
+  @doc since: "0.1.0"
   @spec show_area(t()) :: t()
   @spec show_area(t(), area_options()) :: t()
   def show_area(sparkline, options \\ []) do
@@ -511,6 +518,8 @@ defmodule SparklineSvg do
 
   Available reference lines are `:max`, `:min`, `:avg`, and `:median`.
 
+  Reference lines on an empty chart won't be rendered.
+
   ## Examples
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
@@ -522,6 +531,7 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
   """
 
+  @doc since: "0.2.0"
   @spec show_ref_line(t(), ref_line()) :: t()
   @spec show_ref_line(t(), ref_line(), ref_line_options()) :: t()
   def show_ref_line(sparkline, type, options \\ []) do
@@ -557,6 +567,7 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
+  @doc since: "0.1.0"
   @spec add_marker(t(), marker() | markers()) :: t()
   @spec add_marker(t(), marker() | markers(), marker_options()) :: t()
   def add_marker(sparkline, markers, options \\ [])
@@ -582,6 +593,7 @@ defmodule SparklineSvg do
       {:error, :invalid_dimension}
 
   """
+  @doc since: "0.1.0"
   @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
     case compute(sparkline) do
@@ -610,6 +622,7 @@ defmodule SparklineSvg do
       ** (SparklineSvg.Error) invalid_dimension
 
   """
+  @doc since: "0.1.0"
   @spec to_svg!(t()) :: String.t()
   def to_svg!(sparkline) do
     case to_svg(sparkline) do
@@ -632,6 +645,7 @@ defmodule SparklineSvg do
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
+  @doc since: "0.1.0"
   @spec as_data_uri(String.t()) :: String.t()
   def as_data_uri(svg) when is_binary(svg) do
     ["data:image/svg+xml;base64", Base.encode64(svg)] |> Enum.join(",")
@@ -644,6 +658,7 @@ defmodule SparklineSvg do
     Take a sparkline struct and return a new sparkline computed and checked struct but without
     rendering it to an SVG document.
     """
+    @doc since: "0.2.0"
     @spec dry_run(t()) :: {:ok, t()} | {:error, atom()}
     def dry_run(sparkline), do: compute(sparkline)
   end
