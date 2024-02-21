@@ -100,6 +100,9 @@ defmodule SparklineSvg do
   Markers are not used to calculate the boundaries of the chart. If a marker is set outside the
   range of the chart, it will be rendered but won't be visible.
 
+  We always set the `x` value of the marker (position on the x axis). The marker must be of the
+  same type as the `x` axis of the chart.
+
   <!-- tabs-open -->
   ### Single marker
   ``` elixir
@@ -190,7 +193,7 @@ defmodule SparklineSvg do
     |> SparklineSvg.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
     |> SparklineSvg.show_area(class: "fill-green/10")
     |> SparklineSvg.add_marker(1, class: "stroke-red stroke-[0.5px] fill-transparent")
-    |> SparklineSvg.show_ref_line(:max, class="stroke-red stroke-[0.3px]")
+    |> SparklineSvg.show_ref_line(:max, class: "stroke-red stroke-[0.3px]")
     |> SparklineSvg.to_svg!()
   ```
   <!-- tabs-close -->
@@ -514,6 +517,8 @@ defmodule SparklineSvg do
   Add one reference line to a sparkline struct with the given options.
 
   Available reference lines are `:max`, `:min`, `:avg`, and `:median`.
+
+  Reference lines on an empty chart won't be rendered.
 
   ## Examples
 
