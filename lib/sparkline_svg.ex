@@ -38,28 +38,9 @@ defmodule SparklineSvg do
     the `y` axis. The `x` value can be a `number`, a `DateTime`, a `Date`, a `Time`, or a
     `NaiveDateTime`. The `y` value must be a `number`.
 
-  All values in the list must be of the same type.
+  All `x` values in the list must be of the same type.
 
   <!-- tabs-open -->
-  ### Simple datapoints
-  ``` elixir
-  # Number datapoints
-  datapoints = [1, 2, 3]
-  datapoints = [1.1, 1.2, 1.3]
-
-  # Datapoints with DateTime
-  datapoints = [~U[2021-01-01 00:00:00Z], ~U[2021-01-02 00:00:00Z], ~U[2021-01-03 00:00:00Z]]
-
-  # Datapoints with Date
-  datapoints = [~D[2021-01-01], ~D[2021-01-02], ~D[2021-01-03]]
-
-  # Datapoints with Time
-  datapoints = [~T[00:01:00], ~T[00:02:00], ~T[00:03:00]]
-
-  # Datapoints with NaiveDateTime
-  datapoints = [~N[2021-01-01 00:00:00], ~N[2021-01-02 00:00:00], ~N[2021-01-03 00:00:00]]
-  ```
-
   ### Tuple-based datapoints
   ``` elixir
   # Datapoints
@@ -86,6 +67,13 @@ defmodule SparklineSvg do
     {~N[2021-01-03 00:00:00], 3}
   ]
   ```
+
+  ### Simple datapoints
+  ``` elixir
+  # Number datapoints
+  datapoints = [1, 2, 3]
+  datapoints = [1.1, 1.2, 1.3]
+  ```
   <!-- tabs-close -->
 
   ## Markers
@@ -94,8 +82,9 @@ defmodule SparklineSvg do
   therefore are set separately from it. You can add as many markers as you want to a chart.
 
   There are two types of markers:
-  - A single marker that will be rendered as a vertical line.
-  - A range marker that will be rendered as a rectangle.
+  - A single marker that will be rendered as a vertical line that span the entire height of the
+    chart.
+  - A range marker that will be rendered as a rectangle that span the entire height of the chart.
 
   Markers are not used to calculate the boundaries of the chart. If a marker is set outside the
   range of the chart, it will be rendered but won't be visible.
@@ -154,7 +143,7 @@ defmodule SparklineSvg do
   under the line as well as markers and reference lines.
 
   There are two ways to customize the chart:
-  - Using the options like `:color` or `:width`.
+  - Using the options like `:color` or `:dasharray`.
   - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
 
   <!-- tabs-open -->
@@ -198,9 +187,9 @@ defmodule SparklineSvg do
   ```
   <!-- tabs-close -->
 
-  When using the CSS classes to style the chart, the other options like `:color` or `:width` will
-  be ignored. However, some options (`:width`, `:height`, `padding`, `smoothing`, and
-  `placeholder`), are used internally to render the chart and are required in any case.
+  When using the CSS classes to style the chart, the other options like `:color` or `:dasharray`
+  will be ignored. However, some options (`:width`, `:height`, `:padding`, `:smoothing`, and
+  `:placeholder`), are used internally to render the chart and are required in any case.
 
   ### Available options
 
