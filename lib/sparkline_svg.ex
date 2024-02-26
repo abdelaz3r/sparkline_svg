@@ -297,12 +297,17 @@ defmodule SparklineSvg do
   @typedoc "The type of reference line."
   @type ref_line :: :max | :min | :avg | :median
 
+  @typedoc "Padding options for the chart."
+  @type padding ::
+          number()
+          | list({:top, number()} | {:right, number()} | {:bottom, number()} | {:left, number()})
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
             {:width, number()}
             | {:height, number()}
-            | {:padding, number()}
+            | {:padding, padding()}
             | {:smoothing, number()}
             | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
@@ -340,10 +345,13 @@ defmodule SparklineSvg do
           list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
   @typedoc false
+  @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
+
+  @typedoc false
   @type opts :: %{
           width: number(),
           height: number(),
-          padding: number(),
+          padding: opt_padding(),
           smoothing: float(),
           placeholder: nil | String.t(),
           class: nil | String.t(),
@@ -401,6 +409,7 @@ defmodule SparklineSvg do
       @default_opts
       |> Keyword.merge(options)
       |> Map.new()
+      |> Map.update!(:padding, &expand_padding/1)
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
     %SparklineSvg{datapoints: datapoints, options: options, markers: [], ref_lines: %{}}
@@ -658,8 +667,8 @@ defmodule SparklineSvg do
   defp compute(sparkline) do
     %{width: width, height: height, padding: padding} = sparkline.options
 
-    with :ok <- check_dimension(width, padding),
-         :ok <- check_dimension(height, padding),
+    with :ok <- check_x_dimension(width, padding),
+         :ok <- check_y_dimension(height, padding),
          {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
          {:ok, markers} <- Marker.clean(sparkline.markers, type),
          {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
@@ -671,9 +680,32 @@ defmodule SparklineSvg do
     end
   end
 
-  @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
-  defp check_dimension(length, padding) do
-    if length - 2 * padding > 0,
+  @spec expand_padding(padding()) :: opt_padding()
+  defp expand_padding(padding) when is_list(padding) do
+    default = Keyword.get(@default_opts, :padding)
+
+    %{
+      top: Keyword.get(padding, :top, default),
+      right: Keyword.get(padding, :right, default),
+      bottom: Keyword.get(padding, :bottom, default),
+      left: Keyword.get(padding, :left, default)
+    }
+  end
+
+  defp expand_padding(padding) do
+    %{top: padding, right: padding, bottom: padding, left: padding}
+  end
+
+  @spec check_x_dimension(number(), opt_padding()) :: :ok | {:error, atom()}
+  defp check_x_dimension(width, padding) do
+    if width - padding.left - padding.right > 0,
+      do: :ok,
+      else: {:error, :invalid_dimension}
+  end
+
+  @spec check_y_dimension(number(), opt_padding()) :: :ok | {:error, atom()}
+  defp check_y_dimension(height, padding) do
+    if height - padding.top - padding.bottom > 0,
       do: :ok,
       else: {:error, :invalid_dimension}
   end
