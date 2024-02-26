@@ -198,8 +198,13 @@ defmodule SparklineSvg do
   - `:width` - the width of the chart, defaults to `200`.
   - `:height` - the height of the chart, defaults to `50`.
   - `:padding` - the padding of the chart, defaults to `2`. Not targetable with CSS classes.
-    Padding has to be set to a value which `padding * 2 < width` and `padding * 2 < height`
-    otherwise a `:invalid_dimension` error will be raised.
+    The padding can be one the following:
+    - A single positive `number()` that will be used for all sides.
+    - A keyword list where the keys are `:top`, `:right`, `:bottom`, and `:left` and the values are
+      a positive `number()` for each side; missing sides will be set to the default value.
+
+    Padding has to be set to a value which `left_padding + right_padding < width` and `top_padding
+    + bottom_padding < height` otherwise a `:invalid_dimension` error will be raised.
   - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes
     unreadable), defaults to `0.15`. Not targetable with CSS classes.
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
@@ -207,7 +212,7 @@ defmodule SparklineSvg do
     display a message when the chart is empty. Not targetable with CSS classes.
   - `:class` - the value of the HTML class attribut of the chart, defaults to `nil`.
   - `:placeholder_class` - the value of the HTML class attribut of the placeholder, defaults to
-  `nil`. It is the only way to style the placeholder.
+    `nil`. It is the only way to style the placeholder.
 
   ### Dots options
 
@@ -220,7 +225,8 @@ defmodule SparklineSvg do
   - `:width` - the width of the line, defaults to `0.25`.
   - `:color` - the color of the line, defaults to `"black"`.
   - `:dasharray` - the value of the HTML stroke-dasharray attribut of the line, defaults to `""`.
-    Valid dasharray values can be found [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
+    Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribut of the line, defaults to `nil`.
 
   ### Area options
