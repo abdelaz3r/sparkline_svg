@@ -210,48 +210,48 @@ defmodule SparklineSvg do
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
     with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
     display a message when the chart is empty. Not targetable with CSS classes.
-  - `:class` - the value of the HTML class attribut of the chart, defaults to `nil`.
-  - `:placeholder_class` - the value of the HTML class attribut of the placeholder, defaults to
+  - `:class` - the value of the HTML class attribute of the chart, defaults to `nil`.
+  - `:placeholder_class` - the value of the HTML class attribute of the placeholder, defaults to
     `nil`. It is the only way to style the placeholder.
 
   ### Dots options
 
   - `:radius` - the radius of the dots, defaults to `1`.
   - `:color` - the color of the dots, defaults to `"black"`.
-  - `:class` - the value of the HTML class attribut of the dots, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the dots, defaults to `nil`.
 
   ### Line options
 
   - `:width` - the width of the line, defaults to `0.25`.
   - `:color` - the color of the line, defaults to `"black"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the line, defaults to `""`.
+  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the line, defaults to `""`.
     Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribut of the line, defaults to `nil`.
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+  - `:class` - the value of the HTML class attribute of the line, defaults to `nil`.
 
   ### Area options
 
   - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribut of the area, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the area, defaults to `nil`.
 
   ### Marker options
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
-  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribut of the marker, defaults
+  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribute of the marker, defaults
     to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the marker, defaults to `nil`.
 
   ### Reference line options
 
   - `:width` - the width of the reference line, defaults to `0.25`.
   - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the reference line, defaults
+  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the reference line, defaults
     to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+  - `:class` - the value of the HTML class attribute of the reference line, defaults to `nil`.
 
   """
 
