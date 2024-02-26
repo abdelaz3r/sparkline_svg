@@ -128,11 +128,13 @@ defmodule SparklineSvg.Core do
 
   @spec resize_x(number(), min_max(), SparklineSvg.opts()) :: number()
   defp resize_x(x, {min_x, max_x}, %{width: width, padding: padding}) do
-    (x - min_x) / (max_x - min_x) * (width - padding * 2) + padding
+    inner_width = width - padding.left - padding.right
+    (x - min_x) / (max_x - min_x) * inner_width + padding.left
   end
 
   @spec resize_y(number(), min_max(), SparklineSvg.opts()) :: number()
   defp resize_y(y, {min_y, max_y}, %{height: height, padding: padding}) do
-    height - (y - min_y) / (max_y - min_y) * (height - padding * 2) - padding
+    inner_height = height - padding.top - padding.bottom
+    height - (y - min_y) / (max_y - min_y) * inner_height - padding.bottom
   end
 end

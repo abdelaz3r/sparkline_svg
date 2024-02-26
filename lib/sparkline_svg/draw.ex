@@ -188,7 +188,7 @@ defmodule SparklineSvg.Draw do
     %{position: y, options: %{color: color, width: width, dasharray: dasharray, class: class}} =
       ref_line
 
-    %{padding: x1, width: graph_width} = options
+    %{padding: padding, width: graph_width} = options
     y = cast(y)
 
     attrs =
@@ -200,7 +200,7 @@ defmodule SparklineSvg.Draw do
       end
 
     [
-      ~s'<line x1="#{x1}" y1="#{y}" x2="#{graph_width - x1}" y2="#{y}" ',
+      ~s'<line x1="#{padding.left}" y1="#{y}" x2="#{graph_width - padding.right}" y2="#{y}" ',
       attrs,
       ~s' />'
     ]
