@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0 (2024-02-27)
+
+  * Enhancements
+    * Support `:padding` option specifying padding for specific side
+
 ## v0.2.0 (2024-02-21)
 
   * Enhancements
