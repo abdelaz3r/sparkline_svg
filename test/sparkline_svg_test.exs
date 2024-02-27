@@ -35,6 +35,27 @@ defmodule SparklineSvgTest do
     assert SparklineSvg.dry_run(sparkline) == {:error, :invalid_y_type}
   end
 
+  test "valid padding" do
+    data = [{1, 1}, {2, 2}]
+
+    opts = [width: 10, height: 10, padding: 2]
+    {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 8.0}, {8.0, 2.0}]
+
+    opts = [width: 10, height: 10, padding: [top: 5]]
+    {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 8.0}, {8.0, 5.0}]
+
+    # different vertical and horizontal padding
+    opts = [width: 10, height: 10, padding: [top: 2, bottom: 2, left: 3, right: 3]]
+    {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{3.0, 8.0}, {7.0, 2.0}]
+
+    opts = [width: 10, height: 10, padding: [top: 1, bottom: 2, left: 3, right: 4]]
+    {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{3.0, 8.0}, {6.0, 1.0}]
+  end
+
   test "valid datapoints" do
     {:ok, sparkline} = SparklineSvg.new([1, 2]) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]

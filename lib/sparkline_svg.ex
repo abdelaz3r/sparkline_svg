@@ -38,28 +38,9 @@ defmodule SparklineSvg do
     the `y` axis. The `x` value can be a `number`, a `DateTime`, a `Date`, a `Time`, or a
     `NaiveDateTime`. The `y` value must be a `number`.
 
-  All values in the list must be of the same type.
+  All `x` values in the list must be of the same type.
 
   <!-- tabs-open -->
-  ### Simple datapoints
-  ``` elixir
-  # Number datapoints
-  datapoints = [1, 2, 3]
-  datapoints = [1.1, 1.2, 1.3]
-
-  # Datapoints with DateTime
-  datapoints = [~U[2021-01-01 00:00:00Z], ~U[2021-01-02 00:00:00Z], ~U[2021-01-03 00:00:00Z]]
-
-  # Datapoints with Date
-  datapoints = [~D[2021-01-01], ~D[2021-01-02], ~D[2021-01-03]]
-
-  # Datapoints with Time
-  datapoints = [~T[00:01:00], ~T[00:02:00], ~T[00:03:00]]
-
-  # Datapoints with NaiveDateTime
-  datapoints = [~N[2021-01-01 00:00:00], ~N[2021-01-02 00:00:00], ~N[2021-01-03 00:00:00]]
-  ```
-
   ### Tuple-based datapoints
   ``` elixir
   # Datapoints
@@ -86,6 +67,13 @@ defmodule SparklineSvg do
     {~N[2021-01-03 00:00:00], 3}
   ]
   ```
+
+  ### Simple datapoints
+  ``` elixir
+  # Number datapoints
+  datapoints = [1, 2, 3]
+  datapoints = [1.1, 1.2, 1.3]
+  ```
   <!-- tabs-close -->
 
   ## Markers
@@ -94,8 +82,9 @@ defmodule SparklineSvg do
   therefore are set separately from it. You can add as many markers as you want to a chart.
 
   There are two types of markers:
-  - A single marker that will be rendered as a vertical line.
-  - A range marker that will be rendered as a rectangle.
+  - A single marker that will be rendered as a vertical line that span the entire height of the
+    chart.
+  - A range marker that will be rendered as a rectangle that span the entire height of the chart.
 
   Markers are not used to calculate the boundaries of the chart. If a marker is set outside the
   range of the chart, it will be rendered but won't be visible.
@@ -154,7 +143,7 @@ defmodule SparklineSvg do
   under the line as well as markers and reference lines.
 
   There are two ways to customize the chart:
-  - Using the options like `:color` or `:width`.
+  - Using the options like `:color` or `:dasharray`.
   - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
 
   <!-- tabs-open -->
@@ -198,9 +187,9 @@ defmodule SparklineSvg do
   ```
   <!-- tabs-close -->
 
-  When using the CSS classes to style the chart, the other options like `:color` or `:width` will
-  be ignored. However, some options (`:width`, `:height`, `padding`, `smoothing`, and
-  `placeholder`), are used internally to render the chart and are required in any case.
+  When using the CSS classes to style the chart, the other options like `:color` or `:dasharray`
+  will be ignored. However, some options (`:width`, `:height`, `:padding`, `:smoothing`, and
+  `:placeholder`), are used internally to render the chart and are required in any case.
 
   ### Available options
 
@@ -209,54 +198,60 @@ defmodule SparklineSvg do
   - `:width` - the width of the chart, defaults to `200`.
   - `:height` - the height of the chart, defaults to `50`.
   - `:padding` - the padding of the chart, defaults to `2`. Not targetable with CSS classes.
-    Padding has to be set to a value which `padding * 2 < width` and `padding * 2 < height`
-    otherwise a `:invalid_dimension` error will be raised.
+    The padding can be one the following:
+    - A single positive `number()` that will be used for all sides.
+    - A keyword list where the keys are `:top`, `:right`, `:bottom`, and `:left` and the values are
+      a positive `number()` for each side; missing sides will be set to the default value.
+
+    Padding has to be set to a value which `left_padding + right_padding < width` and `top_padding
+    + bottom_padding < height` otherwise a `:invalid_dimension` error will be raised.
   - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes
     unreadable), defaults to `0.15`. Not targetable with CSS classes.
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
     with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
     display a message when the chart is empty. Not targetable with CSS classes.
-  - `:class` - the value of the HTML class attribut of the chart, defaults to `nil`.
-  - `:placeholder_class` - the value of the HTML class attribut of the placeholder, defaults to
-  `nil`. It is the only way to style the placeholder.
+  - `:class` - the value of the HTML class attribute of the chart, defaults to `nil`.
+  - `:placeholder_class` - the value of the HTML class attribute of the placeholder, defaults to
+    `nil`. It is the only way to style the placeholder.
 
   ### Dots options
 
   - `:radius` - the radius of the dots, defaults to `1`.
   - `:color` - the color of the dots, defaults to `"black"`.
-  - `:class` - the value of the HTML class attribut of the dots, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the dots, defaults to `nil`.
 
   ### Line options
 
   - `:width` - the width of the line, defaults to `0.25`.
   - `:color` - the color of the line, defaults to `"black"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the line, defaults to `""`.
-    Valid dasharray values can be found [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribut of the line, defaults to `nil`.
+  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the line, defaults to `""`.
+    Valid dasharray values can be found
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+  - `:class` - the value of the HTML class attribute of the line, defaults to `nil`.
 
   ### Area options
 
   - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribut of the area, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the area, defaults to `nil`.
 
   ### Marker options
 
   - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
   - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
-  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribut of the marker, defaults
+  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribute of the marker, defaults
     to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
   - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribut of the marker, defaults to `nil`.
+  - `:class` - the value of the HTML class attribute of the marker, defaults to `nil`.
 
   ### Reference line options
 
   - `:width` - the width of the reference line, defaults to `0.25`.
   - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribut of the reference line, defaults
+  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the reference line, defaults
     to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribut of the reference line, defaults to `nil`.
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+  - `:class` - the value of the HTML class attribute of the reference line, defaults to `nil`.
 
   """
 
@@ -308,12 +303,17 @@ defmodule SparklineSvg do
   @typedoc "The type of reference line."
   @type ref_line :: :max | :min | :avg | :median
 
+  @typedoc "Padding options for the chart."
+  @type padding ::
+          number()
+          | list({:top, number()} | {:right, number()} | {:bottom, number()} | {:left, number()})
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
             {:width, number()}
             | {:height, number()}
-            | {:padding, number()}
+            | {:padding, padding()}
             | {:smoothing, number()}
             | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
@@ -351,10 +351,13 @@ defmodule SparklineSvg do
           list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
   @typedoc false
+  @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
+
+  @typedoc false
   @type opts :: %{
           width: number(),
           height: number(),
-          padding: number(),
+          padding: opt_padding(),
           smoothing: float(),
           placeholder: nil | String.t(),
           class: nil | String.t(),
@@ -412,6 +415,7 @@ defmodule SparklineSvg do
       @default_opts
       |> Keyword.merge(options)
       |> Map.new()
+      |> Map.update!(:padding, &expand_padding/1)
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
     %SparklineSvg{datapoints: datapoints, options: options, markers: [], ref_lines: %{}}
@@ -549,8 +553,8 @@ defmodule SparklineSvg do
   If you want to apply different options to different markers, you can call this function multiple
   times with a single marker and the desired options.
 
-  Markers are not used to calculate the boudaries of the chart. If you set a marker outside the range
-  of the chart, it will be rendered but won't be visible.
+  Markers are not used to calculate the boudaries of the chart. If you set a marker outside the
+  range of the chart, it will be rendered but won't be visible.
 
   ## Examples
 
@@ -567,6 +571,7 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
+
   @doc since: "0.1.0"
   @spec add_marker(t(), marker() | markers()) :: t()
   @spec add_marker(t(), marker() | markers(), marker_options()) :: t()
@@ -593,6 +598,7 @@ defmodule SparklineSvg do
       {:error, :invalid_dimension}
 
   """
+
   @doc since: "0.1.0"
   @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
@@ -622,6 +628,7 @@ defmodule SparklineSvg do
       ** (SparklineSvg.Error) invalid_dimension
 
   """
+
   @doc since: "0.1.0"
   @spec to_svg!(t()) :: String.t()
   def to_svg!(sparkline) do
@@ -645,6 +652,7 @@ defmodule SparklineSvg do
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
+
   @doc since: "0.1.0"
   @spec as_data_uri(String.t()) :: String.t()
   def as_data_uri(svg) when is_binary(svg) do
@@ -658,6 +666,7 @@ defmodule SparklineSvg do
     Take a sparkline struct and return a new sparkline computed and checked struct but without
     rendering it to an SVG document.
     """
+
     @doc since: "0.2.0"
     @spec dry_run(t()) :: {:ok, t()} | {:error, atom()}
     def dry_run(sparkline), do: compute(sparkline)
@@ -669,8 +678,8 @@ defmodule SparklineSvg do
   defp compute(sparkline) do
     %{width: width, height: height, padding: padding} = sparkline.options
 
-    with :ok <- check_dimension(width, padding),
-         :ok <- check_dimension(height, padding),
+    with :ok <- check_x_dimension(width, padding),
+         :ok <- check_y_dimension(height, padding),
          {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
          {:ok, markers} <- Marker.clean(sparkline.markers, type),
          {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
@@ -682,9 +691,32 @@ defmodule SparklineSvg do
     end
   end
 
-  @spec check_dimension(number(), number()) :: :ok | {:error, atom()}
-  defp check_dimension(length, padding) do
-    if length - 2 * padding > 0,
+  @spec expand_padding(padding()) :: opt_padding()
+  defp expand_padding(padding) when is_list(padding) do
+    default = Keyword.get(@default_opts, :padding)
+
+    %{
+      top: Keyword.get(padding, :top, default),
+      right: Keyword.get(padding, :right, default),
+      bottom: Keyword.get(padding, :bottom, default),
+      left: Keyword.get(padding, :left, default)
+    }
+  end
+
+  defp expand_padding(padding) do
+    %{top: padding, right: padding, bottom: padding, left: padding}
+  end
+
+  @spec check_x_dimension(number(), opt_padding()) :: :ok | {:error, atom()}
+  defp check_x_dimension(width, padding) do
+    if width - padding.left - padding.right > 0,
+      do: :ok,
+      else: {:error, :invalid_dimension}
+  end
+
+  @spec check_y_dimension(number(), opt_padding()) :: :ok | {:error, atom()}
+  defp check_y_dimension(height, padding) do
+    if height - padding.top - padding.bottom > 0,
       do: :ok,
       else: {:error, :invalid_dimension}
   end
