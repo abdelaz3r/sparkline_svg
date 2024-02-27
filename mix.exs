@@ -1,7 +1,7 @@
 defmodule SparklineSvg.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @repo_url "https://github.com/abdelaz3r/sparkline_svg"
 
   def project do
