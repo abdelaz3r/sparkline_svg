@@ -553,8 +553,8 @@ defmodule SparklineSvg do
   If you want to apply different options to different markers, you can call this function multiple
   times with a single marker and the desired options.
 
-  Markers are not used to calculate the boudaries of the chart. If you set a marker outside the range
-  of the chart, it will be rendered but won't be visible.
+  Markers are not used to calculate the boudaries of the chart. If you set a marker outside the
+  range of the chart, it will be rendered but won't be visible.
 
   ## Examples
 
@@ -571,6 +571,7 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
+
   @doc since: "0.1.0"
   @spec add_marker(t(), marker() | markers()) :: t()
   @spec add_marker(t(), marker() | markers(), marker_options()) :: t()
@@ -597,6 +598,7 @@ defmodule SparklineSvg do
       {:error, :invalid_dimension}
 
   """
+
   @doc since: "0.1.0"
   @spec to_svg(t()) :: {:ok, String.t()} | {:error, atom()}
   def to_svg(sparkline) do
@@ -626,6 +628,7 @@ defmodule SparklineSvg do
       ** (SparklineSvg.Error) invalid_dimension
 
   """
+
   @doc since: "0.1.0"
   @spec to_svg!(t()) :: String.t()
   def to_svg!(sparkline) do
@@ -649,6 +652,7 @@ defmodule SparklineSvg do
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
+
   @doc since: "0.1.0"
   @spec as_data_uri(String.t()) :: String.t()
   def as_data_uri(svg) when is_binary(svg) do
@@ -662,6 +666,7 @@ defmodule SparklineSvg do
     Take a sparkline struct and return a new sparkline computed and checked struct but without
     rendering it to an SVG document.
     """
+
     @doc since: "0.2.0"
     @spec dry_run(t()) :: {:ok, t()} | {:error, atom()}
     def dry_run(sparkline), do: compute(sparkline)
