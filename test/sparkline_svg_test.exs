@@ -104,6 +104,14 @@ defmodule SparklineSvgTest do
     assert sparkline.datapoints == [{2.0, 25.0}, {198.0, 25.0}]
   end
 
+  test "with one value datapoints" do
+    {:ok, sparkline} = SparklineSvg.new([1]) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{100.0, 25.0}]
+
+    {:ok, sparkline} = SparklineSvg.new([{5, 1}]) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{100.0, 25.0}]
+  end
+
   test "to_svg!/1 error handling" do
     assert_raise SparklineSvg.Error, "invalid_x_type", fn ->
       SparklineSvg.new([{"a", 1}, {"b", 2}]) |> SparklineSvg.to_svg!()

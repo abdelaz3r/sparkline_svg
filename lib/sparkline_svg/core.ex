@@ -44,7 +44,12 @@ defmodule SparklineSvg.Core do
     {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
     [{x, y} | _tail] = datapoints
 
-    min_max_x = if max_x - min_x == 0, do: {0, 2 * x}, else: {min_x, max_x}
+    min_max_x =
+      cond do
+        max_x - min_x != 0 -> {min_x, max_x}
+        x == 0 -> {-1, 1}
+        true -> {0, 2 * x}
+      end
 
     min_max_y =
       cond do
