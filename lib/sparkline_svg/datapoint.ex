@@ -4,9 +4,9 @@ defmodule SparklineSvg.Datapoint do
   alias SparklineSvg.Core
   alias SparklineSvg.Type
 
-  @spec clean(SparklineSvg.datapoints()) ::
-          {:ok, Core.points(), SparklineSvg.x()} | {:error, atom()}
-  def clean([{_x, _y} | _] = datapoints) do
+  @spec clean(SparklineSvg.datapoints(), SparklineSvg.window()) ::
+          {:ok, Core.points(), SparklineSvg.window(), SparklineSvg.x()} | {:error, atom()}
+  def clean([{_x, _y} | _] = datapoints, window) do
     {datapoints, type} =
       Enum.reduce_while(datapoints, {[], nil}, fn
         {x, y}, {datapoints, type} ->
@@ -26,16 +26,19 @@ defmodule SparklineSvg.Datapoint do
         {:error, reason}
 
       datapoints ->
+        # check for window type (current type or auto)
+
         datapoints =
           datapoints
           |> Enum.uniq_by(fn {x, _} -> x end)
           |> Enum.sort_by(fn {x, _} -> x end)
+          |> window(window)
 
-        {:ok, datapoints, type}
+        {:ok, datapoints, window, type}
     end
   end
 
-  def clean(datapoints) do
+  def clean(datapoints, window) do
     datapoints =
       datapoints
       |> Enum.with_index()
@@ -51,8 +54,35 @@ defmodule SparklineSvg.Datapoint do
       end)
 
     case datapoints do
-      {:error, reason} -> {:error, reason}
-      datapoints -> {:ok, Enum.reverse(datapoints), :number}
+      {:error, reason} ->
+        {:error, reason}
+
+      datapoints ->
+        # check for window type (type or auto)
+
+        datapoints =
+          datapoints
+          |> Enum.reverse()
+          |> window(window)
+
+        {:ok, datapoints, window, :number}
     end
+  end
+
+  @spec window(Core.points(), SparklineSvg.window()) :: Core.points()
+  def window(datapoints, %{min: :auto, max: :auto}) do
+    datapoints
+  end
+
+  def window(datapoints, %{min: min, max: :auto}) do
+    Enum.filter(datapoints, fn {x, _} -> x >= min end)
+  end
+
+  def window(datapoints, %{min: :auto, max: max}) do
+    Enum.filter(datapoints, fn {x, _} -> x <= max end)
+  end
+
+  def window(datapoints, %{min: min, max: max}) do
+    Enum.filter(datapoints, fn {x, _} -> x >= min and x <= max end)
   end
 end

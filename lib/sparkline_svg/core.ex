@@ -32,6 +32,8 @@ defmodule SparklineSvg.Core do
     %{datapoints: datapoints, ref_lines: ref_lines, markers: markers, options: options} =
       sparkline
 
+    # fetch min and max values from the options
+    # if not present, calculate them from the datapoints
     {min_max_x, min_max_y} = get_min_max(datapoints)
 
     %SparklineSvg{

@@ -344,6 +344,9 @@ defmodule SparklineSvg do
   @type ref_line_options ::
           list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
 
+  @typedoc "Keyword list of options for the x window."
+  @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
+
   @typedoc false
   @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
 
@@ -365,14 +368,18 @@ defmodule SparklineSvg do
   @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
 
   @typedoc false
+  @type window :: %{min: :auto | x(), max: :auto | x()}
+
+  @typedoc false
   @type t :: %__MODULE__{
           datapoints: datapoints(),
           options: opts(),
           markers: list(Marker.t()),
-          ref_lines: ref_lines()
+          ref_lines: ref_lines(),
+          window: window()
         }
-  @enforce_keys [:datapoints, :options, :markers, :ref_lines]
-  defstruct [:datapoints, :options, :markers, :ref_lines]
+  @enforce_keys [:datapoints, :options, :markers, :ref_lines, :window]
+  defstruct [:datapoints, :options, :markers, :ref_lines, :window]
 
   @doc ~S"""
   Create a new sparkline struct with the given datapoints and options.
@@ -414,7 +421,13 @@ defmodule SparklineSvg do
       |> Map.update!(:padding, &expand_padding/1)
       |> Map.merge(%{dots: nil, line: nil, area: nil})
 
-    %SparklineSvg{datapoints: datapoints, options: options, markers: [], ref_lines: %{}}
+    %SparklineSvg{
+      datapoints: datapoints,
+      options: options,
+      markers: [],
+      ref_lines: %{},
+      window: %{min: :auto, max: :auto}
+    }
   end
 
   @doc ~S"""
@@ -539,6 +552,24 @@ defmodule SparklineSvg do
     ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
 
     %SparklineSvg{sparkline | ref_lines: ref_lines}
+  end
+
+  @doc ~S"""
+  TODO.
+  """
+
+  @default_window_opts [min: :auto, max: :auto]
+
+  @doc since: "0.4.0"
+  @spec set_x_window(t()) :: t()
+  @spec set_x_window(t(), window_options()) :: t()
+  def set_x_window(sparkline, options \\ []) do
+    window =
+      @default_window_opts
+      |> Keyword.merge(options)
+      |> Map.new()
+
+    %SparklineSvg{sparkline | window: window}
   end
 
   @doc ~S"""
@@ -672,15 +703,27 @@ defmodule SparklineSvg do
 
   @spec compute(t()) :: {:ok, t()} | {:error, atom()}
   defp compute(sparkline) do
-    %{width: width, height: height, padding: padding} = sparkline.options
+    %{
+      datapoints: datapoints,
+      markers: markers,
+      ref_lines: ref_lines,
+      window: window,
+      options: %{width: width, height: height, padding: padding}
+    } = sparkline
 
     with :ok <- check_x_dimension(width, padding),
          :ok <- check_y_dimension(height, padding),
-         {:ok, datapoints, type} <- Datapoint.clean(sparkline.datapoints),
-         {:ok, markers} <- Marker.clean(sparkline.markers, type),
-         {:ok, ref_lines} <- ReferenceLine.clean(sparkline.ref_lines) do
+         {:ok, datapoints, window, type} <- Datapoint.clean(datapoints, window),
+         {:ok, markers} <- Marker.clean(markers, type),
+         {:ok, ref_lines} <- ReferenceLine.clean(ref_lines) do
       sparkline =
-        %SparklineSvg{sparkline | datapoints: datapoints, markers: markers, ref_lines: ref_lines}
+        %SparklineSvg{
+          sparkline
+          | datapoints: datapoints,
+            markers: markers,
+            ref_lines: ref_lines,
+            window: window
+        }
         |> Core.compute()
 
       {:ok, sparkline}
