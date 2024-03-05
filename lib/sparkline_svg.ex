@@ -315,6 +315,7 @@ defmodule SparklineSvg do
             | {:height, number()}
             | {:padding, padding()}
             | {:smoothing, number()}
+            | {:precision, non_neg_integer()}
             | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
             | {:placeholder_class, nil | String.t()}
@@ -402,6 +403,7 @@ defmodule SparklineSvg do
     height: 50,
     padding: 2,
     smoothing: 0.15,
+    precision: 3,
     placeholder: nil,
     class: nil,
     placeholder_class: nil

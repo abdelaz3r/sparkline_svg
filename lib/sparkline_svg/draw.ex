@@ -66,7 +66,15 @@ defmodule SparklineSvg.Draw do
         else: [~s'class="', class, ~s'"']
 
     Enum.map(datapoints, fn {x, y} ->
-      [~s'<circle cx="', cast(x), ~s'" cy="', cast(y), ~s'" r="#{radius}" ', attrs, ~s' />']
+      [
+        ~s'<circle cx="',
+        cast(x, options),
+        ~s'" cy="',
+        cast(y, options),
+        ~s'" r="#{radius}" ',
+        attrs,
+        ~s' />'
+      ]
     end)
   end
 
@@ -87,7 +95,7 @@ defmodule SparklineSvg.Draw do
         [~s'class="', class, ~s'"']
       end
 
-    path = ["M#{left},", cast(y), "L#{right},", cast(y)]
+    path = ["M#{left},", cast(y, options), "L#{right},", cast(y, options)]
     [~s'<path d="', path, ~s'" ', attrs, ~s' />']
   end
 
@@ -145,9 +153,9 @@ defmodule SparklineSvg.Draw do
 
     [
       ~s'<rect x="',
-      cast(min(x1, x2)),
+      cast(min(x1, x2), options),
       ~s'" y="#{-width}" width="',
-      cast(abs(x2 - x1)),
+      cast(abs(x2 - x1), options),
       ~s'" height="#{height + 2 * width}" ',
       attrs,
       ~s' />'
@@ -175,7 +183,7 @@ defmodule SparklineSvg.Draw do
         [~s'class="', class, ~s'"']
       end
 
-    [~s'<path d="M', cast({x, 0.0}), ~s'V#{height}" ', attrs, ~s' />']
+    [~s'<path d="M', cast({x, 0.0}, options), ~s'V#{height}" ', attrs, ~s' />']
   end
 
   @spec ref_lines(SparklineSvg.ref_lines(), SparklineSvg.opts()) :: iolist()
@@ -189,7 +197,7 @@ defmodule SparklineSvg.Draw do
       ref_line
 
     %{padding: padding, width: graph_width} = options
-    y = cast(y)
+    y = cast(y, options)
 
     attrs =
       if class == nil do
@@ -208,7 +216,7 @@ defmodule SparklineSvg.Draw do
 
   @spec compute_curve(Core.points(), SparklineSvg.opts()) :: iolist()
   defp compute_curve([curr | rest], options) do
-    ["M#{cast(curr)}"]
+    ["M#{cast(curr, options)}"]
     |> compute_curve(rest, curr, curr, options)
   end
 
@@ -241,7 +249,7 @@ defmodule SparklineSvg.Draw do
     cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
     cp2 = calculate_control_point(curr, prev1, next, :right, options)
 
-    [acc, "C", cast(cp1), " ", cast(cp2), " ", cast(curr)]
+    [acc, "C", cast(cp1, options), " ", cast(cp2, options), " ", cast(curr, options)]
   end
 
   @spec calculate_control_point(
@@ -274,18 +282,18 @@ defmodule SparklineSvg.Draw do
     }
   end
 
-  @spec cast(number() | {number(), number()}) :: iolist() | String.t()
-  defp cast({x, y}) do
-    [cast(x), ",", cast(y)]
+  @spec cast(number() | {number(), number()}, SparklineSvg.opts()) :: iolist() | String.t()
+  defp cast({x, y}, opts) do
+    [cast(x, opts), ",", cast(y, opts)]
   end
 
-  defp cast(value) when is_integer(value) do
-    cast(value * 1.0)
+  defp cast(value, _opts) when is_integer(value) do
+    Integer.to_string(value)
   end
 
-  defp cast(value) when is_float(value) do
+  defp cast(value, opts) when is_float(value) do
     value
-    |> Float.round(3)
+    |> Float.round(opts.precision)
     |> Float.to_string()
   end
 end
