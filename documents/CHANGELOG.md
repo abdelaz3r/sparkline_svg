@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1 (2024-03-05)
+
+  * Bug fixes
+    * Fix crashes when only one value is given
+
 ## v0.3.0 (2024-02-27)
 
   * Enhancements

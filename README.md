@@ -79,7 +79,7 @@ The package can be installed by adding `:sparkline_svg` to your list of dependen
 ```elixir
 def deps do
   [
-    {:sparkline_svg, "~> 0.3.0"}
+    {:sparkline_svg, "~> 0.3.1"}
   ]
 end
 ```
