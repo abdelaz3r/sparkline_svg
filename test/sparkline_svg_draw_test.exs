@@ -189,4 +189,20 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C11.8,44.55 47.733,31.9 67.333,25.0C86.933,18.1 113.067,-1.45 132.667,2.0C152.267,5.45 188.2,41.1 198.0,48.0" fill="none" stroke="black" stroke-width="0.25" /><line x1="2" y1="2.0" x2="198" y2="2.0" class="sparkline-max" /></svg>'
   end
+
+  test "to_svg!/1 with different precision" do
+    assert SparklineSvg.new([1, 2, 5, 2, 13], width: 13.2, height: 22.9, precision: 5)
+           |> SparklineSvg.show_dots()
+           |> SparklineSvg.show_line()
+           |> SparklineSvg.show_area()
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 13.2 22.9" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,20.9C2.345,20.66375 3.61,20.27 4.3,19.325C4.99,18.38 5.91,14.6 6.6,14.6C7.29,14.6 8.21,21.215 8.9,19.325C9.59,17.435 10.855,4.59875 11.2,2.0V22.9H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /><path d="M2.0,20.9C2.345,20.66375 3.61,20.27 4.3,19.325C4.99,18.38 5.91,14.6 6.6,14.6C7.29,14.6 8.21,21.215 8.9,19.325C9.59,17.435 10.855,4.59875 11.2,2.0" fill="none" stroke="black" stroke-width="0.25" /><circle cx="2.0" cy="20.9" r="1" fill="black" /><circle cx="4.3" cy="19.325" r="1" fill="black" /><circle cx="6.6" cy="14.6" r="1" fill="black" /><circle cx="8.9" cy="19.325" r="1" fill="black" /><circle cx="11.2" cy="2.0" r="1" fill="black" /></svg>'
+
+    assert SparklineSvg.new([1, 2, 5, 2, 13], width: 13.2, height: 22.9, precision: 0)
+           |> SparklineSvg.show_dots()
+           |> SparklineSvg.show_line()
+           |> SparklineSvg.show_area()
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 13.2 22.9" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,21.0C2.0,21.0 4.0,20.0 4.0,19.0C5.0,18.0 6.0,15.0 7.0,15.0C7.0,15.0 8.0,21.0 9.0,19.0C10.0,17.0 11.0,5.0 11.0,2.0V22.9H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /><path d="M2.0,21.0C2.0,21.0 4.0,20.0 4.0,19.0C5.0,18.0 6.0,15.0 7.0,15.0C7.0,15.0 8.0,21.0 9.0,19.0C10.0,17.0 11.0,5.0 11.0,2.0" fill="none" stroke="black" stroke-width="0.25" /><circle cx="2.0" cy="21.0" r="1" fill="black" /><circle cx="4.0" cy="19.0" r="1" fill="black" /><circle cx="7.0" cy="15.0" r="1" fill="black" /><circle cx="9.0" cy="19.0" r="1" fill="black" /><circle cx="11.0" cy="2.0" r="1" fill="black" /></svg>'
+  end
 end

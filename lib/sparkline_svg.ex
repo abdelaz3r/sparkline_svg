@@ -207,6 +207,9 @@ defmodule SparklineSvg do
     + bottom_padding < height` otherwise a `:invalid_dimension` error will be raised.
   - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes
     unreadable), defaults to `0.15`. Not targetable with CSS classes.
+  - `:precision` - the maximum precision of the values used to render the chart, defaults to `3`.
+    Not targetable with CSS classes. The precision can be set between `0` and `15`. The greater the
+    precision, the more accurate the chart will be but the heavier the SVG will be.
   - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
     with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
     display a message when the chart is empty. Not targetable with CSS classes.
