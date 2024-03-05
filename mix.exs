@@ -7,7 +7,7 @@ defmodule SparklineSvg.MixProject do
   def project do
     [
       app: :sparkline_svg,
-      name: "Sparkline SVG",
+      name: "Sparkline SVG-",
       description: "Sparkline SVG is an Elixir library to generate SVG sparkline charts.",
       version: @version,
       elixir: "~> 1.11",
