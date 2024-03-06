@@ -1,6 +1,8 @@
 defmodule SparklineSvgMRefLineTest do
   use ExUnit.Case, async: true
 
+  alias SparklineSvg.ReferenceLine
+
   test "invalid ref line" do
     assert SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:foo) |> SparklineSvg.dry_run() ==
              {:error, :invalid_ref_line_type}
@@ -87,28 +89,8 @@ defmodule SparklineSvgMRefLineTest do
   end
 
   test "valid custom ref lines" do
-    percentile =
-      fn percentile ->
-        fn datapoints ->
-          values_count = length(datapoints)
-
-          case percentile / 100 * (values_count + 1) do
-            n when n < 1 ->
-              0
-
-            n ->
-              sorted_values = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
-
-              case Enum.drop(sorted_values, max(0, trunc(n) - 1)) do
-                [a, b | _] -> a + (n - trunc(n)) * (b - a)
-                [a] -> a
-              end
-          end
-        end
-      end
-
-    percentile_99 = percentile.(99)
     fixed = fn _ -> 0.33 end
+    percentile_99 = ReferenceLine.percentile(99)
 
     {:ok, sparkline} =
       SparklineSvg.new(1..200)
