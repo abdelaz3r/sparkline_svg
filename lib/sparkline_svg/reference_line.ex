@@ -39,8 +39,12 @@ defmodule SparklineSvg.ReferenceLine do
 
     cond do
       keys == [] -> {:ok, ref_lines}
-      Enum.all?(keys, &Enum.member?(@valid_types, &1)) -> {:ok, ref_lines}
+      Enum.all?(keys, &valid_type?/1) -> {:ok, ref_lines}
       true -> {:error, :invalid_ref_line_type}
     end
   end
+
+  defp valid_type?(type) when type in @valid_types, do: true
+  defp valid_type?(fun) when is_function(fun, 1), do: true
+  defp valid_type?(_), do: false
 end

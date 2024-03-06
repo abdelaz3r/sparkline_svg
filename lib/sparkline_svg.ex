@@ -122,11 +122,14 @@ defmodule SparklineSvg do
   reference lines as you want. Reference lines are displayed as horizontal lines that span the
   entire width of the chart.
 
-  There are four types of currently supported reference lines:
+  There are currently four types of supported reference lines:
   - `:max` - show the maximum value of the chart.
   - `:min` - show the minimum value of the chart.
   - `:avg` - show the average value of the chart.
   - `:median` - show the median value of the chart.
+
+  You can implement custom reference lines by passing a function that receives `Core.points()`
+  and returns the `y` value at which to display the line. See examples in tests.
 
   ``` elixir
   svg =
@@ -134,6 +137,11 @@ defmodule SparklineSvg do
     |> SparklineSvg.new()
     |> SparklineSvg.show_line()
     |> SparklineSvg.show_ref_line(:max, color: "red")
+    |> SparklineSvg.show_ref_line(fn points ->
+      Enum.reduce(points, 0, fn {_x, y}, acc ->
+        y + acc
+      end) / 3
+    end, color: "blue")
     |> SparklineSvg.to_svg!()
   ```
 
@@ -304,7 +312,7 @@ defmodule SparklineSvg do
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
   @typedoc "The type of reference line."
-  @type ref_line :: :max | :min | :avg | :median
+  @type ref_line :: :max | :min | :avg | :median | (Core.points() -> Core.y())
 
   @typedoc "Padding options for the chart."
   @type padding ::

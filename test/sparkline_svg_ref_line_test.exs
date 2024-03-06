@@ -85,4 +85,47 @@ defmodule SparklineSvgMRefLineTest do
     assert sparkline.ref_lines.avg.value == 1.75
     assert sparkline.ref_lines.median.value == 1.5
   end
+
+  test "valid custom ref lines" do
+    percentile =
+      fn percentile ->
+        fn datapoints ->
+          values_count = length(datapoints)
+
+          case percentile / 100 * (values_count + 1) do
+            n when n < 1 ->
+              0
+
+            n ->
+              sorted_values = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
+
+              case Enum.drop(sorted_values, max(0, trunc(n) - 1)) do
+                [a, b | _] -> a + (n - trunc(n)) * (b - a)
+                [a] -> a
+              end
+          end
+        end
+      end
+
+    percentile_99 = percentile.(99)
+    fixed = fn _ -> 0.33 end
+
+    {:ok, sparkline} =
+      SparklineSvg.new(1..200)
+      |> SparklineSvg.show_ref_line(percentile_99)
+      |> SparklineSvg.show_ref_line(fixed)
+      |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines[percentile_99].value == 198.99
+    assert sparkline.ref_lines[fixed].value == 0.33
+  end
+
+  test "custom ref line with empty chart" do
+    fun = fn _ -> 7 end
+
+    {:ok, sparkline} =
+      SparklineSvg.new([]) |> SparklineSvg.show_ref_line(fun) |> SparklineSvg.dry_run()
+
+    assert sparkline.ref_lines[fun].value == nil
+  end
 end
