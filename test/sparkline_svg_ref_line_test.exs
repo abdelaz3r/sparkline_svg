@@ -1,5 +1,6 @@
 defmodule SparklineSvgMRefLineTest do
   use ExUnit.Case, async: true
+  doctest SparklineSvg.ReferenceLine
 
   alias SparklineSvg.ReferenceLine
 

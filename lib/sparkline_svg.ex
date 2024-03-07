@@ -122,28 +122,10 @@ defmodule SparklineSvg do
   reference lines as you want. Reference lines are displayed as horizontal lines that span the
   entire width of the chart.
 
-  There are currently four types of supported reference lines:
-  - `:max` - show the maximum value of the chart.
-  - `:min` - show the minimum value of the chart.
-  - `:avg` - show the average value of the chart.
-  - `:median` - show the median value of the chart.
+  There are currently five basic types of supported reference lines: `:max`, `:min`, `:avg`,
+  `:median`, and percentile. You can implement custom reference lines.
 
-  You can implement custom reference lines by passing a function that receives `Core.points()`
-  and returns the `y` value at which to display the line. See examples in tests.
-
-  ``` elixir
-  svg =
-    datapoints
-    |> SparklineSvg.new()
-    |> SparklineSvg.show_line()
-    |> SparklineSvg.show_ref_line(:max, color: "red")
-    |> SparklineSvg.show_ref_line(fn points ->
-      Enum.reduce(points, 0, fn {_x, y}, acc ->
-        y + acc
-      end) / 3
-    end, color: "blue")
-    |> SparklineSvg.to_svg!()
-  ```
+  See the documentation of `m:SparklineSvg.ReferenceLine` for more information on how to use.
 
   ## Customization
 
@@ -409,6 +391,7 @@ defmodule SparklineSvg do
       ~S'<svg width="100%" height="100%" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg"></svg>'
 
   """
+
   @default_opts [
     width: 200,
     height: 50,

@@ -1,5 +1,8 @@
 defmodule SparklineSvg.Core do
-  @moduledoc false
+  @moduledoc """
+  Internal module of `m:SparklineSvg` that contains the core logic of the library. It is only
+  public for types documentation purposes and should not be used directly.
+  """
 
   alias SparklineSvg.Marker
   alias SparklineSvg.ReferenceLine
@@ -7,18 +10,19 @@ defmodule SparklineSvg.Core do
   @typedoc false
   @typep min_max :: {number(), number()}
 
-  @typedoc false
+  @typedoc "Internal representation of a x value of a point"
   @type x :: number()
 
-  @typedoc false
+  @typedoc "Internal representation of a y value of a point"
   @type y :: number()
 
-  @typedoc false
+  @typedoc "Internal representation of a point"
   @type point :: {x(), y()}
 
-  @typedoc false
+  @typedoc "Internal representation of a list of points"
   @type points :: list(point())
 
+  @doc false
   @spec compute(SparklineSvg.t()) :: SparklineSvg.t()
   def compute(%SparklineSvg{datapoints: []} = sparkline) do
     sparkline
