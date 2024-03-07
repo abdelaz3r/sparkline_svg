@@ -76,18 +76,17 @@ defmodule SparklineSvg.ReferenceLine do
   @spec median() :: ref_line_function()
   def median do
     fn datapoints ->
-      sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
-      length = Enum.count(sorted_datapoints)
+      sorted_value = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
+      length = Enum.count(sorted_value)
       mid = div(length, 2)
 
       if rem(length, 2) == 0 do
-        {_x, left} = Enum.at(sorted_datapoints, mid - 1)
-        {_x, right} = Enum.at(sorted_datapoints, mid)
-
-        (left + right) / 2
+        case Enum.drop(sorted_value, mid - 1) do
+          [a, b | _] -> (a + b) / 2
+          [a] -> a
+        end
       else
-        {_x, y} = Enum.at(sorted_datapoints, mid)
-        y
+        Enum.at(sorted_value, mid)
       end
     end
   end
