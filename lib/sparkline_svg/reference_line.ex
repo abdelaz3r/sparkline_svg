@@ -4,6 +4,8 @@ defmodule SparklineSvg.ReferenceLine do
   alias SparklineSvg.Core
   alias SparklineSvg.ReferenceLine
 
+  @type ref_line_function :: (Core.points() -> Core.y())
+
   @type ref_line_opts :: %{
           width: String.t(),
           color: String.t(),
@@ -45,44 +47,52 @@ defmodule SparklineSvg.ReferenceLine do
     end
   end
 
-  @spec max(Core.points()) :: Core.y()
-  def max(datapoints) do
-    {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
-    y
-  end
-
-  @spec min(Core.points()) :: Core.y()
-  def min(datapoints) do
-    {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
-    y
-  end
-
-  @spec avg(Core.points()) :: Core.y()
-  def avg(datapoints) do
-    {sum, count} =
-      Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
-
-    sum / count
-  end
-
-  @spec median(Core.points()) :: Core.y()
-  def median(datapoints) do
-    sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
-    length = Enum.count(sorted_datapoints)
-    mid = div(length, 2)
-
-    if rem(length, 2) == 0 do
-      {_x, left} = Enum.at(sorted_datapoints, mid - 1)
-      {_x, right} = Enum.at(sorted_datapoints, mid)
-
-      (left + right) / 2
-    else
-      {_x, y} = Enum.at(sorted_datapoints, mid)
+  @spec max() :: ref_line_function()
+  def max do
+    fn datapoints ->
+      {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
       y
     end
   end
 
-  @spec percentile(integer()) :: (Core.points() -> Core.y())
+  @spec min() :: ref_line_function()
+  def min do
+    fn datapoints ->
+      {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
+      y
+    end
+  end
+
+  @spec avg() :: ref_line_function()
+  def avg do
+    fn datapoints ->
+      {sum, count} =
+        Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
+
+      sum / count
+    end
+  end
+
+  @spec median() :: ref_line_function()
+  def median do
+    fn datapoints ->
+      sorted_datapoints = Enum.sort_by(datapoints, fn {_x, y} -> y end)
+      length = Enum.count(sorted_datapoints)
+      mid = div(length, 2)
+
+      if rem(length, 2) == 0 do
+        {_x, left} = Enum.at(sorted_datapoints, mid - 1)
+        {_x, right} = Enum.at(sorted_datapoints, mid)
+
+        (left + right) / 2
+      else
+        {_x, y} = Enum.at(sorted_datapoints, mid)
+        y
+      end
+    end
+  end
+
+  @spec percentile(integer()) :: ref_line_function()
   def percentile(nth) do
     fn datapoints ->
       values_count = length(datapoints)
@@ -102,6 +112,7 @@ defmodule SparklineSvg.ReferenceLine do
     end
   end
 
+  @spec valid_type?(SparklineSvg.ref_line()) :: boolean()
   defp valid_type?(type) when type in @valid_types, do: true
   defp valid_type?(fun) when is_function(fun, 1), do: true
   defp valid_type?(_), do: false

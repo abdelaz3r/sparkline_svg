@@ -89,12 +89,13 @@ defmodule SparklineSvg.Core do
   defp calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options) do
     ref_lines
     |> Enum.map(fn {type, ref_line} ->
-      value =
+      ref_line_fun =
         cond do
-          is_atom(type) -> apply(ReferenceLine, type, [datapoints])
-          is_function(type, 1) -> type.(datapoints)
+          is_atom(type) -> apply(ReferenceLine, type, [])
+          is_function(type, 1) -> type
         end
 
+      value = ref_line_fun.(datapoints)
       position = resize_y(value, min_max_y, options)
 
       {type, %ReferenceLine{ref_line | position: position, value: value}}
