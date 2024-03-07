@@ -111,100 +111,77 @@ defmodule SparklineSvg.ReferenceLine do
   end
 
   @doc """
-  A function that returns the maximum value of a list of points.
+  Returns the maximum value of a list of points.
 
   ## Examples
 
-      iex> max_function = SparklineSvg.ReferenceLine.max()
-      iex> max_function.([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> SparklineSvg.ReferenceLine.max([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
       3
 
   """
 
   @doc since: "0.4.0"
-  @spec max() :: ref_line_function()
-  def max do
-    fn datapoints ->
-      {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
-      y
-    end
+  @spec max(Core.points()) :: Core.y()
+  def max(datapoints) do
+    {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
+    y
   end
 
   @doc """
-  A function that returns the minimum value of a list of points.
+  Returns the minimum value of a list of points.
 
   ## Examples
 
-      iex> min_function = SparklineSvg.ReferenceLine.min()
-      iex> min_function.([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> SparklineSvg.ReferenceLine.min([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
       1
 
   """
 
   @doc since: "0.4.0"
-  @spec min() :: ref_line_function()
-  def min do
-    fn datapoints ->
-      {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
-      y
-    end
+  @spec min(Core.points()) :: Core.y()
+  def min(datapoints) do
+    {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
+    y
   end
 
   @doc """
-  A function that returns the average value of a list of points.
+  Returns the average value of a list of points.
 
   ## Examples
 
-      iex> avg_function = SparklineSvg.ReferenceLine.avg()
-      iex> avg_function.([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> SparklineSvg.ReferenceLine.avg([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
       1.75
 
   """
 
   @doc since: "0.4.0"
-  @spec avg() :: ref_line_function()
-  def avg do
-    fn datapoints ->
-      {sum, count} =
-        Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
+  @spec avg(Core.points()) :: Core.y()
+  def avg(datapoints) do
+    {sum, count} =
+      Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
 
-      sum / count
-    end
+    sum / count
   end
 
   @doc """
-  A function that returns the median value of a list of points.
+  Returns the median value of a list of points.
 
   ## Examples
 
-      iex> median_function = SparklineSvg.ReferenceLine.median()
-      iex> median_function.([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> SparklineSvg.ReferenceLine.median([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
       1.5
 
   """
 
   @doc since: "0.4.0"
-  @spec median() :: ref_line_function()
-  def median do
-    fn datapoints ->
-      sorted_value = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
-      length = Enum.count(sorted_value)
-      mid = div(length, 2)
-
-      if rem(length, 2) == 0 do
-        case Enum.drop(sorted_value, mid - 1) do
-          [a, b | _] -> (a + b) / 2
-          [a] -> a
-        end
-      else
-        Enum.at(sorted_value, mid)
-      end
-    end
+  @spec median(Core.points()) :: Core.y()
+  def median(datapoints) do
+    percentile(50).(datapoints)
   end
 
   @doc """
-  A function that returns, given a `integer()` `nth`, the `nth` percentile value of a list of
-  points.
+  Returns, given a `integer()` `nth` a new function that can be used to calculates the `nth`
+  percentile of a list of points.
 
   ## Examples
 
