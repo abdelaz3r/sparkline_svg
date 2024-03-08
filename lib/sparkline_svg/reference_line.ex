@@ -196,19 +196,20 @@ defmodule SparklineSvg.ReferenceLine do
   def percentile(nth) do
     fn datapoints ->
       values_count = length(datapoints)
+      index = nth / 100 * (values_count + 1)
+      find_interpolated_value(datapoints, index)
+    end
+  end
 
-      case nth / 100 * (values_count + 1) do
-        n when n < 1 ->
-          0
+  @spec find_interpolated_value(Core.points(), number()) :: Core.y()
+  defp find_interpolated_value(_datapoints, index) when index < 1, do: 0
 
-        n ->
-          sorted_values = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
+  defp find_interpolated_value(datapoints, index) do
+    sorted_values = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
 
-          case Enum.drop(sorted_values, max(0, trunc(n) - 1)) do
-            [a, b | _] -> a + (n - trunc(n)) * (b - a)
-            [a] -> a
-          end
-      end
+    case Enum.drop(sorted_values, max(0, trunc(index) - 1)) do
+      [a, b | _] -> a + (index - trunc(index)) * (b - a)
+      [a] -> a
     end
   end
 
