@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0 (2024-03-05)
+
+  * Enhancements
+    * Expose number `:precision` through general options
+    * Support `percentile/1` reference line
+    * Support custom reference lines
+
 ## v0.3.1 (2024-03-05)
 
   * Bug fixes
