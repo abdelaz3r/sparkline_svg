@@ -49,7 +49,8 @@ defmodule SparklineSvg.MixProject do
 
   defp package() do
     [
-      files: ~w(lib .formatter.exs mix.exs README* LICENSE* documents),
+      files:
+        ~w(lib .formatter.exs mix.exs README* LICENSE* documents/EXAMPLES.md documents/CHANGELOG.md),
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @repo_url
