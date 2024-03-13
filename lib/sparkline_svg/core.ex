@@ -29,12 +29,21 @@ defmodule SparklineSvg.Core do
   end
 
   def compute(%SparklineSvg{} = sparkline) do
-    %{datapoints: datapoints, ref_lines: ref_lines, markers: markers, options: options} =
+    %{
+      datapoints: datapoints,
+      ref_lines: ref_lines,
+      markers: markers,
+      options: options,
+      window: window
+    } =
       sparkline
 
-    # fetch min and max values from the options
-    # if not present, calculate them from the datapoints
-    {min_max_x, min_max_y} = get_min_max(datapoints)
+    {{min_x, max_x}, min_max_y} = get_min_max(datapoints)
+
+    min_x = if window.min == :auto, do: min_x, else: window.min
+    max_x = if window.max == :auto, do: max_x, else: window.max
+
+    min_max_x = {min_x, max_x}
 
     %SparklineSvg{
       sparkline
