@@ -21,20 +21,18 @@ defmodule SparklineSvg.Datapoint do
           {:halt, {{:error, :mixed_datapoints_types}, type}}
       end)
 
-    case datapoints do
-      {:error, reason} ->
-        {:error, reason}
+    with datapoints when is_list(datapoints) <- datapoints,
+         {:ok, min, _type} <- Type.cast_window(window.min, type),
+         {:ok, max, _type} <- Type.cast_window(window.max, type) do
+      window = %{min: min, max: max}
 
-      datapoints ->
-        # check for window type (current type or auto)
+      datapoints =
+        datapoints
+        |> Enum.uniq_by(fn {x, _} -> x end)
+        |> Enum.sort_by(fn {x, _} -> x end)
+        |> window(window)
 
-        datapoints =
-          datapoints
-          |> Enum.uniq_by(fn {x, _} -> x end)
-          |> Enum.sort_by(fn {x, _} -> x end)
-          |> window(window)
-
-        {:ok, datapoints, window, type}
+      {:ok, datapoints, window, type}
     end
   end
 
@@ -53,19 +51,17 @@ defmodule SparklineSvg.Datapoint do
           end
       end)
 
-    case datapoints do
-      {:error, reason} ->
-        {:error, reason}
+    with datapoints when is_list(datapoints) <- datapoints,
+         {:ok, min, _type} <- Type.cast_window(window.min, :number),
+         {:ok, max, _type} <- Type.cast_window(window.max, :number) do
+      window = %{min: min, max: max}
 
-      datapoints ->
-        # check for window type (type or auto)
+      datapoints =
+        datapoints
+        |> Enum.reverse()
+        |> window(window)
 
-        datapoints =
-          datapoints
-          |> Enum.reverse()
-          |> window(window)
-
-        {:ok, datapoints, window, :number}
+      {:ok, datapoints, window, :number}
     end
   end
 

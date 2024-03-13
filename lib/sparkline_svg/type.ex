@@ -47,4 +47,14 @@ defmodule SparklineSvg.Type do
   def cast_y(_y) do
     {:error, :invalid_y_type}
   end
+
+  @spec cast_window(:auto | SparklineSvg.x(), atom()) ::
+          {:ok, :auto | Core.x(), atom()} | {:error, atom()}
+  def cast_window(:auto, type) do
+    {:ok, :auto, type}
+  end
+
+  def cast_window(x, type) do
+    cast_x(x, type)
+  end
 end
