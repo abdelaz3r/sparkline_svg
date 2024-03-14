@@ -35,8 +35,7 @@ defmodule SparklineSvg.Core do
       markers: markers,
       options: options,
       window: window
-    } =
-      sparkline
+    } = sparkline
 
     {{min_x, max_x}, min_max_y} = get_min_max(datapoints)
 

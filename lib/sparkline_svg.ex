@@ -127,6 +127,10 @@ defmodule SparklineSvg do
 
   See the documentation of `m:SparklineSvg.ReferenceLine` for more information on how to use.
 
+  ## Window
+
+  TODO.
+
   ## Customization
 
   SparklineSvg allows you to customize the chart showing or hiding the dots, the line, and the area
@@ -245,6 +249,10 @@ defmodule SparklineSvg do
     to `""`. Valid dasharray values can be found
     [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
   - `:class` - the value of the HTML class attribute of the reference line, defaults to `nil`.
+
+  ### Window options
+
+  TODO.
 
   """
 
@@ -542,6 +550,7 @@ defmodule SparklineSvg do
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, color: "red")
       iex> SparklineSvg.to_svg!(chart)
       ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+
   """
 
   @doc since: "0.2.0"
@@ -555,12 +564,40 @@ defmodule SparklineSvg do
   end
 
   @doc ~S"""
-  TODO.
+  Set the x window of a sparkline struct with the given options.
+
+  The window is automatically calculated based on the datapoints. If you want to set a custom
+  window, use this function.
+
+  Datapoints outside the window will be removed before rendering and reference lines computations.
+
+  When using this function with a list of numbers as datapoints, the min window value and the max
+  window must be interpreted as the index of the list. Negative values are allowed.
+
+  ## Examples
+
+      iex> chart = SparklineSvg.new([1, 2, 3, 4]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: 1, max: 2)
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+
+      iex> chart = SparklineSvg.new([1, 2, 3]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: -1, max: 3)
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M51.0,48.0C58.35,44.55 85.3,31.9 100.0,25.0C114.7,18.1 141.65,5.45 149.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+
+      iex> now = DateTime.utc_now()
+      iex> chart =
+      ...>   [{now, 2}, {DateTime.add(now, 1), 3}]
+      ...>   |> SparklineSvg.new()
+      ...>   |> SparklineSvg.show_line()
+      ...>   |> SparklineSvg.set_x_window(min: DateTime.add(now, -1))
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M100.0,48.0C114.7,41.1 183.3,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+
   """
 
   @default_window_opts [min: :auto, max: :auto]
 
-  @doc since: "0.4.0"
+  @doc since: "0.5.0"
   @spec set_x_window(t()) :: t()
   @spec set_x_window(t(), window_options()) :: t()
   def set_x_window(sparkline, options \\ []) do

@@ -80,4 +80,14 @@ defmodule SparklineSvgWindowTest do
 
     assert resp == {:error, :mixed_datapoints_types}
   end
+
+  test "set_x_window/2 out-of-bound" do
+    {:ok, sparkline} =
+      1..5
+      |> SparklineSvg.new()
+      |> SparklineSvg.set_x_window(min: -5, max: -1)
+      |> SparklineSvg.dry_run()
+
+    assert sparkline.datapoints == []
+  end
 end
