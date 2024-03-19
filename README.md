@@ -42,8 +42,14 @@ Markers are used to highlight specific spots on the chart. There are two types o
 ### Reference lines
 
 Reference lines are used to show common reference lines on the chart. There are four types of
-currently supported reference lines (`maximum`, `minimum`, `average`, and `median`) that will
-be rendered as horizontal lines.
+currently supported reference lines (`maximum`, `minimum`, `average`, `median`, and `percentile/1`)
+that will be rendered as horizontal lines.
+
+## Window
+
+Normally the window is automatically calculated based on the datapoints. However, you can set the
+min or the max value of the window or both to show only a specific part of the chart or to always
+display the same amount of data.
 
 ### Customization
 

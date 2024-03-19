@@ -129,7 +129,14 @@ defmodule SparklineSvg do
 
   ## Window
 
-  TODO.
+  Window option can be used to set the minimum and maximum value of the x axis of the chart.
+  Normally the window is automatically calculated based on the datapoints. You can set the min or
+  the max value of the window or both.
+
+  Outside of window datapoints will be discarded before calculation of the reference lines.
+
+  This can be useful to have a consistent chart when the data is not consistent or to have multiple
+  charts with the same window.
 
   ## Customization
 
@@ -252,7 +259,10 @@ defmodule SparklineSvg do
 
   ### Window options
 
-  TODO.
+  - `:min` - the minimum value of the window, defaults to `:auto`. The value must be of the same
+    type as the `x` axis of the chart, or `:auto`.
+  - `:max` - the maximum value of the window, defaults to `:auto`. The value must be of the same
+    type as the `x` axis of the chart, or `:auto`.
 
   """
 
