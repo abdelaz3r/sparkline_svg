@@ -94,6 +94,12 @@ defmodule SparklineSvgTest do
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
   end
 
+  test "valid descending order datapoints" do
+    data = [{~D[2021-01-02], 1}, {~D[2021-01-01], 2}]
+    {:ok, sparkline} = SparklineSvg.new(data) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
+  end
+
   test "two same points" do
     {:ok, sparkline} = SparklineSvg.new([{1, 0}, {1, 2}]) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{100.0, 25.0}]

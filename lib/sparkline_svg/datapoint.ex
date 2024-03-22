@@ -18,7 +18,7 @@ defmodule SparklineSvg.Datapoint do
         datapoints
         |> maybe_window(window)
         |> Enum.uniq_by(fn {x, _} -> x end)
-        |> Enum.sort_by(fn {x, _} -> x end)
+        |> Enum.reverse()
 
       {:ok, datapoints, window, type}
     end

@@ -37,12 +37,8 @@ defmodule SparklineSvg.Core do
       window: window
     } = sparkline
 
-    {{min_x, max_x}, min_max_y} = get_min_max(datapoints)
-
-    min_x = if window.min == :auto, do: min_x, else: window.min
-    max_x = if window.max == :auto, do: max_x, else: window.max
-
-    min_max_x = {min_x, max_x}
+    min_max_x = get_min_max_x(datapoints, window)
+    min_max_y = get_min_max_y(datapoints)
 
     %SparklineSvg{
       sparkline
@@ -52,27 +48,34 @@ defmodule SparklineSvg.Core do
     }
   end
 
-  @spec get_min_max(points()) :: {min_max(), min_max()}
-  defp get_min_max(datapoints) do
-    {{min_x, _}, {max_x, _}} = Enum.min_max_by(datapoints, fn {x, _} -> x end)
-    {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
-    [{x, y} | _tail] = datapoints
+  @spec get_min_max_x(points(), SparklineSvg.window()) :: min_max()
+  defp get_min_max_x(datapoints, window) do
+    [{min_x, _} | _tail] = datapoints
+    {max_x, _} = List.last(datapoints)
 
-    min_max_x =
+    {min_x, max_x} =
       cond do
         max_x - min_x != 0 -> {min_x, max_x}
-        x == 0 -> {-1, 1}
-        true -> {0, 2 * x}
+        min_x == 0 -> {-1, 1}
+        true -> {0, 2 * min_x}
       end
 
-    min_max_y =
-      cond do
-        max_y - min_y != 0 -> {min_y, max_y}
-        y == 0 -> {-1, 1}
-        true -> {0, 2 * y}
-      end
+    min_x = if window.min == :auto, do: min_x, else: window.min
+    max_x = if window.max == :auto, do: max_x, else: window.max
 
-    {min_max_x, min_max_y}
+    {min_x, max_x}
+  end
+
+  @spec get_min_max_y(points()) :: min_max()
+  defp get_min_max_y(datapoints) do
+    [{_, y} | _tail] = datapoints
+    {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
+
+    cond do
+      max_y - min_y != 0 -> {min_y, max_y}
+      y == 0 -> {-1, 1}
+      true -> {0, 2 * y}
+    end
   end
 
   @spec resize_datapoints(points(), min_max(), min_max(), SparklineSvg.opts()) :: points()
