@@ -230,7 +230,7 @@ defmodule SparklineSvg do
   - `:color` - the color of the line, defaults to `"black"`.
   - `:dasharray` - the value of the HTML stroke-dasharray attribute of the line, defaults to `""`.
     Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribute of the line, defaults to `nil`.
 
   ### Area options
@@ -254,7 +254,7 @@ defmodule SparklineSvg do
   - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
   - `:dasharray` - the value of the HTML stroke-dasharray attribute of the reference line, defaults
     to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attributee/stroke-dasharray).
+    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attribute/stroke-dasharray).
   - `:class` - the value of the HTML class attribute of the reference line, defaults to `nil`.
 
   ### Window options
