@@ -94,10 +94,34 @@ defmodule SparklineSvgTest do
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
   end
 
-  test "valid descending order datapoints" do
+  test "valid order datapoints sort asc" do
+    data = [{~D[2021-01-02], 1}, {~D[2021-01-01], 2}]
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :asc) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 2.0}, {198.0, 48.0}]
+
+    data = [{~D[2021-01-01], 2}, {~D[2021-01-02], 1}]
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :asc) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 2.0}, {198.0, 48.0}]
+  end
+
+  test "valid datapoints with sort desc" do
     data = [{~D[2021-01-02], 1}, {~D[2021-01-01], 2}]
     {:ok, sparkline} = SparklineSvg.new(data, sort: :desc) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
+
+    data = [{~D[2021-01-01], 2}, {~D[2021-01-02], 1}]
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :desc) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
+  end
+
+  test "valid order datapoints sort none" do
+    data = [{~D[2021-01-02], 1}, {~D[2021-01-01], 2}]
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :none) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
+
+    data = [{~D[2021-01-01], 2}, {~D[2021-01-02], 1}]
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :none) |> SparklineSvg.dry_run()
+    assert sparkline.datapoints == [{2.0, 2.0}, {198.0, 48.0}]
   end
 
   test "two same points" do
