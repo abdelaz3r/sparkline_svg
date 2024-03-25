@@ -414,6 +414,8 @@ defmodule SparklineSvg do
   If neither `SparklineSvg.show_dots/2`, `SparklineSvg.show_line/2`, nor `SparklineSvg.show_area/2`
   are called, the rendered chart will be an empty SVG document.
 
+  List of available options can be found [here](`m:SparklineSvg#module-available-options`).
+
   ## Examples
 
       iex> chart = SparklineSvg.new([1, 2])
@@ -464,6 +466,8 @@ defmodule SparklineSvg do
   Calling this function multiple times will override the previous dots options. If no options are
   given, the dots will be shown with the default options.
 
+  List of available options can be found [here](`m:SparklineSvg#module-dots-options`).
+
   ## Examples
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots()
@@ -496,6 +500,8 @@ defmodule SparklineSvg do
   Calling this function multiple times will override the previous line options. If no options are
   given, the line will be shown with the default options.
 
+  List of available options can be found [here](`m:SparklineSvg#module-line-options`).
+
   ## Examples
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line()
@@ -527,6 +533,8 @@ defmodule SparklineSvg do
 
   Calling this function multiple times will override the previous area options. If no options are
   given, the area will be shown with the default options.
+
+  List of available options can be found [here](`m:SparklineSvg#module-area-options`).
 
   ## Examples
 
@@ -561,6 +569,8 @@ defmodule SparklineSvg do
 
   Reference lines on an empty chart won't be rendered.
 
+  List of available options can be found [here](`m:SparklineSvg#module-reference-line-options`).
+
   ## Examples
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
@@ -593,6 +603,8 @@ defmodule SparklineSvg do
 
   When using this function with a list of numbers as datapoints, the min window value and the max
   window must be interpreted as the index of the list. Negative values are allowed.
+
+  List of available options can be found [here](`m:SparklineSvg#module-window-options`).
 
   ## Examples
 
@@ -639,6 +651,8 @@ defmodule SparklineSvg do
 
   Markers are not used to calculate the boudaries of the chart. If you set a marker outside the
   range of the chart, it will be rendered but won't be visible.
+
+  List of available options can be found [here](`m:SparklineSvg#module-marker-options`).
 
   ## Examples
 

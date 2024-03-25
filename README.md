@@ -41,9 +41,9 @@ Markers are used to highlight specific spots on the chart. There are two types o
 
 ### Reference lines
 
-Reference lines are used to show common reference lines on the chart. There are four types of
+Reference lines are used to show common reference lines on the chart. There are five types of
 currently supported reference lines (`maximum`, `minimum`, `average`, `median`, and `percentile/1`)
-that will be rendered as horizontal lines.
+that will be rendered as horizontal lines. You can also add custom reference line.
 
 ## Window
 
@@ -57,6 +57,9 @@ Sparkline SVG allows you to customize the chart showing or hiding the dots, the 
 under the line. There are two ways to customize the chart:
 - Using the options like color or width.
 - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
+
+For all the customization options, visit the
+[options documentation](https://hexdocs.pm/sparkline_svg/SparklineSvg.html#module-available-options).
 
 ### Usage example
 
@@ -95,6 +98,9 @@ end
 This library is currently under active development and it’s API is likely to change.
 
 ## Examples
+
+A more complete example list can be found in the
+[documentation](https://hexdocs.pm/sparkline_svg/examples.html).
 
 ### Light sparkline
 
