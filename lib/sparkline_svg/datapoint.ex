@@ -4,9 +4,9 @@ defmodule SparklineSvg.Datapoint do
   alias SparklineSvg.Core
   alias SparklineSvg.Type
 
-  @spec clean(SparklineSvg.datapoints(), SparklineSvg.window()) ::
+  @spec clean(SparklineSvg.datapoints(), SparklineSvg.window(), SparklineSvg.sort_options()) ::
           {:ok, Core.points(), SparklineSvg.window(), SparklineSvg.x()} | {:error, atom()}
-  def clean(datapoints, window) do
+  def clean(datapoints, window, sort) do
     {datapoints, type} = ensure_datapoint_type(datapoints)
 
     with datapoints when is_list(datapoints) <- datapoints,
@@ -18,7 +18,13 @@ defmodule SparklineSvg.Datapoint do
         datapoints
         |> maybe_window(window)
         |> Enum.uniq_by(fn {x, _} -> x end)
-        |> Enum.reverse()
+
+      datapoints =
+        case sort do
+          :asc -> Enum.sort_by(datapoints, fn {x, _} -> x end)
+          :desc -> Enum.sort_by(datapoints, fn {x, _} -> x end, :desc)
+          :none -> Enum.reverse(datapoints)
+        end
 
       {:ok, datapoints, window, type}
     end

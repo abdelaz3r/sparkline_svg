@@ -217,6 +217,10 @@ defmodule SparklineSvg do
   - `:class` - the value of the HTML class attribute of the chart, defaults to `nil`.
   - `:placeholder_class` - the value of the HTML class attribute of the placeholder, defaults to
     `nil`. It is the only way to style the placeholder.
+  - `:sort` - can be one of these atoms: `:asc`, `:desc`, or `none`. Defaults to `:asc`. If set to
+    `:asc` or `:desc`, the datapoints will be sorted by the `x` axis before rendering the chart.
+    If set to `:none`, the datapoints will be rendered in the order they are given, potentially
+    resulting in unexpected visual representations.
 
   ### Dots options
 
@@ -319,6 +323,9 @@ defmodule SparklineSvg do
           number()
           | list({:top, number()} | {:right, number()} | {:bottom, number()} | {:left, number()})
 
+  @typedoc "Sorting options for the chart."
+  @type sort_options :: :asc | :desc | :none
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
@@ -330,6 +337,7 @@ defmodule SparklineSvg do
             | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
             | {:placeholder_class, nil | String.t()}
+            | {:sort, sort_options()}
           )
 
   @typedoc "Keyword list of options for the dots of the chart."
@@ -377,6 +385,7 @@ defmodule SparklineSvg do
           placeholder: nil | String.t(),
           class: nil | String.t(),
           placeholder_class: nil | String.t(),
+          sort: sort_options(),
           dots: nil | map(),
           line: nil | map(),
           area: nil | map()
@@ -425,7 +434,8 @@ defmodule SparklineSvg do
     precision: 3,
     placeholder: nil,
     class: nil,
-    placeholder_class: nil
+    placeholder_class: nil,
+    sort: :asc
   ]
 
   @doc since: "0.1.0"
@@ -755,12 +765,12 @@ defmodule SparklineSvg do
       markers: markers,
       ref_lines: ref_lines,
       window: window,
-      options: %{width: width, height: height, padding: padding}
+      options: %{width: width, height: height, padding: padding, sort: sort}
     } = sparkline
 
     with :ok <- check_x_dimension(width, padding),
          :ok <- check_y_dimension(height, padding),
-         {:ok, datapoints, window, type} <- Datapoint.clean(datapoints, window),
+         {:ok, datapoints, window, type} <- Datapoint.clean(datapoints, window, sort),
          {:ok, markers} <- Marker.clean(markers, type),
          {:ok, ref_lines} <- ReferenceLine.clean(ref_lines) do
       sparkline =

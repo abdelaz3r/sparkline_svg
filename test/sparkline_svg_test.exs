@@ -96,7 +96,7 @@ defmodule SparklineSvgTest do
 
   test "valid descending order datapoints" do
     data = [{~D[2021-01-02], 1}, {~D[2021-01-01], 2}]
-    {:ok, sparkline} = SparklineSvg.new(data) |> SparklineSvg.dry_run()
+    {:ok, sparkline} = SparklineSvg.new(data, sort: :desc) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 48.0}, {198.0, 2.0}]
   end
 
