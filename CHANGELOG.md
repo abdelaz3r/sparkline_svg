@@ -1,11 +1,26 @@
 # Changelog
 
+## v0.5.0 (2024-03-25)
+
+  * Enhancements
+    * Support `:sort` option to control data sorting
+      ([#39](https://github.com/abdelaz3r/sparkline_svg/pull/39))
+    * Add `set_x_window/2` function with `:min` and `:max` options 
+      ([#33](https://github.com/abdelaz3r/sparkline_svg/pull/33))
+    * Improve links in documentation
+  * Bug fixes
+    * Fix link in documentation
+      ([#40](https://github.com/abdelaz3r/sparkline_svg/pull/40))
+      ([Juan Barrios](https://github.com/03juan))
+
 ## v0.4.0 (2024-03-05)
 
   * Enhancements
     * Expose number `:precision` through general options
-    * Support `percentile/1` reference line
-    * Support custom reference lines
+      ([#35](https://github.com/abdelaz3r/sparkline_svg/pull/35))
+    * Support `percentile/1` reference line and custom reference lines
+      ([#37](https://github.com/abdelaz3r/sparkline_svg/pull/37))
+      ([victor felder](https://github.com/vhf))
 
 ## v0.3.1 (2024-03-05)
 
