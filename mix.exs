@@ -21,7 +21,7 @@ defmodule SparklineSvg.MixProject do
         extras: [
           {"README.md", [title: "About"]},
           {"documents/EXAMPLES.md", [title: "Examples"]},
-          {"documents/CHANGELOG.md", [title: "Changelog"]},
+          {"CHANGELOG.md", [title: "Changelog"]},
           {"LICENSE", [title: "License"]}
         ],
         authors: ["Gil Clavien"]
@@ -49,8 +49,7 @@ defmodule SparklineSvg.MixProject do
 
   defp package() do
     [
-      files:
-        ~w(lib .formatter.exs mix.exs README* LICENSE* documents/EXAMPLES.md documents/CHANGELOG.md),
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE* CHANGELOG* documents/EXAMPLES.md),
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @repo_url
