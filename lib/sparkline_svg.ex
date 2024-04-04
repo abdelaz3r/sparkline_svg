@@ -334,9 +334,7 @@ defmodule SparklineSvg do
             | {:padding, padding()}
             | {:smoothing, number()}
             | {:precision, non_neg_integer()}
-            | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
-            | {:placeholder_class, nil | String.t()}
             | {:sort, sort_options()}
           )
 
@@ -373,6 +371,9 @@ defmodule SparklineSvg do
   @typedoc "Keyword list of options for the x window."
   @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
 
+  @typedoc "Keyword list of options for the placeholder."
+  @type placeholder_options :: list({:class, String.t()})
+
   @typedoc false
   @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
 
@@ -382,13 +383,12 @@ defmodule SparklineSvg do
           height: number(),
           padding: opt_padding(),
           smoothing: float(),
-          placeholder: nil | String.t(),
           class: nil | String.t(),
-          placeholder_class: nil | String.t(),
           sort: sort_options(),
           dots: nil | map(),
           line: nil | map(),
-          area: nil | map()
+          area: nil | map(),
+          placeholder: nil | map()
         }
 
   @typedoc false
@@ -434,9 +434,7 @@ defmodule SparklineSvg do
     padding: 2,
     smoothing: 0.15,
     precision: 3,
-    placeholder: nil,
     class: nil,
-    placeholder_class: nil,
     sort: :asc
   ]
 
@@ -449,7 +447,7 @@ defmodule SparklineSvg do
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.update!(:padding, &expand_padding/1)
-      |> Map.merge(%{dots: nil, line: nil, area: nil})
+      |> Map.merge(%{dots: nil, line: nil, area: nil, placeholder: nil})
 
     %SparklineSvg{
       datapoints: datapoints,
@@ -591,6 +589,25 @@ defmodule SparklineSvg do
     ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
 
     %SparklineSvg{sparkline | ref_lines: ref_lines}
+  end
+
+  @doc ~S"""
+  TODO.
+  """
+
+  @default_placeholder_opts [class: nil]
+
+  @doc since: "0.x.0"
+  @spec set_placeholder(t(), String.t()) :: t()
+  @spec set_placeholder(t(), String.t(), placeholder_options()) :: t()
+  def set_placeholder(sparkline, content, options \\ []) do
+    placeholder_options =
+      @default_placeholder_opts
+      |> Keyword.merge(content: content)
+      |> Keyword.merge(options)
+      |> Map.new()
+
+    %SparklineSvg{sparkline | options: %{sparkline.options | placeholder: placeholder_options}}
   end
 
   @doc ~S"""
