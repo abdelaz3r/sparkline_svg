@@ -151,8 +151,9 @@ defmodule SparklineSvg do
   ### Options
   ``` elixir
   svg =
-    datapoints
-    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data")
+    [3, 2, 4, 1, 5, 1, 4]
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5)
+    |> SparklineSvg.set_placeholder("No data")
     |> SparklineSvg.show_dots(radius: 0.1, color: "rgb(255, 255, 255)")
     |> SparklineSvg.show_line(width: 0.5, color: "rgb(166, 218, 149)")
     |> SparklineSvg.show_area(color: "rgba(166, 218, 149, 0.2)")
@@ -164,8 +165,9 @@ defmodule SparklineSvg do
   ### CSS classes
   ``` elixir
   svg =
-    datapoints
-    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "sparkline")
+    [3, 2, 4, 1, 5, 1, 4]
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5)
+    |> SparklineSvg.set_placeholder("No data", class: "sparkline")
     |> SparklineSvg.show_dots(class: "sparkline-dots")
     |> SparklineSvg.show_line(class: "sparkline-line")
     |> SparklineSvg.show_area(class: "sparkline-area")
@@ -177,8 +179,9 @@ defmodule SparklineSvg do
   ### Tailwind classes
   ``` elixir
   svg =
-    datapoints
-    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5, placeholder: "No data", class: "bg-transparent")
+    [3, 2, 4, 1, 5, 1, 4]
+    |> SparklineSvg.new(width: 100, height: 40, padding: 0.5)
+    |> SparklineSvg.set_placeholder("No data", class: "fill-red")
     |> SparklineSvg.show_dots(class: "fill-green")
     |> SparklineSvg.show_line(class: "stroke-green stroke-[0.5px] fill-transparent")
     |> SparklineSvg.show_area(class: "fill-green/10")
@@ -189,8 +192,8 @@ defmodule SparklineSvg do
   <!-- tabs-close -->
 
   When using the CSS classes to style the chart, the other options like `:color` or `:dasharray`
-  will be ignored. However, some options (`:width`, `:height`, `:padding`, `:smoothing`, and
-  `:placeholder`), are used internally to render the chart and are required in any case.
+  will be ignored. However, some options (`:width`, `:height`, `:padding`, `:smoothing`), are used
+  internally to render the chart and are required in any case.
 
   ### Available options
 
@@ -211,12 +214,7 @@ defmodule SparklineSvg do
   - `:precision` - the maximum precision of the values used to render the chart, defaults to `3`.
     Not targetable with CSS classes. The precision can be set between `0` and `15`. The greater the
     precision, the more accurate the chart will be but the heavier the SVG will be.
-  - `:placeholder` - a placeholder for an empty chart, defaults to `nil`. If set to `nil`, a chart
-    with no datapoints will be an empty SVG document. Alternatively, you can set it to a string to
-    display a message when the chart is empty. Not targetable with CSS classes.
   - `:class` - the value of the HTML class attribute of the chart, defaults to `nil`.
-  - `:placeholder_class` - the value of the HTML class attribute of the placeholder, defaults to
-    `nil`. It is the only way to style the placeholder.
   - `:sort` - can be one of these atoms: `:asc`, `:desc`, or `none`. Defaults to `:asc`. If set to
     `:asc` or `:desc`, the datapoints will be sorted by the `x` axis before rendering the chart.
     If set to `:none`, the datapoints will be rendered in the order they are given, potentially
@@ -267,6 +265,11 @@ defmodule SparklineSvg do
     type as the `x` axis of the chart, or `:auto`.
   - `:max` - the maximum value of the window, defaults to `:auto`. The value must be of the same
     type as the `x` axis of the chart, or `:auto`.
+
+  ### Placeholder options
+
+  - `:class` - the value of the HTML class attribute of the placeholder, defaults to `nil`. It is
+  currently the only way to style the placeholder.
 
   """
 
@@ -334,9 +337,7 @@ defmodule SparklineSvg do
             | {:padding, padding()}
             | {:smoothing, number()}
             | {:precision, non_neg_integer()}
-            | {:placeholder, nil | String.t()}
             | {:class, nil | String.t()}
-            | {:placeholder_class, nil | String.t()}
             | {:sort, sort_options()}
           )
 
@@ -373,6 +374,9 @@ defmodule SparklineSvg do
   @typedoc "Keyword list of options for the x window."
   @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
 
+  @typedoc "Keyword list of options for the placeholder."
+  @type placeholder_options :: list({:class, String.t()})
+
   @typedoc false
   @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
 
@@ -382,13 +386,12 @@ defmodule SparklineSvg do
           height: number(),
           padding: opt_padding(),
           smoothing: float(),
-          placeholder: nil | String.t(),
           class: nil | String.t(),
-          placeholder_class: nil | String.t(),
           sort: sort_options(),
           dots: nil | map(),
           line: nil | map(),
-          area: nil | map()
+          area: nil | map(),
+          placeholder: nil | map()
         }
 
   @typedoc false
@@ -434,9 +437,7 @@ defmodule SparklineSvg do
     padding: 2,
     smoothing: 0.15,
     precision: 3,
-    placeholder: nil,
     class: nil,
-    placeholder_class: nil,
     sort: :asc
   ]
 
@@ -449,7 +450,7 @@ defmodule SparklineSvg do
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.update!(:padding, &expand_padding/1)
-      |> Map.merge(%{dots: nil, line: nil, area: nil})
+      |> Map.merge(%{dots: nil, line: nil, area: nil, placeholder: nil})
 
     %SparklineSvg{
       datapoints: datapoints,
@@ -591,6 +592,41 @@ defmodule SparklineSvg do
     ref_lines = Map.put(sparkline.ref_lines, type, ref_line)
 
     %SparklineSvg{sparkline | ref_lines: ref_lines}
+  end
+
+  @doc ~S"""
+  Set the placeholder of a sparkline struct with the given options.
+
+  The placeholder will only be shown for an empty chart. Without this function, a chart with no
+  datapoints will be an empty SVG document.
+
+  List of available options can be found [here](`m:SparklineSvg#module-placeholder-options`).
+
+  ## Examples
+
+      iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data")
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'
+
+      iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data", class: "placeholder")
+      iex> SparklineSvg.to_svg!(chart)
+      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle" class="placeholder">No data</text></svg>'
+
+  """
+
+  @default_placeholder_opts [class: nil]
+
+  @doc since: "0.x.0"
+  @spec set_placeholder(t(), String.t()) :: t()
+  @spec set_placeholder(t(), String.t(), placeholder_options()) :: t()
+  def set_placeholder(sparkline, content, options \\ []) do
+    placeholder_options =
+      @default_placeholder_opts
+      |> Keyword.merge(content: content)
+      |> Keyword.merge(options)
+      |> Map.new()
+
+    %SparklineSvg{sparkline | options: %{sparkline.options | placeholder: placeholder_options}}
   end
 
   @doc ~S"""

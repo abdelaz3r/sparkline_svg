@@ -43,13 +43,13 @@ defmodule SparklineSvg.Draw do
   defp placeholder(%{placeholder: nil}), do: ""
 
   defp placeholder(options) do
-    %{placeholder: placeholder, placeholder_class: placeholder_class} = options
+    %{placeholder: %{content: content, class: class}} = options
 
     [
       ~s'<text x="50%" y="50%" text-anchor="middle"',
-      if(placeholder_class != nil, do: [~s' class="', placeholder_class, ~s'"'], else: ""),
+      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
       ~s'>',
-      placeholder,
+      content,
       ~s'</text>'
     ]
   end
