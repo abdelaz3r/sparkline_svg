@@ -28,6 +28,13 @@ defmodule SparklineSvgDrawTest do
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'
   end
 
+  test "to_svg!/1 with empty chart and placeholder with options" do
+    assert SparklineSvg.new([])
+           |> SparklineSvg.set_placeholder("No data", class: "placeholder")
+           |> SparklineSvg.to_svg!() ==
+             ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle" class="placeholder">No data</text></svg>'
+  end
+
   test "to_svg!/1 with one point (dots)" do
     assert SparklineSvg.new([{1, 0}]) |> SparklineSvg.show_dots() |> SparklineSvg.to_svg!() ==
              ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="100.0" cy="25.0" r="1" fill="black" /></svg>'
