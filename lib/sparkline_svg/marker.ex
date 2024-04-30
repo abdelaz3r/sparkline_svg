@@ -4,34 +4,40 @@ defmodule SparklineSvg.Marker do
   alias SparklineSvg.Marker
   alias SparklineSvg.Type
 
-  @type marker_opts :: %{
-          fill_color: String.t(),
-          stroke_color: String.t(),
-          stroke_width: String.t(),
-          stroke_dasharray: String.t(),
-          class: nil | String.t()
-        }
-
   @type t :: %Marker{
           position: SparklineSvg.marker(),
-          options: marker_opts()
+          options: map()
         }
   @enforce_keys [:position, :options]
   defstruct [:position, :options]
 
-  @default_opts [
-    fill_color: "rgba(255, 0, 0, 0.1)",
-    stroke_color: "red",
-    stroke_width: 0.25,
-    stroke_dasharray: "",
-    class: nil
+  @default_single_opts [
+    stroke: "red",
+    "stroke-width": 0.25
+  ]
+
+  @default_range_opts [
+    fill: "rgba(255, 0, 0, 0.1)",
+    stroke: "red",
+    "stroke-width": 0.25
   ]
 
   @spec new(SparklineSvg.marker()) :: t()
   @spec new(SparklineSvg.marker(), SparklineSvg.marker_options()) :: t()
-  def new(position, options \\ []) do
+  def new(position, options \\ [])
+
+  def new(position, options) when is_tuple(position) do
     options =
-      @default_opts
+      @default_range_opts
+      |> Keyword.merge(options)
+      |> Map.new()
+
+    %Marker{position: position, options: options}
+  end
+
+  def new(position, options) do
+    options =
+      @default_single_opts
       |> Keyword.merge(options)
       |> Map.new()
 

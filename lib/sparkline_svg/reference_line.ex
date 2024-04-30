@@ -66,25 +66,17 @@ defmodule SparklineSvg.ReferenceLine do
   @type ref_line_function :: (Core.points() -> Core.y())
 
   @typedoc false
-  @type ref_line_opts :: %{
-          width: String.t(),
-          color: String.t(),
-          dasharray: String.t(),
-          class: nil | String.t()
-        }
-
-  @typedoc false
   @type t :: %ReferenceLine{
           type: SparklineSvg.ref_line(),
           value: nil | number(),
           position: nil | number(),
-          options: ref_line_opts()
+          options: map()
         }
   @enforce_keys [:type, :value, :position, :options]
   defstruct [:type, :value, :position, :options]
 
   @valid_types [:max, :min, :avg, :median]
-  @default_opts [width: 0.25, color: "rgba(0, 0, 0, 0.5)", dasharray: "", class: nil]
+  @default_opts [fill: "none", "stroke-width": 0.25, stroke: "rgba(0, 0, 0, 0.5)"]
 
   @doc false
   @spec new(SparklineSvg.ref_line()) :: ReferenceLine.t()
