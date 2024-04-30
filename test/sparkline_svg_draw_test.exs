@@ -96,7 +96,7 @@ defmodule SparklineSvgDrawTest do
            |> SparklineSvg.show_line(class: "line")
            |> SparklineSvg.show_area(class: "area")
            |> SparklineSvg.to_svg!() ==
-             ~S'<svg viewBox="0 0 200 50" class="sparkline" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" class="area" /><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" class="line" /><circle cx="2.0" cy="48.0" class="dot" /><circle cx="198.0" cy="2.0" class="dot" /></svg>'
+             ~S'<svg class="sparkline" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path class="area" d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" /><path class="line" d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" /><circle class="dot" cx="2.0" cy="48.0" /><circle class="dot" cx="198.0" cy="2.0" /></svg>'
   end
 
   test "to_svg!/1 with marker" do
@@ -134,7 +134,7 @@ defmodule SparklineSvgDrawTest do
     assert SparklineSvg.new([1, 2])
            |> SparklineSvg.add_marker(0, class: "sparkline-marker")
            |> SparklineSvg.to_svg!() ==
-             ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,0.0V50" class="sparkline-marker" /></svg>'
+             ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path class="sparkline-marker" d="M2.0,0.0V50" /></svg>'
   end
 
   test "to_svg!/1 with max ref line" do

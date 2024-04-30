@@ -5,6 +5,15 @@ defmodule SparklineSvg.Draw do
   alias SparklineSvg.Marker
   alias SparklineSvg.ReferenceLine
 
+  @non_nullified_otps %{
+    "svg" => [:viewBox, :xmlns],
+    "text" => [],
+    "path" => [:d],
+    "circle" => [:cx, :cy],
+    "rect" => [:x, :y, :width, :height],
+    "line" => [:x1, :x2, :y1, :y2]
+  }
+
   @spec chart(SparklineSvg.t()) :: iolist()
   def chart(%SparklineSvg{datapoints: []} = sparkline) do
     %{options: %{internal: internal_opts, svg: attrs} = opts} = sparkline
@@ -69,6 +78,7 @@ defmodule SparklineSvg.Draw do
 
   defp line(datapoints, options) do
     %{internal: internal_opts, line: attrs} = options
+
     attrs = Map.put(attrs, :d, compute_curve(datapoints, internal_opts))
 
     render_tag("path", attrs, internal_opts)
@@ -205,21 +215,25 @@ defmodule SparklineSvg.Draw do
 
   @spec render_tag(String.t(), attrs(), SparklineSvg.opts()) :: iolist()
   defp render_tag(name, attributes, opts) do
-    ["<", name, render_attributes(attributes, opts), " />"]
+    ["<", name, render_attributes(name, attributes, opts), " />"]
   end
 
   @spec render_tag(String.t(), attrs(), iolist(), SparklineSvg.opts()) :: iolist()
   defp render_tag(name, attributes, content, opts) when is_list(content) do
-    ["<", name, render_attributes(attributes, opts), ">", content, "</", name, ">"]
+    ["<", name, render_attributes(name, attributes, opts), ">", content, "</", name, ">"]
   end
 
   defp render_tag(name, attributes, content, opts) do
     render_tag(name, attributes, [content], opts)
   end
 
-  @spec render_attributes(attrs(), SparklineSvg.opts()) :: iolist()
-  defp render_attributes(attributes, opts) do
+  @spec render_attributes(String.t(), attrs(), SparklineSvg.opts()) :: iolist()
+  defp render_attributes(tag_name, attributes, opts) do
+    has_class = Map.has_key?(attributes, :class)
+    attrs_to_keep = [:class | @non_nullified_otps[tag_name]]
+
     attributes
+    |> Enum.filter(fn {name, _value} -> if has_class, do: name in attrs_to_keep, else: true end)
     |> Enum.map(fn {name, value} -> {Atom.to_string(name), cast(value, opts)} end)
     |> Enum.sort()
     |> Enum.map(fn {name, value} -> [" ", name, ~s'="', value, ~s'"'] end)
