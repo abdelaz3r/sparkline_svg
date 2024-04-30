@@ -7,15 +7,9 @@ defmodule SparklineSvg.Draw do
 
   @spec chart(SparklineSvg.t()) :: iolist()
   def chart(%SparklineSvg{datapoints: []} = sparkline) do
-    %{options: %{width: width, height: height, class: class} = options} = sparkline
+    %{options: %{internal: internal_opts, svg: attrs} = opts} = sparkline
 
-    [
-      ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
-      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
-      ~s' xmlns="http://www.w3.org/2000/svg">',
-      placeholder(options),
-      "</svg>"
-    ]
+    render_tag("svg", attrs, placeholder(opts), internal_opts)
   end
 
   def chart(%SparklineSvg{} = sparkline) do
@@ -23,58 +17,39 @@ defmodule SparklineSvg.Draw do
       datapoints: datapoints,
       markers: markers,
       ref_lines: ref_lines,
-      options: %{width: width, height: height, class: class} = options
+      options: %{internal: internal_opts, svg: attrs} = opts
     } = sparkline
 
-    [
-      ~s'<svg width="100%" height="100%" viewBox="0 0 #{width} #{height}"',
-      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
-      ~s' xmlns="http://www.w3.org/2000/svg">',
-      area(datapoints, options),
-      line(datapoints, options),
-      dots(datapoints, options),
-      markers(markers, options),
-      ref_lines(ref_lines, options),
-      ~s'</svg>'
+    content = [
+      area(datapoints, opts),
+      line(datapoints, opts),
+      dots(datapoints, opts),
+      markers(markers, opts),
+      ref_lines(ref_lines, opts)
     ]
+
+    render_tag("svg", attrs, content, internal_opts)
   end
 
   @spec placeholder(SparklineSvg.opts()) :: iolist()
   defp placeholder(%{placeholder: nil}), do: ""
 
   defp placeholder(options) do
-    %{placeholder: %{content: content, class: class}} = options
+    %{internal: internal_opts, placeholder: %{options: attrs, content: content}} = options
 
-    [
-      ~s'<text x="50%" y="50%" text-anchor="middle"',
-      if(class != nil, do: [~s' class="', class, ~s'"'], else: ""),
-      ~s'>',
-      content,
-      ~s'</text>'
-    ]
+    render_tag("text", attrs, content, internal_opts)
   end
 
   @spec dots(Core.points(), SparklineSvg.opts()) :: iolist()
   defp dots(_datapoints, %{dots: nil}), do: ""
 
   defp dots(datapoints, options) do
-    %{dots: %{color: color, radius: radius, class: class}} = options
-
-    attrs =
-      if class == nil,
-        do: [~s'fill="', color, ~s'"'],
-        else: [~s'class="', class, ~s'"']
+    %{internal: internal_opts, dots: attrs} = options
 
     Enum.map(datapoints, fn {x, y} ->
-      [
-        ~s'<circle cx="',
-        cast(x, options),
-        ~s'" cy="',
-        cast(y, options),
-        ~s'" r="#{radius}" ',
-        attrs,
-        ~s' />'
-      ]
+      attrs = Map.merge(attrs, %{cx: x, cy: y})
+
+      render_tag("circle", attrs, internal_opts)
     end)
   end
 
@@ -82,35 +57,21 @@ defmodule SparklineSvg.Draw do
   defp line(_datapoints, %{line: nil}), do: ""
 
   defp line([{x, y}], options) do
-    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
+    %{internal: internal_opts, line: attrs} = options
 
-    left = x - options.width / 10
-    right = x + options.width / 10
+    left = cast(x - internal_opts.width / 10, internal_opts)
+    right = cast(x + internal_opts.width / 10, internal_opts)
+    path = ["M", left, ",", cast(y, internal_opts), "L", right, ",", cast(y, internal_opts)]
+    attrs = Map.put(attrs, :d, path)
 
-    attrs =
-      if class == nil do
-        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
-        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
-      else
-        [~s'class="', class, ~s'"']
-      end
-
-    path = ["M#{left},", cast(y, options), "L#{right},", cast(y, options)]
-    [~s'<path d="', path, ~s'" ', attrs, ~s' />']
+    render_tag("path", attrs, internal_opts)
   end
 
   defp line(datapoints, options) do
-    %{line: %{color: color, width: width, dasharray: dasharray, class: class}} = options
+    %{internal: internal_opts, line: attrs} = options
+    attrs = Map.put(attrs, :d, compute_curve(datapoints, internal_opts))
 
-    attrs =
-      if class == nil do
-        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
-        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
-      else
-        [~s'class="', class, ~s'"']
-      end
-
-    [~s'<path d="', compute_curve(datapoints, options), ~s'" ', attrs, ~s' />']
+    render_tag("path", attrs, internal_opts)
   end
 
   @spec area(Core.points(), SparklineSvg.opts()) :: iolist()
@@ -118,18 +79,17 @@ defmodule SparklineSvg.Draw do
   defp area([_points], _options), do: ""
 
   defp area(datapoints, options) do
-    %{area: %{color: color, class: class}, height: height} = options
+    %{internal: internal_opts, area: attrs} = options
 
     # Extract the x value of the first datapoint to know where to finish the area.
     [{x, _y} | _] = datapoints
 
-    attrs =
-      if class == nil,
-        do: [~s'fill="', color, ~s'" stroke="none"'],
-        else: [~s'class="', class, ~s'"']
+    height = cast(internal_opts.height, internal_opts)
+    x = cast(x, internal_opts)
+    path = [compute_curve(datapoints, internal_opts), "V", height, "H", x, "Z"]
+    attrs = Map.put(attrs, :d, path)
 
-    path = [compute_curve(datapoints, options), "V#{height}H#{x}Z"]
-    [~s'<path d="', path, ~s'" ', attrs, ~s' />']
+    render_tag("path", attrs, internal_opts)
   end
 
   @spec markers(list(Marker.t()), SparklineSvg.opts()) :: iolist()
@@ -139,51 +99,22 @@ defmodule SparklineSvg.Draw do
 
   @spec marker(Marker.t(), SparklineSvg.opts()) :: iolist()
   defp marker(%Marker{position: {_x1, _x2}} = marker, options) do
-    %{
-      position: {x1, x2},
-      options: %{fill_color: fill_color, stroke_color: color, stroke_width: width, class: class}
-    } = marker
+    %{position: {x1, x2}, options: attrs} = marker
+    %{internal: %{height: height} = internal_opts} = options
 
-    %{height: height} = options
+    attrs = Map.merge(attrs, %{x: min(x1, x2), y: -1, width: abs(x2 - x1), height: height + 2})
 
-    attrs =
-      if class == nil,
-        do: [~s'fill="', fill_color, ~s'" stroke="', color, ~s'" stroke-width="#{width}"'],
-        else: [~s'class="', class, ~s'"']
-
-    [
-      ~s'<rect x="',
-      cast(min(x1, x2), options),
-      ~s'" y="#{-width}" width="',
-      cast(abs(x2 - x1), options),
-      ~s'" height="#{height + 2 * width}" ',
-      attrs,
-      ~s' />'
-    ]
+    render_tag("rect", attrs, internal_opts)
   end
 
   defp marker(%Marker{position: _x} = marker, options) do
-    %{
-      position: x,
-      options: %{
-        stroke_color: color,
-        stroke_width: width,
-        stroke_dasharray: dasharray,
-        class: class
-      }
-    } = marker
+    %{position: x, options: attrs} = marker
+    %{internal: %{height: height} = internal_opts} = options
 
-    %{height: height} = options
+    path = ["M", join_cast({x, 0.0}, internal_opts), "V", cast(height, internal_opts)]
+    attrs = Map.put(attrs, :d, path)
 
-    attrs =
-      if class == nil do
-        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
-        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
-      else
-        [~s'class="', class, ~s'"']
-      end
-
-    [~s'<path d="M', cast({x, 0.0}, options), ~s'V#{height}" ', attrs, ~s' />']
+    render_tag("path", attrs, internal_opts)
   end
 
   @spec ref_lines(SparklineSvg.ref_lines(), SparklineSvg.opts()) :: iolist()
@@ -193,31 +124,18 @@ defmodule SparklineSvg.Draw do
 
   @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
   defp ref_line(ref_line, options) do
-    %{position: y, options: %{color: color, width: width, dasharray: dasharray, class: class}} =
-      ref_line
+    %{position: y, options: attrs} = ref_line
+    %{internal: %{padding: padding, width: width} = internal_opts} = options
 
-    %{padding: padding, width: graph_width} = options
-    y = cast(y, options)
+    attrs = Map.merge(attrs, %{x1: padding.left, x2: width - padding.right, y1: y, y2: y})
 
-    attrs =
-      if class == nil do
-        dash_attr = if(dasharray != "", do: [~s' stroke-dasharray="', dasharray, ~s'"'], else: [])
-        [~s'fill="none" stroke="', color, ~s'" stroke-width="', "#{width}", ~s'"', dash_attr]
-      else
-        [~s'class="', class, ~s'"']
-      end
-
-    [
-      ~s'<line x1="#{padding.left}" y1="#{y}" x2="#{graph_width - padding.right}" y2="#{y}" ',
-      attrs,
-      ~s' />'
-    ]
+    render_tag("line", attrs, internal_opts)
   end
 
   @spec compute_curve(Core.points(), SparklineSvg.opts()) :: iolist()
-  defp compute_curve([curr | rest], options) do
-    ["M#{cast(curr, options)}"]
-    |> compute_curve(rest, curr, curr, options)
+  defp compute_curve([curr | rest], opts) do
+    ["M", join_cast(curr, opts)]
+    |> compute_curve(rest, curr, curr, opts)
   end
 
   @spec compute_curve(
@@ -227,14 +145,14 @@ defmodule SparklineSvg.Draw do
           Core.point(),
           SparklineSvg.opts()
         ) :: iolist()
-  defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, options) do
+  defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, opts) do
     acc
-    |> curve_command(prev2, prev1, curr, next, options)
-    |> compute_curve(rest, prev1, curr, options)
+    |> curve_command(prev2, prev1, curr, next, opts)
+    |> compute_curve(rest, prev1, curr, opts)
   end
 
-  defp compute_curve(acc, [curr], prev2, prev1, options) do
-    curve_command(acc, prev2, prev1, curr, curr, options)
+  defp compute_curve(acc, [curr], prev2, prev1, opts) do
+    curve_command(acc, prev2, prev1, curr, curr, opts)
   end
 
   @spec curve_command(
@@ -245,11 +163,11 @@ defmodule SparklineSvg.Draw do
           Core.point(),
           SparklineSvg.opts()
         ) :: iolist()
-  defp curve_command(acc, prev2, prev1, curr, next, options) do
-    cp1 = calculate_control_point(prev1, prev2, curr, :left, options)
-    cp2 = calculate_control_point(curr, prev1, next, :right, options)
+  defp curve_command(acc, prev2, prev1, curr, next, opts) do
+    cp1 = calculate_control_point(prev1, prev2, curr, :left, opts)
+    cp2 = calculate_control_point(curr, prev1, next, :right, opts)
 
-    [acc, "C", cast(cp1, options), " ", cast(cp2, options), " ", cast(curr, options)]
+    [acc, "C", join_cast(cp1, opts), " ", join_cast(cp2, opts), " ", join_cast(curr, opts)]
   end
 
   @spec calculate_control_point(
@@ -259,11 +177,11 @@ defmodule SparklineSvg.Draw do
           :left | :right,
           SparklineSvg.opts()
         ) :: {number(), number()}
-  defp calculate_control_point({x, y}, prev, next, direction, options) do
+  defp calculate_control_point({x, y}, prev, next, direction, opts) do
     {length, angle} = calculate_line(prev, next)
 
     angle = if direction == :right, do: angle + :math.pi(), else: angle
-    length = length * options.smoothing
+    length = length * opts.smoothing
 
     {
       x + :math.cos(angle) * length,
@@ -282,14 +200,40 @@ defmodule SparklineSvg.Draw do
     }
   end
 
-  @spec cast(number() | {number(), number()}, SparklineSvg.opts()) :: iolist() | String.t()
-  defp cast({x, y}, opts) do
+  @typep attr_value :: SparklineSvg.option_value() | iolist()
+  @typep attrs :: %{atom() => attr_value()}
+
+  @spec render_tag(String.t(), attrs(), SparklineSvg.opts()) :: iolist()
+  defp render_tag(name, attributes, opts) do
+    ["<", name, render_attributes(attributes, opts), " />"]
+  end
+
+  @spec render_tag(String.t(), attrs(), iolist(), SparklineSvg.opts()) :: iolist()
+  defp render_tag(name, attributes, content, opts) when is_list(content) do
+    ["<", name, render_attributes(attributes, opts), ">", content, "</", name, ">"]
+  end
+
+  defp render_tag(name, attributes, content, opts) do
+    render_tag(name, attributes, [content], opts)
+  end
+
+  @spec render_attributes(attrs(), SparklineSvg.opts()) :: iolist()
+  defp render_attributes(attributes, opts) do
+    attributes
+    |> Enum.map(fn {name, value} -> {Atom.to_string(name), cast(value, opts)} end)
+    |> Enum.sort()
+    |> Enum.map(fn {name, value} -> [" ", name, ~s'="', value, ~s'"'] end)
+  end
+
+  @spec join_cast(Core.point(), SparklineSvg.opts()) :: iolist()
+  defp join_cast({x, y}, opts) do
     [cast(x, opts), ",", cast(y, opts)]
   end
 
-  defp cast(value, _opts) when is_integer(value) do
-    Integer.to_string(value)
-  end
+  @spec cast(attr_value(), SparklineSvg.opts()) :: iolist()
+  defp cast(value, _opts) when is_list(value), do: value
+  defp cast(value, _opts) when is_binary(value), do: value
+  defp cast(value, _opts) when is_integer(value), do: Integer.to_string(value)
 
   defp cast(value, opts) when is_float(value) do
     value

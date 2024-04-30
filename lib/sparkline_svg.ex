@@ -419,70 +419,47 @@ defmodule SparklineSvg do
   @typedoc "Sorting options for the chart."
   @type sort_options :: :asc | :desc | :none
 
+  @typedoc "A generic value for an option of the chart"
+  @type option_value :: number() | String.t()
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
-            {:width, number()}
-            | {:height, number()}
+            {:precision, 0..15}
+            | {:sort, sort_options()}
             | {:padding, padding()}
             | {:smoothing, number()}
-            | {:precision, non_neg_integer()}
-            | {:class, nil | String.t()}
-            | {:sort, sort_options()}
+            | {atom(), option_value()}
           )
 
   @typedoc "Keyword list of options for the dots of the chart."
   @type dots_options ::
-          list({:radius, number()} | {:color, String.t()} | {:class, nil | String.t()})
+          list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the line of the chart."
-  @type line_options ::
-          list(
-            {:width, number()}
-            | {:color, String.t()}
-            | {:dasharray, String.t()}
-            | {:class, nil | String.t()}
-          )
+  @type line_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for the area under the line of the chart."
-  @type area_options :: list({:color, String.t()} | {:class, nil | String.t()})
+  @type area_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for a marker of the chart."
-  @type marker_options ::
-          list(
-            {:fill_color, String.t()}
-            | {:stroke_color, String.t()}
-            | {:stroke_width, number()}
-            | {:stroke_dasharray, String.t()}
-            | {:class, nil | String.t()}
-          )
+  @type marker_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for a reference line."
   @type ref_line_options ::
-          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
+          list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the x window."
   @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
 
   @typedoc "Keyword list of options for the placeholder."
-  @type placeholder_options :: list({:class, String.t()})
+  @type placeholder_options :: list({atom(), option_value()})
 
   @typedoc false
   @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
 
   @typedoc false
-  @type opts :: %{
-          width: number(),
-          height: number(),
-          padding: opt_padding(),
-          smoothing: float(),
-          class: nil | String.t(),
-          sort: sort_options(),
-          dots: nil | map(),
-          line: nil | map(),
-          area: nil | map(),
-          placeholder: nil | map()
-        }
+  @type opts :: %{atom() => option_value() | (Core.points() -> option_value()) | opts() | nil}
 
   @typedoc false
   @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
@@ -522,13 +499,15 @@ defmodule SparklineSvg do
   """
 
   @default_opts [
-    width: 200,
-    height: 50,
+    w: 200,
+    h: 50,
+    precision: 3,
+    sort: :asc,
     padding: 2,
     smoothing: 0.15,
-    precision: 3,
-    class: nil,
-    sort: :asc
+    width: "100%",
+    height: "100%",
+    xmlns: "http://www.w3.org/2000/svg"
   ]
 
   @doc since: "0.1.0"
@@ -540,11 +519,30 @@ defmodule SparklineSvg do
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.update!(:padding, &expand_padding/1)
-      |> Map.merge(%{dots: nil, line: nil, area: nil, placeholder: nil})
+
+    internal_opts =
+      options
+      |> Map.take([:precision, :sort, :padding, :smoothing])
+      |> Map.put(:width, options.w)
+      |> Map.put(:height, options.h)
+
+    svg_opts =
+      options
+      |> Map.drop([:precision, :sort, :padding, :smoothing, :w, :h])
+      |> Map.put_new(:viewBox, "0 0 #{internal_opts.width} #{internal_opts.height}")
+
+    opts = %{
+      internal: internal_opts,
+      svg: svg_opts,
+      dots: nil,
+      line: nil,
+      area: nil,
+      placeholder: nil
+    }
 
     %SparklineSvg{
       datapoints: datapoints,
-      options: options,
+      options: opts,
       markers: [],
       ref_lines: %{},
       window: %{min: :auto, max: :auto}
@@ -571,7 +569,7 @@ defmodule SparklineSvg do
 
   """
 
-  @default_dots_opts [radius: 1, color: "black", class: nil]
+  @default_dots_opts [r: 1, fill: "black"]
 
   @doc since: "0.1.0"
   @spec show_dots(t()) :: t()
@@ -605,7 +603,7 @@ defmodule SparklineSvg do
 
   """
 
-  @default_line_opts [width: 0.25, color: "black", dasharray: "", class: nil]
+  @default_line_opts ["stroke-width": 0.25, stroke: "black", fill: "none"]
 
   @doc since: "0.1.0"
   @spec show_line(t()) :: t()
@@ -639,7 +637,7 @@ defmodule SparklineSvg do
 
   """
 
-  @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
+  @default_area_opts [fill: "rgba(0, 0, 0, 0.1)", stroke: "none"]
 
   @doc since: "0.1.0"
   @spec show_area(t()) :: t()
@@ -704,7 +702,7 @@ defmodule SparklineSvg do
 
   """
 
-  @default_placeholder_opts [class: nil]
+  @default_placeholder_opts [x: "50%", y: "50%", "text-anchor": "middle"]
 
   @doc since: "0.x.0"
   @spec set_placeholder(t(), String.t()) :: t()
@@ -712,11 +710,16 @@ defmodule SparklineSvg do
   def set_placeholder(sparkline, content, options \\ []) do
     placeholder_options =
       @default_placeholder_opts
-      |> Keyword.merge(content: content)
       |> Keyword.merge(options)
       |> Map.new()
 
-    %SparklineSvg{sparkline | options: %{sparkline.options | placeholder: placeholder_options}}
+    %SparklineSvg{
+      sparkline
+      | options: %{
+          sparkline.options
+          | placeholder: %{content: content, options: placeholder_options}
+        }
+    }
   end
 
   @doc ~S"""
@@ -905,7 +908,9 @@ defmodule SparklineSvg do
       markers: markers,
       ref_lines: ref_lines,
       window: window,
-      options: %{width: width, height: height, padding: padding, sort: sort}
+      options: %{
+        internal: %{width: width, height: height, padding: padding, sort: sort}
+      }
     } = sparkline
 
     with :ok <- check_x_dimension(width, padding),

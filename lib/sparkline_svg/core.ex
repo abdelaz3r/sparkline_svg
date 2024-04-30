@@ -33,7 +33,7 @@ defmodule SparklineSvg.Core do
       datapoints: datapoints,
       ref_lines: ref_lines,
       markers: markers,
-      options: options,
+      options: %{internal: internal_opts},
       window: window
     } = sparkline
 
@@ -42,9 +42,9 @@ defmodule SparklineSvg.Core do
 
     %SparklineSvg{
       sparkline
-      | datapoints: resize_datapoints(datapoints, min_max_x, min_max_y, options),
-        markers: resize_markers(markers, min_max_x, options),
-        ref_lines: calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options)
+      | datapoints: resize_datapoints(datapoints, min_max_x, min_max_y, internal_opts),
+        markers: resize_markers(markers, min_max_x, internal_opts),
+        ref_lines: calc_resize_ref_lines(ref_lines, datapoints, min_max_y, internal_opts)
     }
   end
 
