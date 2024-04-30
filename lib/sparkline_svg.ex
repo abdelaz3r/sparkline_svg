@@ -513,11 +513,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2])
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2], width: 240, height: 80)
+      iex> chart = SparklineSvg.new([1, 2], w: 240, h: 80)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 240 80" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
   """
 
@@ -563,11 +563,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="1" fill="black" /><circle cx="198.0" cy="2.0" r="1" fill="black" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" fill="black" r="1" /><circle cx="198.0" cy="2.0" fill="black" r="1" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots(radius: 0.5, color: "red")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots(r: 0.5, fill: "red")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="0.5" fill="red" /><circle cx="198.0" cy="2.0" r="0.5" fill="red" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" fill="red" r="0.5" /><circle cx="198.0" cy="2.0" fill="red" r="0.5" /></svg>'
 
   """
 
@@ -597,11 +597,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line(width: 0.1, color: "green")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line("stroke-width": 0.1, stroke: "green")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
 
   """
 
@@ -631,11 +631,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area(color: "rgba(0, 255, 255, 0.2)")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area(fill: "rgba(0, 255, 255, 0.2)")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
 
   """
 
@@ -666,11 +666,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><line fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" x1="2" x2="198" y1="2.0" y2="2.0" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, color: "red")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, stroke: "red")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><line fill="none" stroke="red" stroke-width="0.25" x1="2" x2="198" y1="25.0" y2="25.0" /></svg>'
 
   """
 
@@ -696,11 +696,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><text text-anchor="middle" x="50%" y="50%">No data</text></svg>'
 
       iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data", class: "placeholder")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle" class="placeholder">No data</text></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><text class="placeholder">No data</text></svg>'
 
   """
 
@@ -736,11 +736,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2, 3, 4]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: 1, max: 2)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
       iex> chart = SparklineSvg.new([1, 2, 3]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: -1, max: 3)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M51.0,48.0C58.35,44.55 85.3,31.9 100.0,25.0C114.7,18.1 141.65,5.45 149.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M51.0,48.0C58.35,44.55 85.3,31.9 100.0,25.0C114.7,18.1 141.65,5.45 149.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
       iex> now = DateTime.utc_now()
       iex> chart =
@@ -749,7 +749,7 @@ defmodule SparklineSvg do
       ...>   |> SparklineSvg.show_line()
       ...>   |> SparklineSvg.set_x_window(min: DateTime.add(now, -1))
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M100.0,48.0C114.7,41.1 183.3,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M100.0,48.0C114.7,41.1 183.3,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
   """
 
@@ -784,15 +784,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" stroke="red" stroke-width="0.25" /></svg>'
 
       iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker({2.1, 2.4})
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><rect x="413.6" y="-0.25" width="58.8" height="50.5" fill="rgba(255, 0, 0, 0.1)" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><rect fill="rgba(255, 0, 0, 0.1)" height="52" stroke="red" stroke-width="0.25" width="58.8" x="413.6" y="-1" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2, stroke_color: "rgba(0, 255, 0, 0.2)")
+      iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2, stroke: "rgba(0, 255, 0, 0.2)")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
 
@@ -816,9 +816,9 @@ defmodule SparklineSvg do
   ## Examples
 
       iex> SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg()
-      {:ok, ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
+      {:ok, ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'}
 
-      iex> SparklineSvg.new([1, 2], width: 10, padding: 10) |> SparklineSvg.to_svg()
+      iex> SparklineSvg.new([1, 2], w: 10, padding: 10) |> SparklineSvg.to_svg()
       {:error, :invalid_dimension}
 
   """
@@ -846,9 +846,9 @@ defmodule SparklineSvg do
   ## Examples
 
       iex> SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg!()
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
-      iex> SparklineSvg.new([1, 2], width: 10, padding: 10) |> SparklineSvg.to_svg!()
+      iex> SparklineSvg.new([1, 2], w: 10, padding: 10) |> SparklineSvg.to_svg!()
       ** (SparklineSvg.Error) invalid_dimension
 
   """
@@ -873,7 +873,7 @@ defmodule SparklineSvg do
 
       iex> svg = SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg!()
       iex> SparklineSvg.as_data_uri(svg)
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
+      "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyMDAgNTAiIHdpZHRoPSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
 

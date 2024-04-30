@@ -4,10 +4,10 @@ defmodule SparklineSvgTest do
 
   test "invalid dimension" do
     data = [{1, 1}, {2, 2}]
-    sparkline = SparklineSvg.new(data, width: 5, padding: 4)
+    sparkline = SparklineSvg.new(data, w: 5, padding: 4)
     assert SparklineSvg.dry_run(sparkline) == {:error, :invalid_dimension}
 
-    sparkline = SparklineSvg.new(data, height: 5, padding: 4)
+    sparkline = SparklineSvg.new(data, h: 5, padding: 4)
     assert SparklineSvg.dry_run(sparkline) == {:error, :invalid_dimension}
   end
 
@@ -38,20 +38,20 @@ defmodule SparklineSvgTest do
   test "valid padding" do
     data = [{1, 1}, {2, 2}]
 
-    opts = [width: 10, height: 10, padding: 2]
+    opts = [w: 10, h: 10, padding: 2]
     {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 8.0}, {8.0, 2.0}]
 
-    opts = [width: 10, height: 10, padding: [top: 5]]
+    opts = [w: 10, h: 10, padding: [top: 5]]
     {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{2.0, 8.0}, {8.0, 5.0}]
 
     # different vertical and horizontal padding
-    opts = [width: 10, height: 10, padding: [top: 2, bottom: 2, left: 3, right: 3]]
+    opts = [w: 10, h: 10, padding: [top: 2, bottom: 2, left: 3, right: 3]]
     {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{3.0, 8.0}, {7.0, 2.0}]
 
-    opts = [width: 10, height: 10, padding: [top: 1, bottom: 2, left: 3, right: 4]]
+    opts = [w: 10, h: 10, padding: [top: 1, bottom: 2, left: 3, right: 4]]
     {:ok, sparkline} = SparklineSvg.new(data, opts) |> SparklineSvg.dry_run()
     assert sparkline.datapoints == [{3.0, 8.0}, {6.0, 1.0}]
   end
@@ -154,6 +154,6 @@ defmodule SparklineSvgTest do
            |> SparklineSvg.show_line()
            |> SparklineSvg.to_svg!()
            |> SparklineSvg.as_data_uri() ==
-             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yLjAsNDguMEMzMS40LDQxLjEgMTY4LjYsOC45IDE5OC4wLDIuMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwLjI1IiAvPjwvc3ZnPg=="
+             "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyMDAgNTAiIHdpZHRoPSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yLjAsNDguMEMzMS40LDQxLjEgMTY4LjYsOC45IDE5OC4wLDIuMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwLjI1IiAvPjwvc3ZnPg=="
   end
 end
