@@ -6,8 +6,8 @@ permissions:
   contents: read
 
 jobs:
-  mix_test_old:
-    name: Mix test (Elixir ${{matrix.elixir}} | OTP ${{matrix.otp}})
+  tests:
+    name: Tests (Elixir ${{matrix.elixir}} | OTP ${{matrix.otp}})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -55,8 +55,8 @@ jobs:
       - run: mix compile --warnings-as-errors
         if: matrix.warnings_as_errors
       - run: mix test
-  dialyzer:
-    name: Latest checks (format, credo, dialyzer)
+  lint:
+    name: Format & credo
     runs-on: ubuntu-latest
     env:
       MIX_ENV: test
@@ -65,7 +65,27 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 26
-          elixir-version: 1.16.x
+          elixir-version: 1.17.x
+      - name: Install Dependencies
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get --only test
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Run credo
+        run: mix credo --strict
+  dialyzer:
+    name: Dialyzer
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 26
+          elixir-version: 1.17.x
       - name: Install Dependencies
         run: |
           mix local.hex --force
@@ -79,9 +99,5 @@ jobs:
             ~/.mix
             _build
           key: dialyzer
-      - name: Check Formatting
-        run: mix format --check-formatted
-      - name: Run credo
-        run: mix credo --strict
       - name: Run dialyzer
         run: mix dialyzer --halt-exit-status
