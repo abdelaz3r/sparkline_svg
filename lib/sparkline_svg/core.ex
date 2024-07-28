@@ -4,6 +4,7 @@ defmodule SparklineSvg.Core do
   public for types documentation purposes and should not be used directly.
   """
 
+  alias SparklineSvg.Datapoint
   alias SparklineSvg.Marker
   alias SparklineSvg.ReferenceLine
 
@@ -33,7 +34,7 @@ defmodule SparklineSvg.Core do
       datapoints: datapoints,
       ref_lines: ref_lines,
       markers: markers,
-      options: options,
+      options: %{internal: internal_opts},
       window: window
     } = sparkline
 
@@ -42,16 +43,16 @@ defmodule SparklineSvg.Core do
 
     %SparklineSvg{
       sparkline
-      | datapoints: resize_datapoints(datapoints, min_max_x, min_max_y, options),
-        markers: resize_markers(markers, min_max_x, options),
-        ref_lines: calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options)
+      | datapoints: resize_datapoints(datapoints, min_max_x, min_max_y, internal_opts),
+        markers: resize_markers(markers, min_max_x, internal_opts),
+        ref_lines: calc_resize_ref_lines(ref_lines, datapoints, min_max_y, internal_opts)
     }
   end
 
-  @spec get_min_max_x(points(), SparklineSvg.window()) :: min_max()
+  @spec get_min_max_x(Datapoint.points(), SparklineSvg.window()) :: min_max()
   defp get_min_max_x(datapoints, window) do
-    [{min_x, _} | _tail] = datapoints
-    {max_x, _} = List.last(datapoints)
+    [%{computed: {min_x, _}} | _tail] = datapoints
+    %{computed: {max_x, _}} = List.last(datapoints)
 
     {min_x, max_x} =
       cond do
@@ -66,10 +67,12 @@ defmodule SparklineSvg.Core do
     {min_x, max_x}
   end
 
-  @spec get_min_max_y(points()) :: min_max()
+  @spec get_min_max_y(Datapoint.points()) :: min_max()
   defp get_min_max_y(datapoints) do
-    [{_, y} | _tail] = datapoints
-    {{_, min_y}, {_, max_y}} = Enum.min_max_by(datapoints, fn {_, y} -> y end)
+    [%{computed: {_, y}} | _tail] = datapoints
+
+    {%{computed: {_, min_y}}, %{computed: {_, max_y}}} =
+      Enum.min_max_by(datapoints, fn %{computed: {_, y}} -> y end)
 
     cond do
       max_y - min_y != 0 -> {min_y, max_y}
@@ -78,10 +81,11 @@ defmodule SparklineSvg.Core do
     end
   end
 
-  @spec resize_datapoints(points(), min_max(), min_max(), SparklineSvg.opts()) :: points()
+  @spec resize_datapoints(Datapoint.points(), min_max(), min_max(), SparklineSvg.opts()) ::
+          Datapoint.points()
   defp resize_datapoints(datapoints, min_max_x, min_max_y, options) do
-    Enum.map(datapoints, fn {x, y} ->
-      {resize_x(x, min_max_x, options), resize_y(y, min_max_y, options)}
+    Enum.map(datapoints, fn %{computed: {x, y}} = point ->
+      %{point | computed: {resize_x(x, min_max_x, options), resize_y(y, min_max_y, options)}}
     end)
   end
 

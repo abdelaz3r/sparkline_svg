@@ -140,12 +140,14 @@ defmodule SparklineSvg do
 
   ## Customization
 
-  SparklineSvg allows you to customize the chart showing or hiding the dots, the line, and the area
-  under the line as well as markers and reference lines.
+  SparklineSvg allows you to customize the chart by showing or hiding the dots, the line, and the
+  area under the line, as well as markers and reference lines. SparklineSvg gives you full access
+  to the attributes of the SVG elements, so you can customize the chart as you want. Here are
+  three examples of customization:
 
-  There are two ways to customize the chart:
-  - Using the options like `:color` or `:dasharray`.
-  - Using the CSS classes option to give classes to SVG elements and then using CSS to style them.
+  1. Shows how to customize using options that will set the attributes of the SVG elements.
+  2. Shows how to use the `class` option to style the chart using CSS classes.
+  3. Is a variation of 2. using Tailwind CSS classes with a proper `.tailwind.config.js` file.
 
   <!-- tabs-open -->
   ### Options
@@ -154,11 +156,11 @@ defmodule SparklineSvg do
     [3, 2, 4, 1, 5, 1, 4]
     |> SparklineSvg.new(width: 100, height: 40, padding: 0.5)
     |> SparklineSvg.set_placeholder("No data")
-    |> SparklineSvg.show_dots(radius: 0.1, color: "rgb(255, 255, 255)")
-    |> SparklineSvg.show_line(width: 0.5, color: "rgb(166, 218, 149)")
-    |> SparklineSvg.show_area(color: "rgba(166, 218, 149, 0.2)")
-    |> SparklineSvg.add_marker(1, stroke_color: "red", stroke_width: 0.5)
-    |> SparklineSvg.show_ref_line(:max, width: 0.3, color: "red")
+    |> SparklineSvg.show_dots(r: 0.1, fill: "rgb(255, 255, 255)")
+    |> SparklineSvg.show_line(stroke: "rgb(166, 218, 149)", "stroke-width": 0.5)
+    |> SparklineSvg.show_area(fill: "rgba(166, 218, 149, 0.2)")
+    |> SparklineSvg.add_marker(1, stroke: "red", "stroke-width": 0.5)
+    |> SparklineSvg.show_ref_line(:max, stroke: "red", "stroke-width": 0.3)
     |> SparklineSvg.to_svg!()
   ```
 
@@ -176,6 +178,16 @@ defmodule SparklineSvg do
     |> SparklineSvg.to_svg!()
   ```
 
+  ``` css
+  // my-css-file.css
+
+  .sparkline {
+    fill: transparent;
+  }
+
+  ...
+  ```
+
   ### Tailwind classes
   ``` elixir
   svg =
@@ -191,85 +203,163 @@ defmodule SparklineSvg do
   ```
   <!-- tabs-close -->
 
-  When using the CSS classes to style the chart, the other options like `:color` or `:dasharray`
-  will be ignored. However, some options (`:width`, `:height`, `:padding`, `:smoothing`), are used
-  internally to render the chart and are required in any case.
+  See the [examples](EXAMPLES.md) page for more complex examples.
+
+  ### Type of options
+
+  Alongside with normal options, there are two kind of noteworthy options:
+
+  - **Internal options**. These options are used internally to render the chart and are mandatory.
+    They are not targetable with CSS classes and must be provided even if you decide to use CSS
+    classes to style the chart. They are marked as **internal** in the documentation.
+  - **Nullified when using a class options**. These options are default svg attribute that will be
+    nullified when a class option is set. The reason is that the class option is meant to be used
+    to style the chart with CSS classes, and setting the default values would override the CSS
+    classes. They are marked as **nullified** in the documentation.
 
   ### Available options
 
   Use the following options to customize the chart:
 
-  - `:width` - the width of the chart, defaults to `200`.
-  - `:height` - the height of the chart, defaults to `50`.
-  - `:padding` - the padding of the chart, defaults to `2`. Not targetable with CSS classes.
-    The padding can be one the following:
-    - A single positive `number()` that will be used for all sides.
+  - `:precision` - the maximum precision of the values used to render the chart, defaults to `3`,
+    [internal](`m:SparklineSvg#module-type-of-options`). The precision can be set between `0` and
+    `15`. The greater the precision, the more accurate the chart will be but the heavier the SVG
+    will be.
+  - `:sort` - can be one of these atoms: `:asc`, `:desc`, or `none`, defaults to `:asc`,
+    [internal](`m:SparklineSvg#module-type-of-options`). If set to `:asc` or `:desc`, the
+    datapoints will be sorted by the `x` axis before rendering the chart. If set to `:none`, the
+    datapoints will be rendered in the order they are given, potentially resulting in unexpected
+    visual representations.
+  - `:padding` - the padding of the chart, defaults to `2`,
+    [internal](`m:SparklineSvg#module-type-of-options`). The padding can be one the following:
+    - A single positive `t:number/0` that will be used for all sides.
     - A keyword list where the keys are `:top`, `:right`, `:bottom`, and `:left` and the values are
-      a positive `number()` for each side; missing sides will be set to the default value.
+      a positive `t:number/0` for each side; missing sides will be set to the default value.
 
     Padding has to be set to a value which `left_padding + right_padding < width` and `top_padding
     + bottom_padding < height` otherwise a `:invalid_dimension` error will be raised.
   - `:smoothing` - the smoothing of the line (`0` = no smoothing, above `0.4` it becomes
-    unreadable), defaults to `0.15`. Not targetable with CSS classes.
-  - `:precision` - the maximum precision of the values used to render the chart, defaults to `3`.
-    Not targetable with CSS classes. The precision can be set between `0` and `15`. The greater the
-    precision, the more accurate the chart will be but the heavier the SVG will be.
-  - `:class` - the value of the HTML class attribute of the chart, defaults to `nil`.
-  - `:sort` - can be one of these atoms: `:asc`, `:desc`, or `none`. Defaults to `:asc`. If set to
-    `:asc` or `:desc`, the datapoints will be sorted by the `x` axis before rendering the chart.
-    If set to `:none`, the datapoints will be rendered in the order they are given, potentially
-    resulting in unexpected visual representations.
+    unreadable), defaults to `0.15`, [internal](`m:SparklineSvg#module-type-of-options`).
+  - `:w` - the internal width of the chart, defaults to `200`,
+    [internal](`m:SparklineSvg#module-type-of-options`). This option must be a positive
+    `t:integer/0` as it is used to calculate all the other values in the chart. This is not the
+    same as the `:width` attribute option.
+  - `:h` - the internal height of the chart, defaults to `50`,
+    [internal](`m:SparklineSvg#module-type-of-options`). This option must be a positive
+    `t:integer/0` as it is used to calculate all the other values in the chart. This is not the
+    same as the `:height` attribute option.
+
+  Additionally to these options you can set any valid attribute for a `<svg>` element. The
+  following attributes have default values:
+
+  - `:width` - the width of the chart, defaults to `100%`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:height` - the height of the chart, defaults to `100%`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:viewBox` - the viewBox of the chart, defaults to a computed value based on the `:w` and
+    `:h` (e.g. `"0 0 200 50"`).
+  - `:xmlns` - the XML namespace of the chart, defaults to `"http://www.w3.org/2000/svg"`.
 
   ### Dots options
 
-  - `:radius` - the radius of the dots, defaults to `1`.
-  - `:color` - the color of the dots, defaults to `"black"`.
-  - `:class` - the value of the HTML class attribute of the dots, defaults to `nil`.
+  The dots are represented as `<circle>` elements in the SVG. You can customize the dots with any
+  valid attribute for that svg element. Dots options values can be a `t:String.t/0`, a
+  `t:number/0`, or a function that takes a `t:SparklineSvg.Core.points/0` and return a
+  `t:number/0` or a `t:String.t/0`. `cx` and `cy` attributes can't be set as their values are
+  computed internally.
+
+  The following attributes have default values:
+
+  - `:r` - the radius of the dots, defaults to `1`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:fill` - the color of the dots, defaults to `"black"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   ### Line options
 
-  - `:width` - the width of the line, defaults to `0.25`.
-  - `:color` - the color of the line, defaults to `"black"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the line, defaults to `""`.
-    Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribute of the line, defaults to `nil`.
+  The line is represented as a `<path>` element in the SVG. You can customize the line with any
+  valid attribute for that svg element. Line options values can be a `t:String.t/0` or a
+  `t:number/0`. `d` attribute can't be set as its value is computed internally.
+
+  The following attributes have default values:
+
+  - `:"stroke-width"` - the width of the line, defaults to `0.25`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:stroke` - the color of the line, defaults to `"black"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:fill` - the fill color of the line, defaults to `"none"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   ### Area options
 
-  - `:color` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribute of the area, defaults to `nil`.
+  The area is represented as a `<path>` element in the SVG. You can customize the area with any
+  valid attribute for that svg element. Area options values can be a `t:String.t/0` or a
+  `t:number/0`. `d` attribute can't be set as its value is computed internally.
+
+  The following attributes have default values:
+
+  - `:fill` - the color of the area under the line, defaults to `"rgba(0, 0, 0, 0.1)"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   ### Marker options
 
-  - `:stroke_width` - the stroke width of the marker, defaults to `0.25`.
-  - `:stroke_color` - the stroke color of the marker, defaults to `"red"`.
-  - `:stroke_dasharray` - the value of the HTML stroke-dasharray attribute of the marker, defaults
-    to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attribute/stroke-dasharray).
-  - `:fill_color` - the fill color of an area marker, defaults to `"rgba(255, 0, 0, 0.1)"`.
-  - `:class` - the value of the HTML class attribute of the marker, defaults to `nil`.
+  Markers are represented either as `<rect>` elements for range markers or as `<path>` elements for
+  single markers. You can customize the markers with any valid attribute for those svg elements.
+  Marker options values can be a `t:String.t/0` or a `t:number/0`. `x`, `y`, `width`, `height`, and
+  `d` attributes can't be set as their values are computed internally.
+
+  The following attributes have default values for both single and range markers:
+
+  - `:stroke` - the stroke color of the marker, defaults to `"red"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:"stroke-width"` - the stroke width of the marker, defaults to `0.25`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+
+  The following attributes have default values for range markers:
+
+  - `:fill` - the fill color of the marker, defaults to `"rgba(255, 0, 0, 0.1)"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   ### Reference line options
 
-  - `:width` - the width of the reference line, defaults to `0.25`.
-  - `:color` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`.
-  - `:dasharray` - the value of the HTML stroke-dasharray attribute of the reference line, defaults
-    to `""`. Valid dasharray values can be found
-    [here](https://developer.mozilla.org/en-US/docs/Web/SVG/attribute/stroke-dasharray).
-  - `:class` - the value of the HTML class attribute of the reference line, defaults to `nil`.
+  Reference lines are represented as `<line>` elements in the SVG. You can customize the reference
+  lines with any valid attribute for that svg element. Reference line options values can be a
+  `t:String.t/0`, a `t:number/0`, or a function that takes a `t:SparklineSvg.Core.y()/0` and
+  return a `t:number/0` or a `t:String.t/0`. `x1`, `y1`, `x2`, and `y2` attributes can't be set as
+  their values are computed internally.
+
+  The following attributes have default values for all reference lines:
+
+  - `:"stroke-width"` - the width of the reference line, defaults to `0.25`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:stroke` - the color of the reference line, defaults to `"rgba(0, 0, 0, 0.5)"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:fill` - the fill color of the line, defaults to `"none"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   ### Window options
 
-  - `:min` - the minimum value of the window, defaults to `:auto`. The value must be of the same
-    type as the `x` axis of the chart, or `:auto`.
-  - `:max` - the maximum value of the window, defaults to `:auto`. The value must be of the same
-    type as the `x` axis of the chart, or `:auto`.
+  - `:min` - the minimum value of the window, defaults to `:auto`,
+    [internal](`m:SparklineSvg#module-type-of-options`). The value must be of the same type as the
+    `x` axis of the chart, or `:auto`.
+  - `:max` - the maximum value of the window, defaults to `:auto`,
+    [internal](`m:SparklineSvg#module-type-of-options`). The value must be of the same type as the
+    `x` axis of the chart, or `:auto`.
 
   ### Placeholder options
 
-  - `:class` - the value of the HTML class attribute of the placeholder, defaults to `nil`. It is
-  currently the only way to style the placeholder.
+  Placeholder is represented a as a `<text>` element. You can customize the placeholder with any
+  valid attribute for this svg elements. Placeholder options values can be a `t:String.t/0` or a
+  `t:number/0`.
+
+  The following attributes have default values:
+
+  - `:x` - the x position of the placeholder, defaults to `"50%"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:y` - the y position of the placeholder, defaults to `"50%"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
+  - `:"text-anchor"` - the text-anchor of the placeholder, defaults to `"middle"`,
+    [nullified](`m:SparklineSvg#module-type-of-options`).
 
   """
 
@@ -319,7 +409,7 @@ defmodule SparklineSvg do
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
   @typedoc "The type of reference line."
-  @type ref_line :: :max | :min | :avg | :median | (Core.points() -> Core.y())
+  @type ref_line :: :max | :min | :avg | :median | (Datapoint.points() -> Core.y())
 
   @typedoc "Padding options for the chart."
   @type padding ::
@@ -329,70 +419,45 @@ defmodule SparklineSvg do
   @typedoc "Sorting options for the chart."
   @type sort_options :: :asc | :desc | :none
 
+  @typedoc "A generic value for an option of the chart"
+  @type option_value :: number() | String.t()
+
   @typedoc "Keyword list of options for the chart."
   @type options ::
           list(
-            {:width, number()}
-            | {:height, number()}
+            {:precision, 0..15}
+            | {:sort, sort_options()}
             | {:padding, padding()}
             | {:smoothing, number()}
-            | {:precision, non_neg_integer()}
-            | {:class, nil | String.t()}
-            | {:sort, sort_options()}
+            | {atom(), option_value()}
           )
 
   @typedoc "Keyword list of options for the dots of the chart."
-  @type dots_options ::
-          list({:radius, number()} | {:color, String.t()} | {:class, nil | String.t()})
+  @type dots_options :: list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the line of the chart."
-  @type line_options ::
-          list(
-            {:width, number()}
-            | {:color, String.t()}
-            | {:dasharray, String.t()}
-            | {:class, nil | String.t()}
-          )
+  @type line_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for the area under the line of the chart."
-  @type area_options :: list({:color, String.t()} | {:class, nil | String.t()})
+  @type area_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for a marker of the chart."
-  @type marker_options ::
-          list(
-            {:fill_color, String.t()}
-            | {:stroke_color, String.t()}
-            | {:stroke_width, number()}
-            | {:stroke_dasharray, String.t()}
-            | {:class, nil | String.t()}
-          )
+  @type marker_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for a reference line."
-  @type ref_line_options ::
-          list({:width, number()} | {:color, String.t()} | {:class, nil | String.t()})
+  @type ref_line_options :: list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the x window."
   @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
 
   @typedoc "Keyword list of options for the placeholder."
-  @type placeholder_options :: list({:class, String.t()})
+  @type placeholder_options :: list({atom(), option_value()})
 
   @typedoc false
   @type opt_padding :: %{top: number(), right: number(), bottom: number(), left: number()}
 
   @typedoc false
-  @type opts :: %{
-          width: number(),
-          height: number(),
-          padding: opt_padding(),
-          smoothing: float(),
-          class: nil | String.t(),
-          sort: sort_options(),
-          dots: nil | map(),
-          line: nil | map(),
-          area: nil | map(),
-          placeholder: nil | map()
-        }
+  @type opts :: %{atom() => option_value() | (Core.points() -> option_value()) | opts() | nil}
 
   @typedoc false
   @type ref_lines :: %{optional(ref_line()) => ReferenceLine.t()}
@@ -402,7 +467,7 @@ defmodule SparklineSvg do
 
   @typedoc false
   @type t :: %__MODULE__{
-          datapoints: datapoints(),
+          datapoints: datapoints() | Datapoint.points(),
           options: opts(),
           markers: list(Marker.t()),
           ref_lines: ref_lines(),
@@ -423,22 +488,24 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2])
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2], width: 240, height: 80)
+      iex> chart = SparklineSvg.new([1, 2], w: 240, h: 80)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 240 80" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
   """
 
   @default_opts [
-    width: 200,
-    height: 50,
+    w: 200,
+    h: 50,
+    precision: 3,
+    sort: :asc,
     padding: 2,
     smoothing: 0.15,
-    precision: 3,
-    class: nil,
-    sort: :asc
+    width: "100%",
+    height: "100%",
+    xmlns: "http://www.w3.org/2000/svg"
   ]
 
   @doc since: "0.1.0"
@@ -450,11 +517,30 @@ defmodule SparklineSvg do
       |> Keyword.merge(options)
       |> Map.new()
       |> Map.update!(:padding, &expand_padding/1)
-      |> Map.merge(%{dots: nil, line: nil, area: nil, placeholder: nil})
+
+    internal_opts =
+      options
+      |> Map.take([:precision, :sort, :padding, :smoothing])
+      |> Map.put(:width, options.w)
+      |> Map.put(:height, options.h)
+
+    svg_opts =
+      options
+      |> Map.drop([:precision, :sort, :padding, :smoothing, :w, :h])
+      |> Map.put_new(:viewBox, "0 0 #{internal_opts.width} #{internal_opts.height}")
+
+    opts = %{
+      internal: internal_opts,
+      svg: svg_opts,
+      dots: nil,
+      line: nil,
+      area: nil,
+      placeholder: nil
+    }
 
     %SparklineSvg{
       datapoints: datapoints,
-      options: options,
+      options: opts,
       markers: [],
       ref_lines: %{},
       window: %{min: :auto, max: :auto}
@@ -473,15 +559,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="1" fill="black" /><circle cx="198.0" cy="2.0" r="1" fill="black" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" fill="black" r="1" /><circle cx="198.0" cy="2.0" fill="black" r="1" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots(radius: 0.5, color: "red")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_dots(r: 0.5, fill: "red")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" r="0.5" fill="red" /><circle cx="198.0" cy="2.0" r="0.5" fill="red" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><circle cx="2.0" cy="48.0" fill="red" r="0.5" /><circle cx="198.0" cy="2.0" fill="red" r="0.5" /></svg>'
 
   """
 
-  @default_dots_opts [radius: 1, color: "black", class: nil]
+  @default_dots_opts [r: 1, fill: "black"]
 
   @doc since: "0.1.0"
   @spec show_dots(t()) :: t()
@@ -507,15 +593,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line(width: 0.1, color: "green")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_line("stroke-width": 0.1, stroke: "green")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="green" stroke-width="0.1" /></svg>'
 
   """
 
-  @default_line_opts [width: 0.25, color: "black", dasharray: "", class: nil]
+  @default_line_opts ["stroke-width": 0.25, stroke: "black", fill: "none"]
 
   @doc since: "0.1.0"
   @spec show_line(t()) :: t()
@@ -541,15 +627,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area()
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 0, 0, 0.1)" stroke="none" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area(color: "rgba(0, 255, 255, 0.2)")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_area(fill: "rgba(0, 255, 255, 0.2)")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0V50H2.0Z" fill="rgba(0, 255, 255, 0.2)" stroke="none" /></svg>'
 
   """
 
-  @default_area_opts [color: "rgba(0, 0, 0, 0.1)", class: nil]
+  @default_area_opts [fill: "rgba(0, 0, 0, 0.1)", stroke: "none"]
 
   @doc since: "0.1.0"
   @spec show_area(t()) :: t()
@@ -576,11 +662,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:max)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="2.0" x2="198" y2="2.0" fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><line fill="none" stroke="rgba(0, 0, 0, 0.5)" stroke-width="0.25" x1="2" x2="198" y1="2.0" y2="2.0" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, color: "red")
+      iex> chart = SparklineSvg.new([1, 2]) |> SparklineSvg.show_ref_line(:avg, stroke: "red")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="25.0" x2="198" y2="25.0" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><line fill="none" stroke="red" stroke-width="0.25" x1="2" x2="198" y1="25.0" y2="25.0" /></svg>'
 
   """
 
@@ -606,15 +692,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle">No data</text></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><text text-anchor="middle" x="50%" y="50%">No data</text></svg>'
 
       iex> chart = SparklineSvg.new([]) |> SparklineSvg.set_placeholder("No data", class: "placeholder")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle" class="placeholder">No data</text></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><text class="placeholder">No data</text></svg>'
 
   """
 
-  @default_placeholder_opts [class: nil]
+  @default_placeholder_opts [x: "50%", y: "50%", "text-anchor": "middle"]
 
   @doc since: "0.x.0"
   @spec set_placeholder(t(), String.t()) :: t()
@@ -622,11 +708,16 @@ defmodule SparklineSvg do
   def set_placeholder(sparkline, content, options \\ []) do
     placeholder_options =
       @default_placeholder_opts
-      |> Keyword.merge(content: content)
       |> Keyword.merge(options)
       |> Map.new()
 
-    %SparklineSvg{sparkline | options: %{sparkline.options | placeholder: placeholder_options}}
+    %SparklineSvg{
+      sparkline
+      | options: %{
+          sparkline.options
+          | placeholder: %{content: content, options: placeholder_options}
+        }
+    }
   end
 
   @doc ~S"""
@@ -646,11 +737,11 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 2, 3, 4]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: 1, max: 2)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M2.0,48.0C31.4,41.1 168.6,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
       iex> chart = SparklineSvg.new([1, 2, 3]) |> SparklineSvg.show_line() |> SparklineSvg.set_x_window(min: -1, max: 3)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M51.0,48.0C58.35,44.55 85.3,31.9 100.0,25.0C114.7,18.1 141.65,5.45 149.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M51.0,48.0C58.35,44.55 85.3,31.9 100.0,25.0C114.7,18.1 141.65,5.45 149.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
       iex> now = DateTime.utc_now()
       iex> chart =
@@ -659,7 +750,7 @@ defmodule SparklineSvg do
       ...>   |> SparklineSvg.show_line()
       ...>   |> SparklineSvg.set_x_window(min: DateTime.add(now, -1))
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M100.0,48.0C114.7,41.1 183.3,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M100.0,48.0C114.7,41.1 183.3,8.9 198.0,2.0" fill="none" stroke="black" stroke-width="0.25" /></svg>'
 
   """
 
@@ -694,15 +785,15 @@ defmodule SparklineSvg do
 
       iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2)
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" stroke="red" stroke-width="0.25" /></svg>'
 
       iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker({2.1, 2.4})
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><rect x="413.6" y="-0.25" width="58.8" height="50.5" fill="rgba(255, 0, 0, 0.1)" stroke="red" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><rect fill="rgba(255, 0, 0, 0.1)" height="52" stroke="red" stroke-width="0.25" width="58.8" x="413.6" y="-1" /></svg>'
 
-      iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2, stroke_color: "rgba(0, 255, 0, 0.2)")
+      iex> chart = SparklineSvg.new([1, 3]) |> SparklineSvg.add_marker(2, stroke: "rgba(0, 255, 0, 0.2)")
       iex> SparklineSvg.to_svg!(chart)
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" fill="none" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"><path d="M394.0,0.0V50" stroke="rgba(0, 255, 0, 0.2)" stroke-width="0.25" /></svg>'
 
   """
 
@@ -726,9 +817,9 @@ defmodule SparklineSvg do
   ## Examples
 
       iex> SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg()
-      {:ok, ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'}
+      {:ok, ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'}
 
-      iex> SparklineSvg.new([1, 2], width: 10, padding: 10) |> SparklineSvg.to_svg()
+      iex> SparklineSvg.new([1, 2], w: 10, padding: 10) |> SparklineSvg.to_svg()
       {:error, :invalid_dimension}
 
   """
@@ -756,9 +847,9 @@ defmodule SparklineSvg do
   ## Examples
 
       iex> SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg!()
-      ~S'<svg width="100%" height="100%" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"></svg>'
+      ~S'<svg height="100%" viewBox="0 0 200 50" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>'
 
-      iex> SparklineSvg.new([1, 2], width: 10, padding: 10) |> SparklineSvg.to_svg!()
+      iex> SparklineSvg.new([1, 2], w: 10, padding: 10) |> SparklineSvg.to_svg!()
       ** (SparklineSvg.Error) invalid_dimension
 
   """
@@ -783,7 +874,7 @@ defmodule SparklineSvg do
 
       iex> svg = SparklineSvg.new([1, 2]) |> SparklineSvg.to_svg!()
       iex> SparklineSvg.as_data_uri(svg)
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMjAwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
+      "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyMDAgNTAiIHdpZHRoPSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
 
   """
 
@@ -815,7 +906,9 @@ defmodule SparklineSvg do
       markers: markers,
       ref_lines: ref_lines,
       window: window,
-      options: %{width: width, height: height, padding: padding, sort: sort}
+      options: %{
+        internal: %{width: width, height: height, padding: padding, sort: sort}
+      }
     } = sparkline
 
     with :ok <- check_x_dimension(width, padding),
