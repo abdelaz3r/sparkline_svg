@@ -1,6 +1,7 @@
 defmodule SparklineSvg.Draw do
   @moduledoc false
 
+  alias SparklineSvg.Datapoint
   alias SparklineSvg.Core
   alias SparklineSvg.Marker
   alias SparklineSvg.ReferenceLine
@@ -49,23 +50,32 @@ defmodule SparklineSvg.Draw do
     render_tag("text", attrs, content, internal_opts)
   end
 
-  @spec dots(Core.points(), SparklineSvg.opts()) :: iolist()
+  @spec dots(Datapoint.points(), SparklineSvg.opts()) :: iolist()
   defp dots(_datapoints, %{dots: nil}), do: ""
 
   defp dots(datapoints, options) do
-    %{internal: internal_opts, dots: attrs} = options
+    %{internal: opts, dots: attrs} = options
 
-    Enum.map(datapoints, fn {x, y} ->
-      attrs = Map.merge(attrs, %{cx: x, cy: y})
+    Enum.map(datapoints, fn %{source: {sx, sy}, computed: {cx, cy}} ->
+      attrs =
+        attrs
+        |> Enum.map(fn
+          {name, value} when is_function(value) ->
+            {name, value.({cast(sx, opts), cast(sy, opts)})}
 
-      render_tag("circle", attrs, internal_opts)
+          attr ->
+            attr
+        end)
+        |> Enum.into(%{cx: cx, cy: cy})
+
+      render_tag("circle", attrs, opts)
     end)
   end
 
-  @spec line(Core.points(), SparklineSvg.opts()) :: iolist()
+  @spec line(Datapoint.points(), SparklineSvg.opts()) :: iolist()
   defp line(_datapoints, %{line: nil}), do: ""
 
-  defp line([{x, y}], options) do
+  defp line([%{computed: {x, y}}], options) do
     %{internal: internal_opts, line: attrs} = options
 
     left = cast(x - internal_opts.width / 10, internal_opts)
@@ -84,7 +94,7 @@ defmodule SparklineSvg.Draw do
     render_tag("path", attrs, internal_opts)
   end
 
-  @spec area(Core.points(), SparklineSvg.opts()) :: iolist()
+  @spec area(Datapoint.points(), SparklineSvg.opts()) :: iolist()
   defp area(_datapoints, %{area: nil}), do: ""
   defp area([_points], _options), do: ""
 
@@ -92,7 +102,7 @@ defmodule SparklineSvg.Draw do
     %{internal: internal_opts, area: attrs} = options
 
     # Extract the x value of the first datapoint to know where to finish the area.
-    [{x, _y} | _] = datapoints
+    [%{computed: {x, _y}} | _] = datapoints
 
     height = cast(internal_opts.height, internal_opts)
     x = cast(x, internal_opts)
@@ -134,15 +144,21 @@ defmodule SparklineSvg.Draw do
 
   @spec ref_line(ReferenceLine.t(), SparklineSvg.opts()) :: iolist()
   defp ref_line(ref_line, options) do
-    %{position: y, options: attrs} = ref_line
+    %{position: y, value: value, options: attrs} = ref_line
     %{internal: %{padding: padding, width: width} = internal_opts} = options
 
-    attrs = Map.merge(attrs, %{x1: padding.left, x2: width - padding.right, y1: y, y2: y})
+    attrs =
+      attrs
+      |> Enum.map(fn
+        {name, func} when is_function(func) -> {name, func.(cast(value, internal_opts))}
+        attr -> attr
+      end)
+      |> Enum.into(%{x1: padding.left, x2: width - padding.right, y1: y, y2: y})
 
     render_tag("line", attrs, internal_opts)
   end
 
-  @spec compute_curve(Core.points(), SparklineSvg.opts()) :: iolist()
+  @spec compute_curve(Datapoint.points(), SparklineSvg.opts()) :: iolist()
   defp compute_curve([curr | rest], opts) do
     ["M", join_cast(curr, opts)]
     |> compute_curve(rest, curr, curr, opts)
@@ -150,9 +166,9 @@ defmodule SparklineSvg.Draw do
 
   @spec compute_curve(
           iolist(),
-          Core.points(),
-          Core.point(),
-          Core.point(),
+          Datapoint.points(),
+          Datapoint.t(),
+          Datapoint.t(),
           SparklineSvg.opts()
         ) :: iolist()
   defp compute_curve(acc, [curr | [next | _] = rest], prev2, prev1, opts) do
@@ -167,10 +183,10 @@ defmodule SparklineSvg.Draw do
 
   @spec curve_command(
           iolist(),
-          Core.point(),
-          Core.point(),
-          Core.point(),
-          Core.point(),
+          Datapoint.t(),
+          Datapoint.t(),
+          Datapoint.t(),
+          Datapoint.t(),
           SparklineSvg.opts()
         ) :: iolist()
   defp curve_command(acc, prev2, prev1, curr, next, opts) do
@@ -181,13 +197,13 @@ defmodule SparklineSvg.Draw do
   end
 
   @spec calculate_control_point(
-          Core.point(),
-          Core.point(),
-          Core.point(),
+          Datapoint.t(),
+          Datapoint.t(),
+          Datapoint.t(),
           :left | :right,
           SparklineSvg.opts()
         ) :: {number(), number()}
-  defp calculate_control_point({x, y}, prev, next, direction, opts) do
+  defp calculate_control_point(%{computed: {x, y}}, prev, next, direction, opts) do
     {length, angle} = calculate_line(prev, next)
 
     angle = if direction == :right, do: angle + :math.pi(), else: angle
@@ -199,8 +215,8 @@ defmodule SparklineSvg.Draw do
     }
   end
 
-  @spec calculate_line(Core.point(), Core.point()) :: {number(), number()}
-  defp calculate_line({x1, y1}, {x2, y2}) do
+  @spec calculate_line(Datapoint.t(), Datapoint.t()) :: {number(), number()}
+  defp calculate_line(%{computed: {x1, y1}}, %{computed: {x2, y2}}) do
     length_x = x2 - x1
     length_y = y2 - y1
 
@@ -239,7 +255,11 @@ defmodule SparklineSvg.Draw do
     |> Enum.map(fn {name, value} -> [" ", name, ~s'="', value, ~s'"'] end)
   end
 
-  @spec join_cast(Core.point(), SparklineSvg.opts()) :: iolist()
+  @spec join_cast(Datapoint.t() | Core.point(), SparklineSvg.opts()) :: iolist()
+  defp join_cast(%{computed: {x, y}}, opts) do
+    [cast(x, opts), ",", cast(y, opts)]
+  end
+
   defp join_cast({x, y}, opts) do
     [cast(x, opts), ",", cast(y, opts)]
   end
@@ -254,4 +274,6 @@ defmodule SparklineSvg.Draw do
     |> Float.round(opts.precision)
     |> Float.to_string()
   end
+
+  defp cast(value, _opts), do: value
 end

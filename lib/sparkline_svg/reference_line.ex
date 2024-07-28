@@ -60,10 +60,11 @@ defmodule SparklineSvg.ReferenceLine do
   """
 
   alias SparklineSvg.Core
+  alias SparklineSvg.Datapoint
   alias SparklineSvg.ReferenceLine
 
   @typedoc "A reference line function."
-  @type ref_line_function :: (Core.points() -> Core.y())
+  @type ref_line_function :: (Datapoint.t() -> Core.y())
 
   @typedoc false
   @type t :: %ReferenceLine{
@@ -107,15 +108,17 @@ defmodule SparklineSvg.ReferenceLine do
 
   ## Examples
 
-      iex> SparklineSvg.ReferenceLine.max([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> points = [{1, 1}, {2, 2}, {3, 3}, {4, 1}]
+      iex> points = Enum.map(points, fn {x, y} -> %{computed: {x, y}} end)
+      iex> SparklineSvg.ReferenceLine.max(points)
       3
 
   """
 
   @doc since: "0.4.0"
-  @spec max(Core.points()) :: Core.y()
+  @spec max(Datapoint.t()) :: Core.y()
   def max(datapoints) do
-    {_x, y} = Enum.max_by(datapoints, fn {_x, y} -> y end)
+    %{computed: {_x, y}} = Enum.max_by(datapoints, fn %{computed: {_x, y}} -> y end)
     y
   end
 
@@ -124,15 +127,17 @@ defmodule SparklineSvg.ReferenceLine do
 
   ## Examples
 
-      iex> SparklineSvg.ReferenceLine.min([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> points = [{1, 1}, {2, 2}, {3, 3}, {4, 1}]
+      iex> points = Enum.map(points, fn {x, y} -> %{computed: {x, y}} end)
+      iex> SparklineSvg.ReferenceLine.min(points)
       1
 
   """
 
   @doc since: "0.4.0"
-  @spec min(Core.points()) :: Core.y()
+  @spec min(Datapoint.t()) :: Core.y()
   def min(datapoints) do
-    {_x, y} = Enum.min_by(datapoints, fn {_x, y} -> y end)
+    %{computed: {_x, y}} = Enum.min_by(datapoints, fn %{computed: {_x, y}} -> y end)
     y
   end
 
@@ -141,16 +146,20 @@ defmodule SparklineSvg.ReferenceLine do
 
   ## Examples
 
-      iex> SparklineSvg.ReferenceLine.avg([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> points = [{1, 1}, {2, 2}, {3, 3}, {4, 1}]
+      iex> points = Enum.map(points, fn {x, y} -> %{computed: {x, y}} end)
+      iex> SparklineSvg.ReferenceLine.avg(points)
       1.75
 
   """
 
   @doc since: "0.4.0"
-  @spec avg(Core.points()) :: Core.y()
+  @spec avg(Datapoint.t()) :: Core.y()
   def avg(datapoints) do
     {sum, count} =
-      Enum.reduce(datapoints, {0, 0}, fn {_x, y}, {sum, count} -> {sum + y, count + 1} end)
+      Enum.reduce(datapoints, {0, 0}, fn %{computed: {_x, y}}, {sum, count} ->
+        {sum + y, count + 1}
+      end)
 
     sum / count
   end
@@ -160,13 +169,15 @@ defmodule SparklineSvg.ReferenceLine do
 
   ## Examples
 
-      iex> SparklineSvg.ReferenceLine.median([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> points = [{1, 1}, {2, 2}, {3, 3}, {4, 1}]
+      iex> points = Enum.map(points, fn {x, y} -> %{computed: {x, y}} end)
+      iex> SparklineSvg.ReferenceLine.median(points)
       1.5
 
   """
 
   @doc since: "0.4.0"
-  @spec median(Core.points()) :: Core.y()
+  @spec median(Datapoint.t()) :: Core.y()
   def median(datapoints) do
     percentile(50).(datapoints)
   end
@@ -177,8 +188,10 @@ defmodule SparklineSvg.ReferenceLine do
 
   ## Examples
 
+      iex> points = [{1, 1}, {2, 2}, {3, 3}, {4, 1}]
+      iex> points = Enum.map(points, fn {x, y} -> %{computed: {x, y}} end)
       iex> percentile_99 = SparklineSvg.ReferenceLine.percentile(99)
-      iex> percentile_99.([{1, 1}, {2, 2}, {3, 3}, {4, 1}])
+      iex> percentile_99.(points)
       3
 
   """
@@ -193,11 +206,11 @@ defmodule SparklineSvg.ReferenceLine do
     end
   end
 
-  @spec find_interpolated_value(Core.points(), number()) :: Core.y()
+  @spec find_interpolated_value(Datapoint.t(), number()) :: Core.y()
   defp find_interpolated_value(_datapoints, index) when index < 1, do: 0
 
   defp find_interpolated_value(datapoints, index) do
-    sorted_values = Enum.map(datapoints, &elem(&1, 1)) |> Enum.sort()
+    sorted_values = Enum.map(datapoints, fn %{computed: {_x, y}} -> y end) |> Enum.sort()
 
     case Enum.drop(sorted_values, max(0, trunc(index) - 1)) do
       [a, b | _] -> a + (index - trunc(index)) * (b - a)

@@ -409,7 +409,7 @@ defmodule SparklineSvg do
           | list({NaiveDateTime.t(), NaiveDateTime.t()})
 
   @typedoc "The type of reference line."
-  @type ref_line :: :max | :min | :avg | :median | (Core.points() -> Core.y())
+  @type ref_line :: :max | :min | :avg | :median | (Datapoint.points() -> Core.y())
 
   @typedoc "Padding options for the chart."
   @type padding ::
@@ -433,8 +433,7 @@ defmodule SparklineSvg do
           )
 
   @typedoc "Keyword list of options for the dots of the chart."
-  @type dots_options ::
-          list({atom(), option_value() | (Core.points() -> option_value())})
+  @type dots_options :: list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the line of the chart."
   @type line_options :: list({atom(), option_value()})
@@ -446,8 +445,7 @@ defmodule SparklineSvg do
   @type marker_options :: list({atom(), option_value()})
 
   @typedoc "Keyword list of options for a reference line."
-  @type ref_line_options ::
-          list({atom(), option_value() | (Core.points() -> option_value())})
+  @type ref_line_options :: list({atom(), option_value() | (Core.points() -> option_value())})
 
   @typedoc "Keyword list of options for the x window."
   @type window_options :: list({:min, :auto | x()} | {:max, :auto | x()})
@@ -469,7 +467,7 @@ defmodule SparklineSvg do
 
   @typedoc false
   @type t :: %__MODULE__{
-          datapoints: datapoints(),
+          datapoints: datapoints() | Datapoint.points(),
           options: opts(),
           markers: list(Marker.t()),
           ref_lines: ref_lines(),
