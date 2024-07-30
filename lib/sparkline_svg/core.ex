@@ -11,7 +11,7 @@ defmodule SparklineSvg.Core do
   @typedoc false
   @typep min_max :: {number(), number()}
 
-  @typedoc "Internal representation of a x value of a point"
+  @typedoc "Internal representation of an x value of a point"
   @type x :: number()
 
   @typedoc "Internal representation of a y value of a point"
@@ -105,7 +105,12 @@ defmodule SparklineSvg.Core do
     end)
   end
 
-  @spec calc_resize_ref_lines(SparklineSvg.ref_lines(), points(), min_max(), SparklineSvg.opts()) ::
+  @spec calc_resize_ref_lines(
+          SparklineSvg.ref_lines(),
+          Datapoint.points(),
+          min_max(),
+          SparklineSvg.opts()
+        ) ::
           SparklineSvg.ref_lines()
   defp calc_resize_ref_lines(ref_lines, datapoints, min_max_y, options) do
     ref_lines

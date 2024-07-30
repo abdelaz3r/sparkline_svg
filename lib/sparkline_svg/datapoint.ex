@@ -1,16 +1,17 @@
 defmodule SparklineSvg.Datapoint do
   @moduledoc false
 
-  alias SparklineSvg.Type
+  alias SparklineSvg.Core
   alias SparklineSvg.Datapoint
+  alias SparklineSvg.Type
 
   @typedoc false
   @type points :: list(Datapoint.t())
 
   @typedoc false
   @type t :: %Datapoint{
-          source: SparklineSvg.datapoints(),
-          computed: points()
+          source: Core.point(),
+          computed: Core.point()
         }
   @enforce_keys [:source, :computed]
   defstruct [:source, :computed]

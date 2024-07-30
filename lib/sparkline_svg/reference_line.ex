@@ -64,7 +64,7 @@ defmodule SparklineSvg.ReferenceLine do
   alias SparklineSvg.ReferenceLine
 
   @typedoc "A reference line function."
-  @type ref_line_function :: (Datapoint.t() -> Core.y())
+  @type ref_line_function :: (Datapoint.points() -> Core.y())
 
   @typedoc false
   @type t :: %ReferenceLine{
@@ -177,7 +177,7 @@ defmodule SparklineSvg.ReferenceLine do
   """
 
   @doc since: "0.4.0"
-  @spec median(Datapoint.t()) :: Core.y()
+  @spec median(Datapoint.points()) :: Core.y()
   def median(datapoints) do
     percentile(50).(datapoints)
   end
@@ -207,6 +207,7 @@ defmodule SparklineSvg.ReferenceLine do
   end
 
   @spec find_interpolated_value(Datapoint.t(), number()) :: Core.y()
+  @spec find_interpolated_value(Datapoint.points(), number()) :: Core.y()
   defp find_interpolated_value(_datapoints, index) when index < 1, do: 0
 
   defp find_interpolated_value(datapoints, index) do
